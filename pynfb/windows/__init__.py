@@ -8,8 +8,8 @@ from PyQt4 import QtGui, QtCore
 from PyQt4.QtCore import pyqtSignal
 from expyriment import control, design
 
-from pynfb.brain import SourceSpaceRecontructor
-from pynfb.brain import SourceSpaceWidget
+from pynfb.brain.brain import SourceSpaceRecontructor
+from pynfb.brain.brain import SourceSpaceWidget
 from pynfb.helpers.dc_blocker import DCBlocker
 from pynfb.protocols.widgets import ProtocolWidget
 from pynfb.widgets.helpers import ch_names_to_2d_pos
