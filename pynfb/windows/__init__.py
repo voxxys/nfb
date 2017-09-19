@@ -8,8 +8,8 @@ from PyQt4 import QtGui, QtCore
 from PyQt4.QtCore import pyqtSignal
 from expyriment import control, design
 
-from pynfb.brain.brain import SourceSpaceRecontructor
-from pynfb.brain.brain import SourceSpaceWidget
+from pynfb.brain import SourceSpaceRecontructor
+from pynfb.brain import SourceSpaceWidget
 from pynfb.helpers.dc_blocker import DCBlocker
 from pynfb.protocols.widgets import ProtocolWidget
 from pynfb.widgets.helpers import ch_names_to_2d_pos
@@ -386,3 +386,9 @@ class SourceSpaceWindow(SecondaryWindow):
 
     def update_protocol_state(self, chunk):
         self.current_protocol.update_state(chunk)
+
+    def __init__(self, parent, current_protocol, **kwargs):
+        super().__init__(parent, current_protocol, **kwargs)
+        # painter_settings = self.current_protocol.widget_painter.settings
+        # self.painter_settings_widget = painter_settings.create_widget()
+        # self.centralWidget().layout().addWidget(self.painter_settings_widget)

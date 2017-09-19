@@ -6,8 +6,9 @@ import numpy as np
 from matplotlib import cm
 from pyqtgraph import opengl as gl
 
-from pynfb.protocols import Protocol
-from pynfb.protocols.widgets import Painter
+from ..protocols import Protocol
+from ..protocols.widgets import Painter
+from .settings import SourceSpaceWidgetPainterSettings
 
 
 class SourceSpaceRecontructor(Protocol):
@@ -125,6 +126,7 @@ class SourceSpaceWidgetPainter(Painter):
 
     def __init__(self, source_space_reconstructor, show_reward=False, params=None):
         super().__init__(show_reward=show_reward)
+        self.settings = SourceSpaceWidgetPainterSettings()
         self.protocol = source_space_reconstructor
         self.chunk_to_sources = source_space_reconstructor.chunk_to_sources
 
@@ -187,3 +189,7 @@ class SourceSpaceWidgetPainter(Painter):
         vmin = vmin or np.min(values)
         vmax = vmax or np.max(values)
         return (values - vmin) / vmax
+
+
+if __name__ == '__main__':
+    from pynfb.windows import SourceSpaceWindow
