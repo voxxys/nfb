@@ -41,6 +41,8 @@ class SourceSpaceWidgetPainterSettings(pTypes.GroupParameter):
     def create_widget(self):
         self.widget = ParameterTree(showHeader=False)
         self.widget.setParameters(self, showTop=True)
+        PREFERRED = QtGui.QSizePolicy.Preferred
+        self.widget.setSizePolicy(PREFERRED, PREFERRED)
         return self.widget
 
 

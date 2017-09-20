@@ -389,6 +389,7 @@ class SourceSpaceWindow(SecondaryWindow):
 
     def __init__(self, parent, current_protocol, **kwargs):
         super().__init__(parent, current_protocol, **kwargs)
-        # painter_settings = self.current_protocol.widget_painter.settings
-        # self.painter_settings_widget = painter_settings.create_widget()
-        # self.centralWidget().layout().addWidget(self.painter_settings_widget)
+        self.settings = self.current_protocol.widget_painter.settings
+        self.settings_widget = self.settings.create_widget()
+        self.centralWidget().layout().addWidget(self.settings_widget)
+        self.adjustSize()

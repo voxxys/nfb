@@ -91,6 +91,7 @@ class SourceSpaceWidget(gl.GLViewWidget):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.reward = None
+        self.setMinimumSize(400, 400)
         self.clear_all()
 
     def clear_all(self):

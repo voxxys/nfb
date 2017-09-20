@@ -1,2 +1,2 @@
-from .brain import SourceSpaceRecontructor, SourceSpaceWidget, SourceSpaceWidgetPainter, SourceSpaceWidgetWithSettings
+from .brain import SourceSpaceRecontructor, SourceSpaceWidget, SourceSpaceWidgetPainter
 from .settings import SourceSpaceWidgetPainterSettings
