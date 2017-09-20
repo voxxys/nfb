@@ -8,13 +8,13 @@ from PyQt4 import QtGui, QtCore
 from PyQt4.QtCore import pyqtSignal
 from expyriment import control, design
 
-from pynfb.brain import SourceSpaceRecontructor
-from pynfb.brain import SourceSpaceWidget
-from pynfb.helpers.dc_blocker import DCBlocker
-from pynfb.protocols.widgets import ProtocolWidget
-from pynfb.widgets.helpers import ch_names_to_2d_pos
-from pynfb.widgets.signals_painter import RawViewer
-from pynfb.widgets.topography import TopomapWidget
+from ..brain import SourceSpaceRecontructor, SourceSpaceWidget
+# from ..brain import SourceSpaceWidgetWithSettings
+from ..helpers.dc_blocker import DCBlocker
+from ..protocols.widgets import ProtocolWidget
+from ..widgets.helpers import ch_names_to_2d_pos
+from ..widgets.signals_painter import RawViewer
+from ..widgets.topography import TopomapWidget
 
 pg.setConfigOptions(antialias=True)
 
