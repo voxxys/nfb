@@ -190,7 +190,3 @@ class SourceSpaceWidgetPainter(Painter):
         vmin = vmin or np.min(values)
         vmax = vmax or np.max(values)
         return (values - vmin) / vmax
-
-
-if __name__ == '__main__':
-    from pynfb.windows import SourceSpaceWindow
