@@ -1,5 +1,5 @@
 import numpy as np
-from pynfb.widgets.helpers import validate_ch_names
+from ..widgets.helpers import validate_ch_names
 
 
 

@@ -4,10 +4,10 @@ from multiprocessing import Process, Pool
 import numpy as np
 from PyQt4 import QtCore
 from itertools import zip_longest, chain
-from pynfb.postprocessing.plot_all_fb_bars import plot_fb_dynamic
-from pynfb.widgets.channel_trouble import ChannelTroubleWarning
-from pynfb.widgets.helpers import WaitMessage
-from pynfb.outlets.signals_outlet import SignalsOutlet
+from .postprocessing.plot_all_fb_bars import plot_fb_dynamic
+from .widgets.channel_trouble import ChannelTroubleWarning
+from .widgets.helpers import WaitMessage
+from .outlets.signals_outlet import SignalsOutlet
 from .generators import run_eeg_sim
 from .inlets.ftbuffer_inlet import FieldTripBufferInlet
 from .inlets.lsl_inlet import LSLInlet
