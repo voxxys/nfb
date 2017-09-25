@@ -107,8 +107,8 @@ class SourceSpaceWidget(gl.GLViewWidget):
 
 
 class SourceSpaceWidgetPainter(Painter):
-    COLORMAP_LIMITS_GLOBAL = 'global'
-    COLORMAP_LIMITS_LOCAL = 'local'
+    # Settings constants
+
     COLORMAP_BUFFER_LENGTH_DEFAULT = 40000  # samples, if colormap limits are set to 'global' then 'global' means last
     # COLORMAP_BUFFER_LENGTH_DEFAULT samples
 
@@ -137,10 +137,10 @@ class SourceSpaceWidgetPainter(Painter):
 
         self.colormap = cm.viridis
         if params is None:
-            self.colormap_limits = self.COLORMAP_LIMITS_GLOBAL
+            self.colormap_limits = self.settings.COLORMAP_LIMITS_GLOBAL
             self.colormap_buffer_length = self.COLORMAP_BUFFER_LENGTH_DEFAULT
 
-        if self.colormap_limits == self.COLORMAP_LIMITS_GLOBAL:
+        if self.colormap_limits == self.settings.COLORMAP_LIMITS_GLOBAL:
             self.range_buffer = self.RangeBuffer(self.colormap_buffer_length)
 
     def prepare_widget(self, widget):
