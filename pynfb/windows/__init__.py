@@ -316,7 +316,7 @@ class SecondaryWindow(QtGui.QMainWindow):
         self.current_protocol.widget_painter.prepare_widget(self.figure)
 
     def closeEvent(self, event):
-        if self.parent() is not None and \
+        if self.parent() is None or \
                 (self.parent().experiment.is_finished or self.parent()._subject_window_want_to_close):
             event.accept()
         else:
