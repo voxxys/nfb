@@ -68,3 +68,8 @@ class SourceSpaceWidgetPainterSettings(MyGroupParameter):
         colormap.mode.sigValueChanged.connect(type_changed)
 
         self.addChild(colormap)
+
+    def update_limits(self, lower_limit, upper_limit):
+        self.colormap.lower_limit.setValue(lower_limit)
+        self.colormap.upper_limit.setValue(upper_limit)
+

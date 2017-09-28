@@ -8,7 +8,7 @@ from pyqtgraph import opengl as gl
 
 from ..protocols import Protocol
 from ..protocols.widgets import Painter
-from .settings import SourceSpaceWidgetPainterSettings
+from .settings import SourceSpaceWidgetPainterSettings as PainterSettings
 
 
 class SourceSpaceRecontructor(Protocol):
@@ -110,7 +110,7 @@ class SourceSpaceWidgetPainter(Painter):
     # Settings constants
 
     COLORMAP_BUFFER_LENGTH_DEFAULT = 40000  # samples, if colormap limits are set to 'global' then 'global' means last
-    # COLORMAP_BUFFER_LENGTH_DEFAULT samples
+                                            # COLORMAP_BUFFER_LENGTH_DEFAULT samples
 
     class RangeBuffer:
         def __init__(self, buffer_length):
@@ -125,9 +125,15 @@ class SourceSpaceWidgetPainter(Painter):
             self.max_buffer.extend(np.max(sources, axis=1))
             self.vmax = max(self.max_buffer)
 
+        def limits(self):
+            return self.vmin, self.vmax
+
     def __init__(self, source_space_reconstructor, show_reward=False, params=None):
         super().__init__(show_reward=show_reward)
-        self.settings = SourceSpaceWidgetPainterSettings()
+
+        self.settings = PainterSettings()
+        self.connect_settings()
+
         self.protocol = source_space_reconstructor
         self.chunk_to_sources = source_space_reconstructor.chunk_to_sources
 
@@ -136,12 +142,12 @@ class SourceSpaceWidgetPainter(Painter):
         self.cortex_mesh_item = None
 
         self.colormap = cm.viridis
-        if params is None:
-            self.colormap_limits = self.settings.COLORMAP_LIMITS_GLOBAL
-            self.colormap_buffer_length = self.COLORMAP_BUFFER_LENGTH_DEFAULT
+        self.colormap_mode = self.settings.colormap.mode.value()
+        self.lock_current_limits = self.settings.colormap.lock_current_limits.value()
+        self.vmin, self.vmax = None, None
 
-        if self.colormap_limits == self.settings.COLORMAP_LIMITS_GLOBAL:
-            self.range_buffer = self.RangeBuffer(self.colormap_buffer_length)
+        self.colormap_buffer_length = self.COLORMAP_BUFFER_LENGTH_DEFAULT
+        self.range_buffer = self.RangeBuffer(self.colormap_buffer_length)
 
     def prepare_widget(self, widget):
         super().prepare_widget(widget)
@@ -168,14 +174,19 @@ class SourceSpaceWidgetPainter(Painter):
     def redraw_state(self, chunk):
         sources = self.chunk_to_sources(chunk)
         last_sources = sources[-1, :]
-        if self.colormap_limits == self.COLORMAP_LIMITS_LOCAL:
-            vmin = None
-            vmax = None
-        elif self.colormap_limits == self.COLORMAP_LIMITS_GLOBAL:
-            self.range_buffer.update(sources)
-            vmin = self.range_buffer.vmin
-            vmax = self.range_buffer.vmax
-        sources_normalized = self.normalize_to_01(last_sources, vmin=vmin, vmax=vmax)
+        self.range_buffer.update(sources)
+
+        if self.colormap_mode == PainterSettings.COLORMAP_LIMITS_LOCAL:
+            self.set_limits(np.min(last_sources), np.max(last_sources))
+            self.settings.update_limits(self.vmin, self.vmax)
+        elif self.colormap_mode == PainterSettings.COLORMAP_LIMITS_GLOBAL and not self.lock_current_limits:
+            self.set_limits(*self.range_buffer.limits())
+            self.settings.update_limits(self.vmin, self.vmax)
+        elif self.colormap_mode == PainterSettings.COLORMAP_LIMITS_MANUAL:
+            # In this case vmin, vmax are set by a slot connected to the changes from settings widget
+            pass
+
+        sources_normalized = self.normalize_to_01(last_sources)
         colors = self.colormap(sources_normalized)
         self.update_mesh_colors(colors)
 
@@ -185,8 +196,29 @@ class SourceSpaceWidgetPainter(Painter):
         self.cortex_mesh_data._vertexColorsIndexedByFaces = None
         self.cortex_mesh_item.meshDataChanged()
 
-    @staticmethod
-    def normalize_to_01(values, vmin=None, vmax=None):
-        vmin = vmin or np.min(values)
-        vmax = vmax or np.max(values)
-        return (values - vmin) / vmax
+    def normalize_to_01(self, values):
+        return (values - self.vmin) / (self.vmax - self.vmin)
+
+    def set_limits(self, vmin, vmax):
+        self.vmin = vmin
+        self.vmax = vmax
+
+
+    def mode_changed(self, mode_object, mode):
+        self.colormap_mode = mode
+        if mode == PainterSettings.COLORMAP_LIMITS_LOCAL:
+            self.settings.colormap.lower_limit.setReadonly(True)
+            self.settings.colormap.upper_limit.setReadonly(True)
+            self.settings.colormap.lock_current_limits.setReadonly(True)
+        elif mode == PainterSettings.COLORMAP_LIMITS_GLOBAL:
+            self.settings.colormap.lower_limit.setReadonly(True)
+            self.settings.colormap.upper_limit.setReadonly(True)
+            self.settings.colormap.lock_current_limits.setReadonly(False)
+        elif mode == PainterSettings.COLORMAP_LIMITS_MANUAL:
+            self.settings.colormap.lower_limit.setReadonly(False)
+            self.settings.colormap.upper_limit.setReadonly(False)
+            self.settings.colormap.lock_current_limits.setReadonly(True)
+
+    def connect_settings(self):
+        cmap_settings = self.settings.colormap
+        cmap_settings.mode.sigValueChanged.connect(self.mode_changed)
