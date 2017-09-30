@@ -176,12 +176,11 @@ class SourceSpaceWidgetPainter(Painter):
         last_sources = sources[-1, :]
         self.range_buffer.update(sources)
 
+        # settings.update_limits will result in sigValueChanged which will trigger update of self.vmin and self.vmax
         if self.colormap_mode == PainterSettings.COLORMAP_LIMITS_LOCAL:
-            self.set_limits(np.min(last_sources), np.max(last_sources))
-            self.settings.update_limits(self.vmin, self.vmax)
+            self.settings.update_limits(np.min(last_sources), np.max(last_sources))
         elif self.colormap_mode == PainterSettings.COLORMAP_LIMITS_GLOBAL and not self.lock_current_limits:
-            self.set_limits(*self.range_buffer.limits())
-            self.settings.update_limits(self.vmin, self.vmax)
+            self.settings.update_limits(*self.range_buffer.limits())
         elif self.colormap_mode == PainterSettings.COLORMAP_LIMITS_MANUAL:
             # In this case vmin, vmax are set by a slot connected to the changes from settings widget
             pass
@@ -203,8 +202,7 @@ class SourceSpaceWidgetPainter(Painter):
         self.vmin = vmin
         self.vmax = vmax
 
-
-    def mode_changed(self, mode_object, mode):
+    def mode_changed(self, param, mode):
         self.colormap_mode = mode
         if mode == PainterSettings.COLORMAP_LIMITS_LOCAL:
             self.settings.colormap.lower_limit.setReadonly(True)
@@ -219,6 +217,14 @@ class SourceSpaceWidgetPainter(Painter):
             self.settings.colormap.upper_limit.setReadonly(False)
             self.settings.colormap.lock_current_limits.setReadonly(True)
 
+    def lower_limit_changed(self, param, vmin):
+        self.vmin = vmin
+
+    def upper_limit_changed(self, param, vmax):
+        self.vmax = vmax
+
     def connect_settings(self):
         cmap_settings = self.settings.colormap
         cmap_settings.mode.sigValueChanged.connect(self.mode_changed)
+        cmap_settings.lower_limit.sigValueChanged.connect(self.lower_limit_changed)
+        cmap_settings.upper_limit.sigValueChanged.connect(self.upper_limit_changed)
