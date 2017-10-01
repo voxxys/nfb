@@ -19,7 +19,6 @@ class SourceSpaceRecontructor(Protocol):
         kwargs['ssd_in_the_end'] = True
         super().__init__(signals, **kwargs)
         inverse_operator = self.make_inverse_operator()
-        self.mesh_data = self.get_mesh_data_from_inverse_operator(inverse_operator)
         self._forward_model_matrix = self._assemble_forward_model_matrix(inverse_operator)
         self.widget_painter = SourceSpaceWidgetPainter(self)
 
@@ -53,32 +52,6 @@ class SourceSpaceRecontructor(Protocol):
         data_path = sample.data_path()
         filename_inv = data_path + '/MEG/sample/sample_audvis-meg-oct-6-meg-inv.fif'
         return read_inverse_operator(filename_inv, verbose='ERROR')
-
-    def get_mesh_data_from_inverse_operator(self, inverse_operator):
-        # Creates pyqtgraph.opengl.MeshData instance to store the cortical mesh used to create the inverse operator.
-
-        # mne's inverse operator is a dict with the geometry information under the key 'src'.
-        # inverse_operator['src'] is a list two items each of which corresponds to one hemisphere.
-        left_hemi, right_hemi = inverse_operator['src']
-
-        # Each hemisphere is represented by a dict that contains the list of all vertices from the original mesh
-        # representaion of that representation (with default options in FreeSurfer that is ~150K vertices). These are
-        # stored under the key 'rr'.
-
-        # Only a small subset of these vertices was most likely during the construction of the inverse operator. The
-        # mesh containing only the used vertices is represented by an array of faces sotred under the 'use_tris' key.
-        # This submesh still contains some extra vertices so that it is still a manifold.
-
-        # Each face is a row with the indices of the vertices of that face. The indexing is into the 'rr' array
-        # containing all the vertices.
-
-        # Let's now combine two meshes into one. Also save the indexes of the used vertices into vertex_idx property
-        vertexes = np.r_[left_hemi['rr'], right_hemi['rr']]
-        lh_vertex_cnt = left_hemi['rr'].shape[0]
-        faces = np.r_[left_hemi['use_tris'], lh_vertex_cnt + right_hemi['use_tris']]
-        self.vertex_idx = np.r_[left_hemi['vertno'], lh_vertex_cnt + right_hemi['vertno']]
-
-        return gl.MeshData(vertexes=vertexes, faces=faces)
 
     def update_state(self, chunk):
         self.widget_painter.redraw_state(chunk)
@@ -139,7 +112,6 @@ class SourceSpaceWidgetPainter(Painter):
         self.chunk_to_sources = source_space_reconstructor.chunk_to_sources
 
         self.cortex_mesh_data = None
-        self.vertex_idx = None
         self.cortex_mesh_item = None
 
         self.brain_colormap = cm.Greys
@@ -154,14 +126,10 @@ class SourceSpaceWidgetPainter(Painter):
     def prepare_widget(self, widget):
         super().prepare_widget(widget)
 
-        self.cortex_mesh_data = self.protocol.mesh_data
-        self.vertex_idx = self.protocol.vertex_idx
-
-        # We will only be assigning colors to a subset of vertexes used for forward/inverse modelling. First, we need to
-        # assign an initial color to all the vertices.
+        self.cortex_mesh_data = self.read_mesh()
         curvature = self.read_curvature()
         # Concave regions get the color 2/3 into the colormap and convex - 1/3
-        brain_colors = self.brain_colormap((curvature > 0)/3 + 1/3)
+        brain_colors = self.brain_colormap((curvature > 0) / 3 + 1/3)
         self.cortex_mesh_data.setVertexColors(brain_colors)
 
         # Set the camera at twice the size of the mesh along the widest dimension
@@ -173,9 +141,33 @@ class SourceSpaceWidgetPainter(Painter):
 
         print('Widget prepared')
 
-    def read_curvature(self):
+    def surfaces_dir(self):
         data_path = sample.data_path()
-        curv_paths = [os.path.join(data_path, "subjects", "sample", "surf",
+        return os.path.join(data_path, "subjects", "sample", "surf")
+
+    def read_mesh(self, cortex_type='inflated'):
+        surf_paths = [os.path.join(self.surfaces_dir(), '{}.{}'.format(h, cortex_type))
+                      for h in ('lh', 'rh')]
+        lh_mesh, rh_mesh = [nib.freesurfer.read_geometry(surf_path) for surf_path in surf_paths]
+        lh_vertexes, lh_faces = lh_mesh
+        rh_vertexes, rh_faces = rh_mesh
+
+        # Move all the vertexes so that the lh has x (L-R) <= 0 and rh - >= 0
+        lh_vertexes[:, 0] -= np.max(lh_vertexes[:, 0])
+        rh_vertexes[:, 0] -= np.min(rh_vertexes[:, 0])
+
+        # Combine two meshes
+        vertexes = np.r_[lh_vertexes, rh_vertexes]
+        lh_vertex_cnt = lh_vertexes.shape[0]
+        faces = np.r_[lh_faces, lh_vertex_cnt + rh_faces]
+
+        # Move the mesh so that the center of the brain is at (0, 0, 0) (kinda)
+        vertexes[:, 1:2] -= np.mean(vertexes[:, 1:2])
+
+        return gl.MeshData(vertexes=vertexes, faces=faces)
+
+    def read_curvature(self):
+        curv_paths = [os.path.join(self.surfaces_dir(),
                                    "{}.curv".format(h)) for h in ('lh', 'rh')]
         curvs = [nib.freesurfer.read_morph_data(curv_path) for curv_path in curv_paths]
         return np.concatenate(curvs)
