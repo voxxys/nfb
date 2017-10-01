@@ -1,10 +1,13 @@
 from collections import deque
 from warnings import warn
+import os
 
 import mne
+from mne.datasets import sample
 import numpy as np
 from matplotlib import cm
 from pyqtgraph import opengl as gl
+import nibabel as nib
 
 from ..protocols import Protocol
 from ..protocols.widgets import Painter
@@ -22,8 +25,6 @@ class SourceSpaceRecontructor(Protocol):
 
     @staticmethod
     def _assemble_forward_model_matrix(inverse_operator):
-        from mne.datasets import sample
-
         warn('Currently info is read from the raw file. TODO: change to getting it from the stream')
         data_path = sample.data_path()
         fname_raw = data_path + '/MEG/sample/sample_audvis_raw.fif'
@@ -158,9 +159,9 @@ class SourceSpaceWidgetPainter(Painter):
 
         # We will only be assigning colors to a subset of vertexes used for forward/inverse modelling. First, we need to
         # assign an initial color to all the vertices.
-        total_vertex_cnt = self.cortex_mesh_data.vertexes().shape[0]
-        brain_color = self.brain_colormap(0.5)
-        brain_colors = np.tile(brain_color, (total_vertex_cnt, 1))
+        curvature = self.read_curvature()
+        # Concave regions get the color 2/3 into the colormap and convex - 1/3
+        brain_colors = self.brain_colormap((curvature > 0)/3 + 1/3)
         self.cortex_mesh_data.setVertexColors(brain_colors)
 
         # Set the camera at twice the size of the mesh along the widest dimension
@@ -171,6 +172,13 @@ class SourceSpaceWidgetPainter(Painter):
         widget.addItem(self.cortex_mesh_item)
 
         print('Widget prepared')
+
+    def read_curvature(self):
+        data_path = sample.data_path()
+        curv_paths = [os.path.join(data_path, "subjects", "sample", "surf",
+                                   "{}.curv".format(h)) for h in ('lh', 'rh')]
+        curvs = [nib.freesurfer.read_morph_data(curv_path) for curv_path in curv_paths]
+        return np.concatenate(curvs)
 
     def redraw_state(self, chunk):
         sources = self.chunk_to_sources(chunk)
