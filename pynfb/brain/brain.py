@@ -141,7 +141,8 @@ class SourceSpaceWidgetPainter(Painter):
         self.vertex_idx = None
         self.cortex_mesh_item = None
 
-        self.colormap = cm.viridis
+        self.brain_colormap = cm.Greys
+        self.data_colormap = cm.viridis
         self.colormap_mode = self.settings.colormap.mode.value()
         self.lock_current_limits = self.settings.colormap.lock_current_limits.value()
         self.vmin, self.vmax = None, None
@@ -158,9 +159,9 @@ class SourceSpaceWidgetPainter(Painter):
         # We will only be assigning colors to a subset of vertexes used for forward/inverse modelling. First, we need to
         # assign an initial color to all the vertices.
         total_vertex_cnt = self.cortex_mesh_data.vertexes().shape[0]
-        initial_color = self.colormap(0.5)
-        initial_colors = np.tile(initial_color, (total_vertex_cnt, 1))
-        self.cortex_mesh_data.setVertexColors(initial_colors)
+        brain_color = self.brain_colormap(0.5)
+        brain_colors = np.tile(brain_color, (total_vertex_cnt, 1))
+        self.cortex_mesh_data.setVertexColors(brain_colors)
 
         # Set the camera at twice the size of the mesh along the widest dimension
         max_ptp = max(np.ptp(self.cortex_mesh_data.vertexes(), axis=0))
