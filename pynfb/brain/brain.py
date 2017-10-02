@@ -164,6 +164,9 @@ class SourceSpaceWidgetPainter(Painter):
         # Move the mesh so that the center of the brain is at (0, 0, 0) (kinda)
         vertexes[:, 1:2] -= np.mean(vertexes[:, 1:2])
 
+        # Swap two columns in faces so that the normals face outwards
+        faces[:, [0, 1]] = faces[:, [1, 0]]
+
         return gl.MeshData(vertexes=vertexes, faces=faces)
 
     def read_curvature(self):
