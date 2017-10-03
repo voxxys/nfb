@@ -46,7 +46,7 @@ class SourceSpaceWidgetPainterSettings(MyGroupParameter):
             {'name': 'Lock current limits', 'type': 'bool', 'value': False, },
             {'name': 'Lower limit', 'type': 'float', 'readonly': True},
             {'name': 'Upper limit', 'type': 'float', 'readonly': True},
-            {'name': 'Threshold', 'type': 'float', 'readonly': True},
+            {'name': 'Threshold', 'type': 'int', 'readonly': True, 'value': 90},
         ]
         colormap = MyGroupParameter(name='Colormap', children=cmap_children)
 
