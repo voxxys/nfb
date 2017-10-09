@@ -25,7 +25,7 @@ class FixedStreamInlet(StreamInlet):
 
 
 class LSLInlet:
-    def __init__(self, name=LSL_STREAM_NAMES[2], only_this_host=False):
+    def __init__(self, name=LSL_STREAM_NAMES[2], only_this_host=True):
         if not only_this_host:
             streams = resolve_byprop('name', name, timeout=LSL_RESOLVE_TIMEOUT)
         else:
