@@ -1,4 +1,5 @@
 from collections import deque
+import itertools
 from warnings import warn
 import os
 
@@ -93,9 +94,11 @@ class SourceSpaceWidget(gl.GLViewWidget):
 
 
 class RangeBuffer:
-    def __init__(self, max_buffer_length):
-        self.max_buffer = deque(maxlen=max_buffer_length)
-        self.current_buffer_length = max_buffer_length
+    COLORMAP_BUFFER_LENGTH_MAX = PainterSettings.COLORMAP_BUFFER_LENGTH_MAX
+
+    def __init__(self, buffer_length):
+        self.max_buffer = deque(maxlen=self.COLORMAP_BUFFER_LENGTH_MAX)
+        self.current_buffer_length = buffer_length
         self.vmax = None
         self.robust_max = SourceSpaceWidgetPainter.robust_max
 
@@ -103,20 +106,26 @@ class RangeBuffer:
         if take_abs:
             sources = np.abs(sources)
         self.max_buffer.extend(self.robust_max(sources))
-        self.vmax = max(self.max_buffer)
+        self.vmax = max(self.head())
+
+    def head(self):
+        # Returns last current_buffer_length from max_buffer
+        stop = len(self.max_buffer)
+        start = max(stop - self.current_buffer_length, 0)
+        return itertools.islice(self.max_buffer, start, stop)
+
+    def buffer_length_changed(self, param, new_buffer_length):
+        # qt slot
+        self.current_buffer_length = int(new_buffer_length)
+
 
 class SourceSpaceWidgetPainter(Painter):
-    # Settings constants
-
-    COLORMAP_BUFFER_LENGTH_MAX = 6000  # samples, if colormap limits are set to 'global' then 'global' means last
-                                        # COLORMAP_BUFFER_LENGTH_DEFAULT samples
     ROBUST_PCT = 95 # Perecntage to use in robust_max
 
     def __init__(self, source_space_reconstructor, show_reward=False, params=None):
         super().__init__(show_reward=show_reward)
 
         self.settings = PainterSettings()
-        self.connect_settings()
 
         self.protocol = source_space_reconstructor
         self.source_vertex_idx = self.protocol.source_vertex_idx
@@ -126,17 +135,19 @@ class SourceSpaceWidgetPainter(Painter):
         self.cortex_mesh_data = None
         self.cortex_mesh_item = None
         self.brain_colormap = cm.Greys
-        self.data_colormap = cm.seismic
+        self.data_colormap = cm.Reds
 
         self.colormap_mode = self.settings.colormap.mode.value()
         self.lock_current_limits = self.settings.colormap.lock_current_limits.value()
         self.vmax = None
 
-        self.colormap_buffer_length = self.COLORMAP_BUFFER_LENGTH_MAX
+        self.colormap_buffer_length = self.settings.colormap.buffer_length.value()
         self.colormap_threshold_pct = self.settings.colormap.threshold_pct.value()
         self.range_buffer = RangeBuffer(self.colormap_buffer_length)
 
         self.smoothing_matrix = self.read_smoothing_matrix()
+
+        self.connect_settings()
 
     def prepare_widget(self, widget):
         super().prepare_widget(widget)
@@ -251,6 +262,7 @@ class SourceSpaceWidgetPainter(Painter):
         cmap_settings.mode.sigValueChanged.connect(self.mode_changed)
         cmap_settings.upper_limit.sigValueChanged.connect(self.upper_limit_changed)
         cmap_settings.threshold_pct.sigValueChanged.connect(self.colormap_threshold_pct_changed)
+        cmap_settings.buffer_length.sigValueChanged.connect(self.range_buffer.buffer_length_changed)
 
     @staticmethod
     def read_smoothing_matrix():

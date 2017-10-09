@@ -34,6 +34,8 @@ class SourceSpaceWidgetPainterSettings(MyGroupParameter):
     COLORMAP_LIMITS_LOCAL = 'local'
     COLORMAP_LIMITS_MANUAL = 'manual'
     COLORMAP_LIMITS_MODES = [COLORMAP_LIMITS_GLOBAL, COLORMAP_LIMITS_MANUAL, COLORMAP_LIMITS_LOCAL]
+    COLORMAP_BUFFER_LENGTH_MAX = 40000
+    COLORMAP_BUFFER_LENGTH_DEFAULT = 6000
 
     def __init__(self):
         opts = {'name': 'Visualization settings', 'type': 'group', 'value': 'true'}
@@ -41,12 +43,14 @@ class SourceSpaceWidgetPainterSettings(MyGroupParameter):
 
         # Colormap options
         cmap_children = [
-            {'name': 'Mode', 'type': 'list',
-             'values': self.COLORMAP_LIMITS_MODES, 'value': 'global'},
+            {'name': 'Mode', 'type': 'list', 'values': self.COLORMAP_LIMITS_MODES, 'value': 'global'},
             {'name': 'Lock current limits', 'type': 'bool', 'value': False, },
+            {'name': 'Buffer length', 'type': 'int', 'value': self.COLORMAP_BUFFER_LENGTH_DEFAULT,
+                                      'limits': (0, self.COLORMAP_BUFFER_LENGTH_MAX)},
             {'name': 'Lower limit', 'type': 'float', 'readonly': True},
             {'name': 'Upper limit', 'type': 'float', 'readonly': True},
             {'name': 'Threshold pct', 'type': 'int', 'suffix': '%', 'readonly': False, 'limits': (0, 100), 'value': 50},
+
         ]
         colormap = MyGroupParameter(name='Colormap', children=cmap_children)
 
