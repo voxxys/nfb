@@ -7,7 +7,7 @@ from pynfb.io.xml_ import xml_file_to_params
 def main():
 
     app = QtGui.QApplication(sys.argv)
-    experiment = Experiment(app, xml_file_to_params('bci_default.xml'))
+    experiment = Experiment(app, xml_file_to_params(['bci_default.xml', 'bci_wrestling.xml'][1]))
     sys.exit(app.exec_())
 
 

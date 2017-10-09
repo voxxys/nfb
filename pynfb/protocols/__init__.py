@@ -127,6 +127,8 @@ class Protocol:
             # find and fit first bci signal:
             bci_signal = [signal for signal in self.signals if isinstance(signal, BCISignal)][0]
             bci_signal.fit_model(X, y)
+            from ..io.dumping import dump_object
+            dump_object(bci_signal, 'test_model.pkl')
 
         if self.ssd_in_the_end:
             signal_manager = SignalsSSDManager(self.signals, x, pos, channels_names, self, signals, protocols,

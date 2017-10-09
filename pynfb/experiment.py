@@ -338,7 +338,10 @@ class Experiment():
                                   for ind, signal in enumerate(self.params['vSignals']['CompositeSignal'])]
 
         # bci signals
-        self.bci_signals = [BCISignal(self.freq, channels_labels, signal['sSignalName'], ind)
+        from .io.dumping import load_object
+        #bci_signal = load_object('test_model.pkl')
+        bci_signal = None
+        self.bci_signals = [bci_signal or BCISignal(self.freq, channels_labels, signal['sSignalName'], ind)
                             for ind, signal in enumerate(self.params['vSignals']['DerivedSignal']) if signal['bBCIMode']]
 
         self.signals += self.composite_signals
