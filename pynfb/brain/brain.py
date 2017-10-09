@@ -108,7 +108,7 @@ class RangeBuffer:
 class SourceSpaceWidgetPainter(Painter):
     # Settings constants
 
-    COLORMAP_BUFFER_LENGTH_MAX = 40000  # samples, if colormap limits are set to 'global' then 'global' means last
+    COLORMAP_BUFFER_LENGTH_MAX = 6000  # samples, if colormap limits are set to 'global' then 'global' means last
                                         # COLORMAP_BUFFER_LENGTH_DEFAULT samples
     ROBUST_PCT = 95 # Perecntage to use in robust_max
 
@@ -243,10 +243,14 @@ class SourceSpaceWidgetPainter(Painter):
     def upper_limit_changed(self, param, vmax):
         self.vmax = vmax
 
+    def colormap_threshold_pct_changed(self, param, threshold_pct):
+        self.colormap_threshold_pct = threshold_pct
+
     def connect_settings(self):
         cmap_settings = self.settings.colormap
         cmap_settings.mode.sigValueChanged.connect(self.mode_changed)
         cmap_settings.upper_limit.sigValueChanged.connect(self.upper_limit_changed)
+        cmap_settings.threshold_pct.sigValueChanged.connect(self.colormap_threshold_pct_changed)
 
     @staticmethod
     def read_smoothing_matrix():
