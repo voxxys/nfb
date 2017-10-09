@@ -1,6 +1,6 @@
 from pyqtgraph.Qt import QtGui
 import pyqtgraph.parametertree.parameterTypes as pTypes
-from pyqtgraph.parametertree import Parameter, ParameterTree
+from pyqtgraph.parametertree import ParameterTree
 
 class MyGroupParameter(pTypes.GroupParameter):
     def addChild(self, child, *args, **kwargs):
@@ -11,7 +11,7 @@ class MyGroupParameter(pTypes.GroupParameter):
             child_name = child['name']
 
         attr_name = '_'.join(child_name.lower().split(' '))
-        # Can't use hasattr because Parameter.__getattr__ looks for attr in self.names which is a dict if children's
+        # Can't use hasattr because Parameter.__getattr__ looks for attr in self.names which is a dict of children's
         # names
         if attr_name in self.__dict__:
             msg = "Can't add child '{}' to '{}' because it already has an attribute named '{}'".format(
@@ -46,7 +46,7 @@ class SourceSpaceWidgetPainterSettings(MyGroupParameter):
             {'name': 'Lock current limits', 'type': 'bool', 'value': False, },
             {'name': 'Lower limit', 'type': 'float', 'readonly': True},
             {'name': 'Upper limit', 'type': 'float', 'readonly': True},
-            {'name': 'Threshold', 'type': 'int', 'readonly': True, 'value': 90},
+            {'name': 'Threshold pct', 'type': 'int', 'readonly': True, 'value': 90},
         ]
         colormap = MyGroupParameter(name='Colormap', children=cmap_children)
 
@@ -68,8 +68,4 @@ class SourceSpaceWidgetPainterSettings(MyGroupParameter):
         colormap.mode.sigValueChanged.connect(type_changed)
 
         self.addChild(colormap)
-
-    def update_limits(self, lower_limit, upper_limit):
-        self.colormap.lower_limit.setValue(lower_limit)
-        self.colormap.upper_limit.setValue(upper_limit)
 

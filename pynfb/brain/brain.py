@@ -92,37 +92,25 @@ class SourceSpaceWidget(gl.GLViewWidget):
         pass
 
 
+class RangeBuffer:
+    def __init__(self, max_buffer_length):
+        self.max_buffer = deque(maxlen=max_buffer_length)
+        self.current_buffer_length = max_buffer_length
+        self.vmax = None
+        self.robust_max = SourceSpaceWidgetPainter.robust_max
+
+    def update(self, sources, take_abs=True):
+        if take_abs:
+            sources = np.abs(sources)
+        self.max_buffer.extend(self.robust_max(sources))
+        self.vmax = max(self.max_buffer)
+
 class SourceSpaceWidgetPainter(Painter):
     # Settings constants
 
-    COLORMAP_BUFFER_LENGTH_DEFAULT = 40000  # samples, if colormap limits are set to 'global' then 'global' means last
-                                            # COLORMAP_BUFFER_LENGTH_DEFAULT samples
-
-    class RangeBuffer:
-        def __init__(self, buffer_length, threshold):
-            self.pcts = [(100 - threshold) / 2, (100 + threshold) / 2]
-
-            self.min_buffer = deque(maxlen=buffer_length)
-            self.max_buffer = deque(maxlen=buffer_length)
-            self.pctl_buffers = [deque(maxlen=buffer_length) for pct in self.pcts]
-            self.vmin = None
-            self.vmax = None
-            self.pctls = None
-
-        def update(self, sources):
-            self.min_buffer.extend(np.min(sources, axis=1))
-            self.vmin = min(self.min_buffer)
-
-            self.max_buffer.extend(np.max(sources, axis=1))
-            self.vmax = max(self.max_buffer)
-
-            for pctls, pctl_buffer in zip(np.percentile(sources, self.pcts, axis=1),
-                                              self.pctl_buffers):
-                pctl_buffer.extend(pctls)
-            self.pctls = [np.mean(pctl_buffer) for pctl_buffer in self.pctl_buffers]
-
-        def limits(self):
-            return self.vmin, self.vmax
+    COLORMAP_BUFFER_LENGTH_MAX = 40000  # samples, if colormap limits are set to 'global' then 'global' means last
+                                        # COLORMAP_BUFFER_LENGTH_DEFAULT samples
+    ROBUST_PCT = 95 # Perecntage to use in robust_max
 
     def __init__(self, source_space_reconstructor, show_reward=False, params=None):
         super().__init__(show_reward=show_reward)
@@ -142,11 +130,11 @@ class SourceSpaceWidgetPainter(Painter):
 
         self.colormap_mode = self.settings.colormap.mode.value()
         self.lock_current_limits = self.settings.colormap.lock_current_limits.value()
-        self.vmin, self.vmax = None, None
+        self.vmax = None
 
-        self.colormap_buffer_length = self.COLORMAP_BUFFER_LENGTH_DEFAULT
-        self.colormap_threshold = self.settings.colormap.threshold.value()
-        self.range_buffer = self.RangeBuffer(self.colormap_buffer_length, self.colormap_threshold)
+        self.colormap_buffer_length = self.COLORMAP_BUFFER_LENGTH_MAX
+        self.colormap_threshold_pct = self.settings.colormap.threshold_pct.value()
+        self.range_buffer = RangeBuffer(self.colormap_buffer_length)
 
         self.smoothing_matrix = self.read_smoothing_matrix()
 
@@ -207,37 +195,35 @@ class SourceSpaceWidgetPainter(Painter):
 
     def redraw_state(self, chunk):
         sources = self.chunk_to_sources(chunk)
-        self.range_buffer.update(sources)
         last_sources = sources[-1, :]
-        pctls = np.percentile(last_sources, self.range_buffer.pcts)
-        sources_smoothed = self.smoothing_matrix.dot(last_sources)
 
-        # settings.update_limits will result in sigValueChanged which will trigger update of self.vmin and self.vmax
-        if self.colormap_mode == PainterSettings.COLORMAP_LIMITS_LOCAL:
-            self.settings.update_limits(np.min(last_sources), np.max(last_sources))
-        elif self.colormap_mode == PainterSettings.COLORMAP_LIMITS_GLOBAL and not self.lock_current_limits:
-            self.settings.update_limits(*self.range_buffer.limits())
-        elif self.colormap_mode == PainterSettings.COLORMAP_LIMITS_MANUAL:
-            # In this case vmin, vmax are set by a slot connected to the changes from settings widget
-            pass
-
-        sources_normalized = self.normalize_to_01(sources_smoothed)
-        invisible_idx = np.where((pctls[0] <= sources_smoothed)
-                                 & (sources_smoothed <= pctls[1]))
-        colors = self.data_colormap(sources_normalized)
-        colors[invisible_idx] = self.background_colors[invisible_idx]
+        self.range_buffer.update(sources, take_abs=True)
+        self.update_colormap_upper_limit(self.colormap_mode, last_sources, take_abs=True)
+        colors = self.calculate_colors(last_sources, self.colormap_threshold_pct, take_abs=True)
         self.update_mesh_colors(colors)
+
+    def update_colormap_upper_limit(self, colormap_mode, last_sources, take_abs=True):
+        if self.colormap_mode == PainterSettings.COLORMAP_LIMITS_MANUAL:
+            # In this case vmax is set by a slot connected to the changes from settings widget
+            return
+
+        elif colormap_mode == PainterSettings.COLORMAP_LIMITS_LOCAL:
+            new_upper_limit = self.robust_max(np.abs(last_sources[np.newaxis, :]))[0]
+
+        elif self.colormap_mode == PainterSettings.COLORMAP_LIMITS_GLOBAL and not self.lock_current_limits:
+            new_upper_limit = self.range_buffer.vmax
+        else:
+            return
+
+        # upper_limit.setValue() will result in sigValueChanged which will trigger the update of self.vmax
+        self.settings.colormap.upper_limit.setValue(new_upper_limit)
 
     def update_mesh_colors(self, colors):
         self.cortex_mesh_data.setVertexColors(colors)
         self.cortex_mesh_item.meshDataChanged()
 
     def normalize_to_01(self, values):
-        return (values - self.vmin) / (self.vmax - self.vmin)
-
-    def set_limits(self, vmin, vmax):
-        self.vmin = vmin
-        self.vmax = vmax
+        return values / self.vmax
 
     def mode_changed(self, param, mode):
         self.colormap_mode = mode
@@ -254,16 +240,12 @@ class SourceSpaceWidgetPainter(Painter):
             self.settings.colormap.upper_limit.setReadonly(False)
             self.settings.colormap.lock_current_limits.setReadonly(True)
 
-    def lower_limit_changed(self, param, vmin):
-        self.vmin = vmin
-
     def upper_limit_changed(self, param, vmax):
         self.vmax = vmax
 
     def connect_settings(self):
         cmap_settings = self.settings.colormap
         cmap_settings.mode.sigValueChanged.connect(self.mode_changed)
-        cmap_settings.lower_limit.sigValueChanged.connect(self.lower_limit_changed)
         cmap_settings.upper_limit.sigValueChanged.connect(self.upper_limit_changed)
 
     @staticmethod
@@ -282,12 +264,22 @@ class SourceSpaceWidgetPainter(Painter):
 
         return smooth_mat_lh.tocsc() + smooth_mat_rh.tocsc()
 
-    def threshold_a_colormap(colormap, lower_threshold, upper_threshold):
-        sample_points = np.linspace(0.0, 1.0, 256)
-        color_list = colormap(sample_points)
-        invisible_idx = np.logical_and(
-            lower_threshold <= sample_points,
-            sample_points <= upper_threshold)
-        color_list[invisible_idx, -1] = 0  # The last number is opacity
-        name = '{}_thresholded'.format(colormap.name)
-        return mpl_colors.LinearSegmentedColormap.from_list(name=name, colors=color_list)
+    @classmethod
+    def robust_max(cls, ndarray):
+        pctl = np.percentile(ndarray, q=cls.ROBUST_PCT, axis=1, keepdims=True)
+        return np.nanmean(
+            np.where(ndarray >= pctl, ndarray, np.nan),
+            axis=1)
+
+    def calculate_colors(self, last_sources, threshold_pct, take_abs=True):
+        sources_smoothed = self.smoothing_matrix.dot(last_sources)
+        sources_normalized = self.normalize_to_01(np.abs(sources_smoothed))
+        colors = self.data_colormap(sources_normalized)
+
+        threshold = threshold_pct / 100
+
+        invisible_mask = sources_normalized <= threshold
+        colors[invisible_mask] = self.background_colors[invisible_mask]
+        colors[~invisible_mask] *= self.background_colors[~invisible_mask, 0, np.newaxis]
+
+        return colors
