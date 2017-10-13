@@ -5,16 +5,16 @@ from mne.io import RawArray
 from mne.preprocessing import ICA
 from sklearn.metrics import mutual_info_score
 
-from ...io.xml_ import get_lsl_info_from_xml
-from ...postprocessing.helpers import dc_blocker
-from ...protocols.signals_manager.scored_components_table import ScoredComponentsTable
+from pynfb.io.xml_ import get_lsl_info_from_xml
+from pynfb.postprocessing.helpers import dc_blocker
+from pynfb.protocols.signals_manager.scored_components_table import ScoredComponentsTable
 import numpy as np
-from ...protocols.ssd.sliders_csp import Sliders
-from ...signal_processing.filters import SpatialRejection
-from ...widgets.helpers import ch_names_to_2d_pos, WaitMessage
-from ..._titles import WAIT_BAR_MESSAGES
-from ...signal_processing.decompositions import CSPDecomposition, ICADecomposition, CSPDecompositionStimulus
-from ...signal_processing.helpers import stimulus_split
+from pynfb.protocols.ssd.sliders_csp import Sliders
+from pynfb.signal_processing.filters import SpatialRejection
+from pynfb.widgets.helpers import ch_names_to_2d_pos, WaitMessage
+from pynfb._titles import WAIT_BAR_MESSAGES
+from pynfb.signal_processing.decompositions import CSPDecomposition, ICADecomposition, CSPDecompositionStimulus
+from pynfb.signal_processing.helpers import stimulus_split
 from time import time
 
 def mutual_info(x, y, bins=100):
@@ -209,21 +209,18 @@ if __name__ == '__main__':
     y[:len(y)//2] = 0
 
 
-    if False:
+    if True:
         dir_ = 'D:\\vnd_spbu\\pilot\\mu5days'
         experiment = 'pilot5days_Skotnikova_Day4_03-02_13-33-55'
-        with h5py.File('{}\\{}\\{}'.format(dir_, experiment, 'experiment_data.h5')) as f:
-            ica = f['protocol1/signals_stats/left/rejections/rejection1'][:]
+        with h5py.File(r'C:\Users\Nikolai\PycharmProjects\nfb\pynfb\results\bci-wrestling_10-11_23-36-24\experiment_data.h5') as f:
+            #ica = f['protocol1/signals_stats/left/rejections/rejection1'][:]
 
-            x_filters = dc_blocker(np.dot(f['protocol1/raw_data'][:], ica))
-            x_rotation = dc_blocker(np.dot(f['protocol2/raw_data'][:], ica))
-            x_dict = {
-                'closed': x_filters[:x_filters.shape[0] // 2],
-                'opened': x_filters[x_filters.shape[0] // 2:],
-                'rotate': x_rotation
-            }
-            x = np.concatenate([x_dict['closed'], x_dict['opened'], x_dict['rotate']])
-            drop_channels = ['AUX', 'A1', 'A2']
+            #x_filters = dc_blocker(np.dot(f['protocol1/raw_data'][:], ica))
+            #x_rotation = dc_blocker(np.dot(f['protocol2/raw_data'][:], ica))
+
+            x = np.concatenate([f['protocol{}/raw_data'.format(j+1)][:] for j in range(12)])
+            print(x.shape)
+            drop_channels = ['AUX', 'A1', 'A2', 'Pz']
             labels, fs = get_lsl_info_from_xml(f['stream_info.xml'][0])
             print('fs: {}\nall labels {}: {}'.format(fs, len(labels), labels))
             channels = [label for label in labels if label not in drop_channels]

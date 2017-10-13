@@ -5,7 +5,7 @@ import h5py
 from pynfb.signals.bci import BCISignal
 
 
-with h5py.File(r'C:\Users\Nikolai\PycharmProjects\nfb\pynfb\results\bci-wrestling_10-10_20-40-16\experiment_data.h5') as f:
+with h5py.File(r'C:\Users\Nikolai\PycharmProjects\nfb\pynfb\results\bci-wrestling_10-11_13-17-44\experiment_data.h5') as f:
     fs, channels, p_names = get_info(f, ['A1', 'A2', 'Pz', 'AUX'])
     raw = OrderedDict()
     for j, name in enumerate(p_names):
@@ -32,8 +32,12 @@ with h5py.File(r'C:\Users\Nikolai\PycharmProjects\nfb\pynfb\results\bci-wrestlin
         y = np.concatenate(y, 0)
         return X, y
 
-    X_train, y_train = get_Xy(list(raw.keys())[:12])
+    X_train, y_train = get_Xy(list(raw.keys())[:9])
+    X_test, y_test = get_Xy(list(raw.keys())[9:12])
+    print(list(raw.keys()))
     for k in range(1):
         bci.reset_model()
         a_train = bci.fit_model(X_train, y_train)
+        print(bci.model.get_accuracies(X_train, y_train))
+        print(bci.model.get_accuracies(X_test, y_test))
 

@@ -60,7 +60,7 @@ class SpatialRejection(BaseFilter):
 
 
 class ButterFilter(BaseFilter):
-    def __init__(self, band, fs, n_channels, order=4):
+    def __init__(self, band, fs, n_channels, order=2):
         self.n_channels = n_channels
         low, high = band
         if low is None and high is None:

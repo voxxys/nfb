@@ -19,7 +19,7 @@ class BCIModel():
         self.prefilter = FilterSequence([ButterFilter((0.5, 45), fs, len(ch_names))])
         self.csp_pools = [SpatialDecompositionPool(ch_names, fs, bands, 'csp', indexes) for _label in states_labels]
         self.csp_transformer = None
-        self.var_detector = InstantaneousVarianceFilter(len(bands)*len(indexes)*len(states_labels), n_taps=int(fs//2))
+        self.var_detector = InstantaneousVarianceFilter(len(bands)*len(indexes)*len(states_labels), n_taps=int(fs))
         #self.classifier = MLPClassifier(hidden_layer_sizes=(), early_stopping=True, verbose=True)
         self.classifier = RandomForestClassifier(max_depth=3, min_samples_leaf=100)
         self.scaler = StandardScaler()
