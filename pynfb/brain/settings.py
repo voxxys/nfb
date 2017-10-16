@@ -41,7 +41,7 @@ class SourceSpaceWidgetPainterSettings(MyGroupParameter):
         opts = {'name': 'Visualization settings', 'type': 'group', 'value': 'true'}
         pTypes.GroupParameter.__init__(self, **opts)
 
-        # Colormap options
+        # Colormap settings
         cmap_children = [
             {'name': 'Mode', 'type': 'list', 'values': self.COLORMAP_LIMITS_MODES, 'value': 'global'},
             {'name': 'Lock current limits', 'type': 'bool', 'value': False, },
@@ -72,6 +72,14 @@ class SourceSpaceWidgetPainterSettings(MyGroupParameter):
 
         self.addChild(colormap)
 
+        # Transformation settings
+        trans_children = [
+            {'name': 'Apply linear filter', 'type': 'bool', 'value': False},
+            {'name': 'Lower cutoff', 'type': 'float', 'dec': 1, 'suffix': 'Hz'},
+            {'name': 'Upper cutoff', 'type': 'int', 'suffix': 'Hz'}
+        ]
+        transformation = MyGroupParameter(name='Transformation', children=trans_children)
+        self.addChild(transformation)
 
 # Adapted from https://stackoverflow.com/a/42011414/3042770
 class Slider(QtGui.QWidget):
