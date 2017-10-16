@@ -17,16 +17,18 @@ from OpenGL.GL import (GL_ONE, GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA, GL_FUNC_ADD
 
 from ..protocols import Protocol
 from ..protocols.widgets import Painter
-from .settings import SourceSpaceWidgetPainterSettings as PainterSettings
+from .settings import (SourceSpaceWidgetPainterSettings as PainterSettings,
+                       SourceSpaceReconstructorSettings as ReconstructorSettings)
 
 
-class SourceSpaceRecontructor(Protocol):
+class SourceSpaceReconstructor(Protocol):
     def __init__(self, signals, **kwargs):
         kwargs['ssd_in_the_end'] = True
         super().__init__(signals, **kwargs)
         inverse_operator = self.make_inverse_operator()
         self._forward_model_matrix = self._assemble_forward_model_matrix(inverse_operator)
         self.source_vertex_idx = self.extract_source_vertex_idx(inverse_operator)
+        self.settings = ReconstructorSettings()
         self.widget_painter = SourceSpaceWidgetPainter(self)
 
     @staticmethod
@@ -67,6 +69,7 @@ class SourceSpaceRecontructor(Protocol):
         return read_inverse_operator(filename_inv, verbose='ERROR')
 
     def transform_input_signal(self, chunk):
+        # if self.settings.
         return chunk
 
     def transform_sources(self, sources):
@@ -221,7 +224,6 @@ class SourceSpaceWidgetPainter(Painter):
         curvs = [nib.freesurfer.read_morph_data(curv_path) for curv_path in curv_paths]
         return np.concatenate(curvs)
 
-
     def redraw_state(self, sources):
 
         self.range_buffer.update(sources, take_abs=True)
@@ -254,26 +256,14 @@ class SourceSpaceWidgetPainter(Painter):
     def normalize_to_01(self, values):
         return values / self.vmax
 
-    def mode_changed(self, param, mode):
-        self.colormap_mode = mode
-        if mode == PainterSettings.COLORMAP_LIMITS_LOCAL:
-            self.settings.colormap.lower_limit.setReadonly(True)
-            self.settings.colormap.upper_limit.setReadonly(True)
-            self.settings.colormap.lock_current_limits.setReadonly(True)
-        elif mode == PainterSettings.COLORMAP_LIMITS_GLOBAL:
-            self.settings.colormap.lower_limit.setReadonly(True)
-            self.settings.colormap.upper_limit.setReadonly(True)
-            self.settings.colormap.lock_current_limits.setReadonly(False)
-        elif mode == PainterSettings.COLORMAP_LIMITS_MANUAL:
-            self.settings.colormap.lower_limit.setReadonly(False)
-            self.settings.colormap.upper_limit.setReadonly(False)
-            self.settings.colormap.lock_current_limits.setReadonly(True)
-
     def upper_limit_changed(self, param, vmax):
         self.vmax = vmax
 
     def colormap_threshold_pct_changed(self, param, threshold_pct):
         self.colormap_threshold_pct = threshold_pct
+
+    def mode_changed(self, param, mode):
+        self.colormap_mode = mode
 
     def connect_settings(self):
         cmap_settings = self.settings.colormap

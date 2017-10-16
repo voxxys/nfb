@@ -8,7 +8,7 @@ from PyQt4 import QtGui, QtCore
 from PyQt4.QtCore import pyqtSignal
 from expyriment import control, design
 
-from ..brain import SourceSpaceRecontructor, SourceSpaceWidget
+from ..brain import SourceSpaceReconstructor, SourceSpaceWidget, SourceSpaceSettings
 # from ..brain import SourceSpaceWidgetWithSettings
 from ..helpers.dc_blocker import DCBlocker
 from ..protocols.widgets import ProtocolWidget
@@ -216,7 +216,7 @@ class MainWindow(QtGui.QMainWindow):
 
         # Source space window
         if plot_source_space_flag:
-            source_space_protocol = SourceSpaceRecontructor(signals)
+            source_space_protocol = SourceSpaceReconstructor(signals)
             self.source_space_window = SourceSpaceWindow(self, source_space_protocol)
             self.source_space_window.show()
 
@@ -390,7 +390,10 @@ class SourceSpaceWindow(SecondaryWindow):
 
     def __init__(self, parent, current_protocol, **kwargs):
         super().__init__(parent, current_protocol, **kwargs)
-        self.settings = self.current_protocol.widget_painter.settings
+        self.settings = SourceSpaceSettings(
+            painter_settings=self.current_protocol.widget_painter.settings,
+            reconstructor_settings=self.current_protocol.settings,
+        )
         self.settings_widget = self.settings.create_widget()
         self.centralWidget().layout().addWidget(self.settings_widget)
         self.adjustSize()

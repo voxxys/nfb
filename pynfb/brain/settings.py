@@ -50,28 +50,24 @@ class SourceSpaceWidgetPainterSettings(MyGroupParameter):
             {'name': 'Lock current limits', 'type': 'bool', 'value': False, },
             {'name': 'Buffer length', 'type': 'slider', 'value': self.COLORMAP_BUFFER_LENGTH_DEFAULT,
                                       'limits': (0, self.COLORMAP_BUFFER_LENGTH_MAX), 'prec': 0},
-            {'name': 'Upper limit', 'type': 'float', 'readonly': True},
+            {'name': 'Upper limit', 'type': 'float', 'readonly': True, 'decimals': 3},
             {'name': 'Threshold pct', 'type': 'slider', 'suffix': '%', 'readonly': False, 'limits': (0, 100),
                                       'value': 50, 'prec': 0},
 
         ]
         colormap = MyGroupParameter(name='Colormap', children=cmap_children)
 
-        def type_changed():
-
-            if colormap.mode.value() == self.COLORMAP_LIMITS_GLOBAL:
+        def mode_changed(param, mode):
+            if mode == self.COLORMAP_LIMITS_LOCAL:
+                colormap.upper_limit.setReadonly(True)
+                colormap.lock_current_limits.setReadonly(True)
+            elif mode == self.COLORMAP_LIMITS_GLOBAL:
                 colormap.upper_limit.setReadonly(True)
                 colormap.lock_current_limits.setReadonly(False)
-
-            if colormap.mode.value() == self.COLORMAP_LIMITS_LOCAL:
-                colormap.upper_limit.setReadonly(True)
-                colormap.lock_current_limits.setReadonly(True)
-
-            if colormap.mode.value() == self.COLORMAP_LIMITS_MANUAL:
+            elif mode == self.COLORMAP_LIMITS_MANUAL:
                 colormap.upper_limit.setReadonly(False)
                 colormap.lock_current_limits.setReadonly(True)
-
-        colormap.mode.sigValueChanged.connect(type_changed)
+        colormap.mode.sigValueChanged.connect(mode_changed)
 
         self.addChild(colormap)
 
@@ -84,21 +80,21 @@ class SourceSpaceReconstructorSettings(MyGroupParameter):
         # Transformation settings
         trans_children = [
             {'name': 'Apply linear filter', 'type': 'bool', 'value': False},
-            {'name': 'Lower cutoff', 'type': 'float', 'dec': 1, 'suffix': 'Hz'},
-            {'name': 'Upper cutoff', 'type': 'int', 'suffix': 'Hz'}
+            {'name': 'Lower cutoff', 'type': 'float', 'decimals': 1, 'suffix': 'Hz', 'limits': (0, None)},
+            {'name': 'Upper cutoff', 'type': 'int', 'suffix': 'Hz', 'limits': (0, 100)}
         ]
         transformation = MyGroupParameter(name='Transformation', children=trans_children)
         self.addChild(transformation)
 
 
 class SourceSpaceSettings(MyGroupParameter):
-    def __init__(self):
+    def __init__(self, painter_settings=None, reconstructor_settings=None):
         opts = {'name': 'Source space settings', 'type': 'group', 'value': 'true'}
         super().__init__(**opts)
 
         self.addChildren([
-            SourceSpaceWidgetPainterSettings(),
-            SourceSpaceReconstructorSettings(),
+            painter_settings or SourceSpaceWidgetPainterSettings(),
+            reconstructor_settings or SourceSpaceReconstructorSettings(),
         ])
 
 # Adapted from https://stackoverflow.com/a/42011414/3042770

@@ -1,3 +1,3 @@
 import sympy
-from .brain import SourceSpaceRecontructor, SourceSpaceWidget, SourceSpaceWidgetPainter
-from .settings import SourceSpaceWidgetPainterSettings
+from .brain import SourceSpaceReconstructor, SourceSpaceWidget, SourceSpaceWidgetPainter
+from .settings import SourceSpaceWidgetPainterSettings, SourceSpaceSettings
