@@ -3,6 +3,9 @@ from pyqtgraph.parametertree import ParameterTree, parameterTypes as pTypes, Par
 
 
 class MyGroupParameter(pTypes.GroupParameter):
+    def __init__(self, **opts):
+        super().__init__(**opts)
+
     def addChild(self, child, *args, **kwargs):
         # child can be a Parameter instance or it can be a dict
         try:
@@ -39,7 +42,7 @@ class SourceSpaceWidgetPainterSettings(MyGroupParameter):
 
     def __init__(self):
         opts = {'name': 'Visualization settings', 'type': 'group', 'value': 'true'}
-        pTypes.GroupParameter.__init__(self, **opts)
+        super().__init__(**opts)
 
         # Colormap settings
         cmap_children = [
@@ -72,6 +75,12 @@ class SourceSpaceWidgetPainterSettings(MyGroupParameter):
 
         self.addChild(colormap)
 
+
+class SourceSpaceReconstructorSettings(MyGroupParameter):
+    def __init__(self):
+        opts = {'name': 'Source space reconstruction settings', 'type': 'group', 'value': 'true'}
+        super().__init__(**opts)
+
         # Transformation settings
         trans_children = [
             {'name': 'Apply linear filter', 'type': 'bool', 'value': False},
@@ -80,6 +89,17 @@ class SourceSpaceWidgetPainterSettings(MyGroupParameter):
         ]
         transformation = MyGroupParameter(name='Transformation', children=trans_children)
         self.addChild(transformation)
+
+
+class SourceSpaceSettings(MyGroupParameter):
+    def __init__(self):
+        opts = {'name': 'Source space settings', 'type': 'group', 'value': 'true'}
+        super().__init__(**opts)
+
+        self.addChildren([
+            SourceSpaceWidgetPainterSettings(),
+            SourceSpaceReconstructorSettings(),
+        ])
 
 # Adapted from https://stackoverflow.com/a/42011414/3042770
 class Slider(QtGui.QWidget):
