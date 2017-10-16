@@ -66,8 +66,25 @@ class SourceSpaceRecontructor(Protocol):
         filename_inv = data_path + '/MEG/sample/sample_audvis-meg-oct-6-meg-inv.fif'
         return read_inverse_operator(filename_inv, verbose='ERROR')
 
+    def transform_input_signal(self, chunk):
+        return chunk
+
+    def transform_sources(self, sources):
+        return sources
+
     def update_state(self, chunk):
-        self.widget_painter.redraw_state(chunk)
+
+        # Filter if filter settings are set
+        chunk_transformed = self.transform_input_signal(chunk)
+
+        # Apply the inverse model
+        sources = self.chunk_to_sources(chunk_transformed)
+
+        # Apply non-linear transformation to the sources
+        sources_transformed = self.transform_sources(sources)
+
+        # Update the visualisation
+        self.widget_painter.redraw_state(sources_transformed)
 
     def close_protocol(self, **kwargs):
         self.widget_painter.close()
@@ -204,11 +221,12 @@ class SourceSpaceWidgetPainter(Painter):
         curvs = [nib.freesurfer.read_morph_data(curv_path) for curv_path in curv_paths]
         return np.concatenate(curvs)
 
-    def redraw_state(self, chunk):
-        sources = self.chunk_to_sources(chunk)
-        last_sources = sources[-1, :]
+
+    def redraw_state(self, sources):
 
         self.range_buffer.update(sources, take_abs=True)
+
+        last_sources = sources[-1, :]
         self.update_colormap_upper_limit(self.colormap_mode, last_sources, take_abs=True)
         colors = self.calculate_colors(last_sources, self.colormap_threshold_pct, take_abs=True)
         self.update_mesh_colors(colors)
