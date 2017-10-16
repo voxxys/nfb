@@ -47,7 +47,6 @@ class SourceSpaceWidgetPainterSettings(MyGroupParameter):
             {'name': 'Lock current limits', 'type': 'bool', 'value': False, },
             {'name': 'Buffer length', 'type': 'slider', 'value': self.COLORMAP_BUFFER_LENGTH_DEFAULT,
                                       'limits': (0, self.COLORMAP_BUFFER_LENGTH_MAX), 'prec': 0},
-            {'name': 'Lower limit', 'type': 'float', 'readonly': True},
             {'name': 'Upper limit', 'type': 'float', 'readonly': True},
             {'name': 'Threshold pct', 'type': 'slider', 'suffix': '%', 'readonly': False, 'limits': (0, 100),
                                       'value': 50, 'prec': 0},
@@ -56,18 +55,17 @@ class SourceSpaceWidgetPainterSettings(MyGroupParameter):
         colormap = MyGroupParameter(name='Colormap', children=cmap_children)
 
         def type_changed():
-            def limits_setReadonly(readonly):
-                colormap.lower_limit.setReadonly(readonly)
-                colormap.upper_limit.setReadonly(readonly)
 
             if colormap.mode.value() == self.COLORMAP_LIMITS_GLOBAL:
-                limits_setReadonly(True)
+                colormap.upper_limit.setReadonly(True)
                 colormap.lock_current_limits.setReadonly(False)
+
             if colormap.mode.value() == self.COLORMAP_LIMITS_LOCAL:
-                limits_setReadonly(True)
+                colormap.upper_limit.setReadonly(True)
                 colormap.lock_current_limits.setReadonly(True)
+
             if colormap.mode.value() == self.COLORMAP_LIMITS_MANUAL:
-                limits_setReadonly(False)
+                colormap.upper_limit.setReadonly(False)
                 colormap.lock_current_limits.setReadonly(True)
 
         colormap.mode.sigValueChanged.connect(type_changed)
