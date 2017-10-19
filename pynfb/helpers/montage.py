@@ -2,6 +2,7 @@ from collections import namedtuple, OrderedDict
 import mne
 import numpy as np
 from matplotlib import pyplot as plt
+from .az_proj import azimuthal_equidistant_projection
 
 
 Channel = namedtuple('Channel', 'pos type')
@@ -83,13 +84,18 @@ class Montage:
             pos = np.asarray([ch_list[ch_ind].pos for ch_ind in ch_inds])
             type_data = np.asarray(data)[ch_inds]
             mne.viz.plot_topomap(type_data, pos=pos, axes=axes, show=False)
-
-
         return axs
 
-
-
-
+def get_ch_pos(list_of_ch_names):
+    montage_ = mne.channels.read_montage('standard_1005')
+    ch_names = [ch.upper() for ch in list_of_ch_names]
+    montage_ch_names = [ch.upper() for ch in montage_.ch_names]
+    montage_indices = [montage_ch_names.index(ch) for ch in ch_names if ch in montage_ch_names]
+    known_ch_mask = [ch in montage_ch_names for ch in ch_names]
+    pos = np.zeros((len(list_of_ch_names), 2)) * np.nan
+    if any(known_ch_mask):
+        pos[known_ch_mask] = azimuthal_equidistant_projection(montage_.pos[montage_indices, :3])
+    return pos, ~np.any(np.isnan(pos), 1)
 
 if __name__ == '__main__':
     layout_1005 = mne.channels.read_layout('EEG1005')

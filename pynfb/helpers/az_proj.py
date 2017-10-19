@@ -20,7 +20,5 @@ def azimuthal_equidistant_projection(hsp):
     x = radius * (2.0 * theta / np.pi) * np.cos(phi)
     y = radius * (2.0 * theta / np.pi) * np.sin(phi)
 
-    n_channels = len(x)
-    pos = np.c_[x, y, width * np.ones(n_channels),
-                height * np.ones(n_channels)]
+    pos = np.c_[x, y]
     return pos
