@@ -73,19 +73,35 @@ class SourceSpaceWidgetPainterSettings(MyGroupParameter):
 
 
 class SourceSpaceReconstructorSettings(MyGroupParameter):
-    def __init__(self):
+    def __init__(self, fs):
         opts = {'name': 'Source space reconstruction settings', 'type': 'group', 'value': 'true'}
         super().__init__(**opts)
+        # Todo: use sampling frequency to switch from number of samples to time
+        self.fs = fs
 
         # Transformation settings
         trans_children = [
-            {'name': 'Apply linear filter', 'type': 'bool', 'value': False},
+            {'name': 'Apply', 'type': 'bool', 'value': False},
             {'name': 'Lower cutoff', 'type': 'float', 'decimals': 1, 'suffix': 'Hz', 'limits': (0, None)},
             {'name': 'Upper cutoff', 'type': 'int', 'suffix': 'Hz', 'limits': (0, 100)}
         ]
-        transformation = MyGroupParameter(name='Transformation', children=trans_children)
+        transformation = MyGroupParameter(name='Linear filter', children=trans_children)
         self.addChild(transformation)
 
+        # Envelope extraction
+        envelope = {'name': 'Extract envelope', 'type': 'bool', 'value': False}
+        self.addChild(envelope)
+
+        # Local desynchronisation
+        desync_children = [
+            {'name': 'Apply', 'type': 'bool', 'value': False},
+            {'name': 'Window width', 'type': 'slider', 'suffix': '', 'readonly': False, 'limits': (0, 1000),
+             'value': 50, 'prec': 0},
+            {'name': 'Lag', 'type': 'slider', 'suffix': '', 'readonly': False, 'limits': (0, 10000),
+             'value': 1000, 'prec': 0},
+        ]
+        desync = MyGroupParameter(name='Linear desynchronisation', children=desync_children)
+        self.addChild(desync)
 
 class SourceSpaceSettings(MyGroupParameter):
     def __init__(self, painter_settings=None, reconstructor_settings=None):
@@ -182,7 +198,7 @@ class SliderParameterItem(pTypes.WidgetParameterItem):
             raise ValueError("You have to provide 'limits' for this parameter")
         self.slider_widget = Slider(**opts)
 
-        self.slider_widget.sigChanged = self.slider_widget.slider.valueChanged
+        self.slider_widget.sigChanged = self.slider_widget.slider.sliderReleased
         self.slider_widget.value = self.slider_widget.value
         self.slider_widget.setValue = self.slider_widget.setValue
         return self.slider_widget

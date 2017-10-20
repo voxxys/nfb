@@ -17,19 +17,53 @@ from OpenGL.GL import (GL_ONE, GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA, GL_FUNC_ADD
 
 from ..protocols import Protocol
 from ..protocols.widgets import Painter
+from ..signal_processing import filters
 from .settings import (SourceSpaceWidgetPainterSettings as PainterSettings,
                        SourceSpaceReconstructorSettings as ReconstructorSettings)
 
 
+# Todo: implement or use something from filters
+class EnvelopeExtractor(object):
+    def __init__(self):
+        return super().__init__()
+
+    def apply(self, sources):
+        return sources
+
+    def reset(self):
+        pass
+
+# Todo: implement
+class LinearDesync(object):
+    def __init__(self, window_width, lag, fs):
+        return super().__init__()
+
+    def apply(self, sources):
+        return sources
+
+    def reset(self):
+        pass
+
 class SourceSpaceReconstructor(Protocol):
-    def __init__(self, signals, **kwargs):
+    def __init__(self, fs, **kwargs):
         kwargs['ssd_in_the_end'] = True
-        super().__init__(signals, **kwargs)
-        inverse_operator = self.make_inverse_operator()
+        super().__init__(signals=None, **kwargs)
+        inverse_operator = self.read_inverse_operator()
         self._forward_model_matrix = self._assemble_forward_model_matrix(inverse_operator)
         self.source_vertex_idx = self.extract_source_vertex_idx(inverse_operator)
-        self.settings = ReconstructorSettings()
         self.widget_painter = SourceSpaceWidgetPainter(self)
+
+        self.fs = fs
+
+        self.settings = ReconstructorSettings(fs=fs)
+        self.connect_settings()
+
+        self.apply_linear_filter = self.settings.linear_filter.aplly.value()
+        self.extract_envelope = self.settings.extract_envelope.value()
+        self.apply_linear_desync = self.settings.linear_desynchronisation.apply.vale()
+        self.linear_filter = None
+        self.envelope_extractor = None
+        self.linear_desync = None
 
     @staticmethod
     def _assemble_forward_model_matrix(inverse_operator):
@@ -61,19 +95,82 @@ class SourceSpaceReconstructor(Protocol):
         return F.dot(chunk.T).T
 
     @staticmethod
-    def make_inverse_operator():
+    def read_inverse_operator():
         from mne.datasets import sample
         from mne.minimum_norm import read_inverse_operator
         data_path = sample.data_path()
         filename_inv = data_path + '/MEG/sample/sample_audvis-meg-oct-6-meg-inv.fif'
         return read_inverse_operator(filename_inv, verbose='ERROR')
 
+    def connect_settings(self):
+        self.settings.sigTreeStateChanged.connect(self.widget_painter.invalidate_colormap_buffer)
+
+        # Linear filter
+
+        # Any change to the linear filter means that everything after it should be reset
+        self.settings.linear_filter.sigTreeChanged.connect(self.envelope_extractor.reset)
+        self.settings.linear_filter.sigTreeChanged.connect(self.linear_desync.reset)
+
+        self.settings.linear_filter.apply.sigChanged.connect(self.linear_filter_switched)
+        self.settings.linear_filter.lower_cutoff.connect(self.initiate_linear_filter)
+        self.settings.linear_filter.upper_cutoff.connect(self.initiate_linear_filter)
+
+        # Envelope
+        self.settings.extract_envelope.sigChanged.connect(self.extract_envelope_switched)
+        self.settings.extract_envelope.sigChanged.connect(self.linear_desync.reset)
+
+        # Linear desynchronisation
+        lin_desync_settings = self.settings.linear_desynchronisation
+        lin_desync_settings.apply.sigChanged.connect(self.linear_desync_switched)
+        lin_desync_settings.window_width.sigChanged.connect(self.initiate_linear_desync)
+        lin_desync_settings.lag.sigChanged.connect(self.initiate_linear_desync)
+
+    def linear_filter_switched(self, param, value):
+        self.apply_linear_filter = value
+        if value is True and not self.linear_filter:
+            self.initiate_linear_filter()
+
+    def initiate_linear_filter(self):
+        lower_cutoff = self.settings.linear_filter.lower_cutoff
+        upper_cutoff = self.settings.linear_filter.upper_cutoff
+        band = (lower_cutoff, upper_cutoff)
+        self.linear_filter = filters.ButterFilter(band, fs=self.fs)
+
     def transform_input_signal(self, chunk):
-        # if self.settings.
-        return chunk
+        result = chunk
+        if self.apply_linear_filter is True:
+            result = self.linear_filter.apply(result)
+        return result
+
+    def extract_envelope_switched(self, param, value):
+        self.extract_envelope = value
+        if value is True and not self.envelope_extractor:
+            self.initiate_envelope_extractor()
+
+    def initiate_envelope_extractor(self):
+        self.envelope_extractor = EnvelopeExtractor()
+
+    def linear_desync_switched(self, param, value):
+        self.apply_linear_desync = value
+        if value is True and not self.linear_desync:
+            self.initiate_linear_desync()
+
+    def initiate_linear_desync(self):
+        lin_desync_settings = self.settings.linear_desynchronisation
+        window_width = lin_desync_settings.window_width.value()
+        lag = lin_desync_settings.lag.value()
+        self.linear_desync = LinearDesync(window_width=window_width, lag=lag, fs=self.fs)
 
     def transform_sources(self, sources):
-        return sources
+        result = sources
+
+        if self.extract_envelope is True:
+            result = self.envelope_extractor.apply(result)
+
+        if self.apply_linear_desync is True:
+            result = self.linear_desync.apply(result)
+
+        return result
 
     def update_state(self, chunk):
 
@@ -121,8 +218,12 @@ class RangeBuffer:
         self.current_buffer_length = buffer_length
         self.vmax = None
         self.robust_max = SourceSpaceWidgetPainter.robust_max
+        self.invalidation_scheduled = False
 
     def update(self, sources, take_abs=True):
+        if self.invalidation_scheduled is True:
+            self.max_buffer.clear()
+            self.invalidation_scheduled = False
         if take_abs:
             sources = np.abs(sources)
         self.max_buffer.extend(self.robust_max(sources))
@@ -137,6 +238,9 @@ class RangeBuffer:
     def buffer_length_changed(self, param, new_buffer_length):
         # qt slot
         self.current_buffer_length = int(new_buffer_length)
+
+    def invalidate(self):
+        self.invalidation_scheduled = True
 
 
 class SourceSpaceWidgetPainter(Painter):
@@ -168,6 +272,9 @@ class SourceSpaceWidgetPainter(Painter):
         self.smoothing_matrix = self.read_smoothing_matrix()
 
         self.connect_settings()
+
+    def invalidate_colormap_buffer(self):
+        self.range_buffer.invalidate()
 
     def prepare_widget(self, widget):
         super().prepare_widget(widget)
