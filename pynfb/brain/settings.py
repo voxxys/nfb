@@ -82,8 +82,8 @@ class SourceSpaceReconstructorSettings(MyGroupParameter):
         # Transformation settings
         trans_children = [
             {'name': 'Apply', 'type': 'bool', 'value': False},
-            {'name': 'Lower cutoff', 'type': 'float', 'decimals': 1, 'suffix': 'Hz', 'limits': (0, None)},
-            {'name': 'Upper cutoff', 'type': 'int', 'suffix': 'Hz', 'limits': (0, 100)}
+            {'name': 'Lower cutoff', 'type': 'float', 'decimals': 1, 'suffix': 'Hz', 'limits': (0, None), 'value': 0.1},
+            {'name': 'Upper cutoff', 'type': 'int', 'suffix': 'Hz', 'limits': (0, 100), 'value': 40}
         ]
         transformation = MyGroupParameter(name='Linear filter', children=trans_children)
         self.addChild(transformation)

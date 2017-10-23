@@ -45,25 +45,34 @@ class LinearDesync(object):
         pass
 
 class SourceSpaceReconstructor(Protocol):
-    def __init__(self, fs, **kwargs):
+    def __init__(self, stream, **kwargs):
         kwargs['ssd_in_the_end'] = True
         super().__init__(signals=None, **kwargs)
+
         inverse_operator = self.read_inverse_operator()
         self._forward_model_matrix = self._assemble_forward_model_matrix(inverse_operator)
         self.source_vertex_idx = self.extract_source_vertex_idx(inverse_operator)
+
         self.widget_painter = SourceSpaceWidgetPainter(self)
 
-        self.fs = fs
+        self.fs = stream.get_frequency()
+        self.n_channels = stream.get_n_channels()
 
-        self.settings = ReconstructorSettings(fs=fs)
-        self.connect_settings()
+        self.settings = ReconstructorSettings(fs=self.fs)
 
-        self.apply_linear_filter = self.settings.linear_filter.aplly.value()
-        self.extract_envelope = self.settings.extract_envelope.value()
-        self.apply_linear_desync = self.settings.linear_desynchronisation.apply.vale()
+        self.apply_linear_filter = self.settings.linear_filter.apply.value()
         self.linear_filter = None
+        self.initiate_linear_filter()
+
+        self.extract_envelope = self.settings.extract_envelope.value()
         self.envelope_extractor = None
+        self.initiate_envelope_extractor()
+
+        self.apply_linear_desync = self.settings.linear_desynchronisation.apply.value()
         self.linear_desync = None
+        self.initiate_linear_desync()
+
+        self.connect_settings()
 
     @staticmethod
     def _assemble_forward_model_matrix(inverse_operator):
@@ -108,33 +117,32 @@ class SourceSpaceReconstructor(Protocol):
         # Linear filter
 
         # Any change to the linear filter means that everything after it should be reset
-        self.settings.linear_filter.sigTreeChanged.connect(self.envelope_extractor.reset)
-        self.settings.linear_filter.sigTreeChanged.connect(self.linear_desync.reset)
+        linear_filter_settings = self.settings.linear_filter
+        linear_filter_settings.sigTreeStateChanged.connect(self.envelope_extractor.reset)
+        linear_filter_settings.sigTreeStateChanged.connect(self.linear_desync.reset)
 
-        self.settings.linear_filter.apply.sigChanged.connect(self.linear_filter_switched)
-        self.settings.linear_filter.lower_cutoff.connect(self.initiate_linear_filter)
-        self.settings.linear_filter.upper_cutoff.connect(self.initiate_linear_filter)
+        linear_filter_settings.apply.sigValueChanged.connect(self.linear_filter_switched)
+        linear_filter_settings.lower_cutoff.sigValueChanged.connect(self.initiate_linear_filter)
+        linear_filter_settings.upper_cutoff.sigValueChanged.connect(self.initiate_linear_filter)
 
         # Envelope
-        self.settings.extract_envelope.sigChanged.connect(self.extract_envelope_switched)
-        self.settings.extract_envelope.sigChanged.connect(self.linear_desync.reset)
+        self.settings.extract_envelope.sigValueChanged.connect(self.extract_envelope_switched)
+        self.settings.extract_envelope.sigValueChanged.connect(self.linear_desync.reset)
 
         # Linear desynchronisation
         lin_desync_settings = self.settings.linear_desynchronisation
-        lin_desync_settings.apply.sigChanged.connect(self.linear_desync_switched)
-        lin_desync_settings.window_width.sigChanged.connect(self.initiate_linear_desync)
-        lin_desync_settings.lag.sigChanged.connect(self.initiate_linear_desync)
+        lin_desync_settings.apply.sigValueChanged.connect(self.linear_desync_switched)
+        lin_desync_settings.window_width.sigValueChanged.connect(self.initiate_linear_desync)
+        lin_desync_settings.lag.sigValueChanged.connect(self.initiate_linear_desync)
 
     def linear_filter_switched(self, param, value):
         self.apply_linear_filter = value
-        if value is True and not self.linear_filter:
-            self.initiate_linear_filter()
 
     def initiate_linear_filter(self):
-        lower_cutoff = self.settings.linear_filter.lower_cutoff
-        upper_cutoff = self.settings.linear_filter.upper_cutoff
+        lower_cutoff = self.settings.linear_filter.lower_cutoff.value()
+        upper_cutoff = self.settings.linear_filter.upper_cutoff.value()
         band = (lower_cutoff, upper_cutoff)
-        self.linear_filter = filters.ButterFilter(band, fs=self.fs)
+        self.linear_filter = filters.ButterFilter(band, fs=self.fs, n_channels=self.n_channels)
 
     def transform_input_signal(self, chunk):
         result = chunk
@@ -144,16 +152,12 @@ class SourceSpaceReconstructor(Protocol):
 
     def extract_envelope_switched(self, param, value):
         self.extract_envelope = value
-        if value is True and not self.envelope_extractor:
-            self.initiate_envelope_extractor()
 
     def initiate_envelope_extractor(self):
         self.envelope_extractor = EnvelopeExtractor()
 
     def linear_desync_switched(self, param, value):
         self.apply_linear_desync = value
-        if value is True and not self.linear_desync:
-            self.initiate_linear_desync()
 
     def initiate_linear_desync(self):
         lin_desync_settings = self.settings.linear_desynchronisation
