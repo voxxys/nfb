@@ -390,9 +390,12 @@ class SourceSpaceWindow(SecondaryWindow):
 
     def __init__(self, parent, current_protocol, **kwargs):
         super().__init__(parent, current_protocol, **kwargs)
+
+        self.fs = self.current_protocol.fs
         self.settings = SourceSpaceSettings(
             painter_settings=self.current_protocol.widget_painter.settings,
             reconstructor_settings=self.current_protocol.settings,
+            fs = self.fs
         )
         self.settings_widget = self.settings.create_widget()
         self.centralWidget().layout().addWidget(self.settings_widget)

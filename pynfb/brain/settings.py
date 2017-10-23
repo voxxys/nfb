@@ -37,19 +37,20 @@ class SourceSpaceWidgetPainterSettings(MyGroupParameter):
     COLORMAP_LIMITS_LOCAL = 'local'
     COLORMAP_LIMITS_MANUAL = 'manual'
     COLORMAP_LIMITS_MODES = [COLORMAP_LIMITS_GLOBAL, COLORMAP_LIMITS_MANUAL, COLORMAP_LIMITS_LOCAL]
-    COLORMAP_BUFFER_LENGTH_MAX = 40000
-    COLORMAP_BUFFER_LENGTH_DEFAULT = 6000
+    COLORMAP_BUFFER_LENGTH_MAX = 40000.0
+    COLORMAP_BUFFER_LENGTH_DEFAULT = 6000.0
 
-    def __init__(self):
+    def __init__(self, fs):
         opts = {'name': 'Visualization settings', 'type': 'group', 'value': 'true'}
         super().__init__(**opts)
+        self.fs = fs
 
         # Colormap settings
         cmap_children = [
             {'name': 'Mode', 'type': 'list', 'values': self.COLORMAP_LIMITS_MODES, 'value': 'global'},
             {'name': 'Lock current limits', 'type': 'bool', 'value': False, },
-            {'name': 'Buffer length', 'type': 'slider', 'value': self.COLORMAP_BUFFER_LENGTH_DEFAULT,
-                                      'limits': (0, self.COLORMAP_BUFFER_LENGTH_MAX), 'prec': 0},
+            {'name': 'Buffer length', 'type': 'slider', 'value': self.COLORMAP_BUFFER_LENGTH_DEFAULT / self.fs,
+                                      'limits': (0, self.COLORMAP_BUFFER_LENGTH_MAX / self.fs), 'prec': 3},
             {'name': 'Upper limit', 'type': 'float', 'readonly': True, 'decimals': 3},
             {'name': 'Threshold pct', 'type': 'slider', 'suffix': '%', 'readonly': False, 'limits': (0, 100),
                                       'value': 50, 'prec': 0},
@@ -95,22 +96,23 @@ class SourceSpaceReconstructorSettings(MyGroupParameter):
         # Local desynchronisation
         desync_children = [
             {'name': 'Apply', 'type': 'bool', 'value': False},
-            {'name': 'Window width', 'type': 'slider', 'suffix': '', 'readonly': False, 'limits': (0, 1000),
-             'value': 50, 'prec': 0},
-            {'name': 'Lag', 'type': 'slider', 'suffix': '', 'readonly': False, 'limits': (0, 10000),
-             'value': 1000, 'prec': 0},
+            {'name': 'Window width', 'type': 'slider', 'suffix': '', 'readonly': False,
+             'limits': (0.0 / self.fs, 1000.0 / self.fs), 'value': 0.050, 'prec': 3},
+            {'name': 'Lag', 'type': 'slider', 'suffix': ' s', 'readonly': False,
+             'limits': (0.0 / self.fs, 10000.0 / self.fs), 'value': 1.000, 'prec': 3},
         ]
         desync = MyGroupParameter(name='Linear desynchronisation', children=desync_children)
         self.addChild(desync)
 
 class SourceSpaceSettings(MyGroupParameter):
-    def __init__(self, painter_settings=None, reconstructor_settings=None):
+    def __init__(self, painter_settings=None, reconstructor_settings=None, fs=None):
         opts = {'name': 'Source space settings', 'type': 'group', 'value': 'true'}
         super().__init__(**opts)
+        self.fs = fs
 
         self.addChildren([
-            painter_settings or SourceSpaceWidgetPainterSettings(),
-            reconstructor_settings or SourceSpaceReconstructorSettings(),
+            painter_settings or SourceSpaceWidgetPainterSettings(fs=self.fs),
+            reconstructor_settings or SourceSpaceReconstructorSettings(fs=self.fs),
         ])
 
 # Adapted from https://stackoverflow.com/a/42011414/3042770

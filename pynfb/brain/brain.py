@@ -53,11 +53,11 @@ class SourceSpaceReconstructor(Protocol):
         self._forward_model_matrix = self._assemble_forward_model_matrix(inverse_operator)
         self.source_vertex_idx = self.extract_source_vertex_idx(inverse_operator)
 
-        self.widget_painter = SourceSpaceWidgetPainter(self)
 
         self.fs = stream.get_frequency()
         self.n_channels = stream.get_n_channels()
 
+        self.widget_painter = SourceSpaceWidgetPainter(self, fs=self.fs)
         self.settings = ReconstructorSettings(fs=self.fs)
 
         self.apply_linear_filter = self.settings.linear_filter.apply.value()
@@ -241,7 +241,7 @@ class RangeBuffer:
 
     def buffer_length_changed(self, param, new_buffer_length):
         # qt slot
-        self.current_buffer_length = int(new_buffer_length)
+        self.current_buffer_length = int(new_buffer_length * self.fs)
 
     def invalidate(self):
         self.invalidation_scheduled = True
@@ -250,10 +250,11 @@ class RangeBuffer:
 class SourceSpaceWidgetPainter(Painter):
     ROBUST_PCT = 95 # Perecntage to use in robust_max
 
-    def __init__(self, source_space_reconstructor, show_reward=False, params=None):
+    def __init__(self, source_space_reconstructor, fs, show_reward=False, params=None):
         super().__init__(show_reward=show_reward)
 
-        self.settings = PainterSettings()
+        self.fs = fs
+        self.settings = PainterSettings(fs=self.fs)
 
         self.protocol = source_space_reconstructor
         self.source_vertex_idx = self.protocol.source_vertex_idx
@@ -269,7 +270,7 @@ class SourceSpaceWidgetPainter(Painter):
         self.lock_current_limits = self.settings.colormap.lock_current_limits.value()
         self.vmax = None
 
-        self.colormap_buffer_length = self.settings.colormap.buffer_length.value()
+        self.colormap_buffer_length = self.settings.colormap.buffer_length.value() * self.fs # from time to # of samples
         self.colormap_threshold_pct = self.settings.colormap.threshold_pct.value()
         self.range_buffer = RangeBuffer(self.colormap_buffer_length)
 
