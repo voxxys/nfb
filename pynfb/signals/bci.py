@@ -13,11 +13,13 @@ from sklearn.preprocessing import StandardScaler
 
 
 class BCIModel():
-    def __init__(self, fs, bands, ch_names, states_labels, indexes):
+    def __init__(self, fs, bands, montage, states_labels, indexes):
         self.states_labels = states_labels
         self.bands = bands
-        self.prefilter = FilterSequence([ButterFilter((0.5, 45), fs, len(ch_names))])
-        self.csp_pools = [SpatialDecompositionPool(ch_names, fs, bands, 'csp', indexes) for _label in states_labels]
+        self.ch_names = montage.get_names('EEG')
+        self.ch_mask = montage.get_mask('EEG')
+        self.prefilter = FilterSequence([ButterFilter((0.5, 45), fs, len(self.ch_names))])
+        self.csp_pools = [SpatialDecompositionPool(self.ch_names, fs, bands, 'csp', indexes) for _label in states_labels]
         self.csp_transformer = None
         self.var_detector = InstantaneousVarianceFilter(len(bands)*len(indexes)*len(states_labels), n_taps=int(fs//2))
         #self.classifier = MLPClassifier(hidden_layer_sizes=(), early_stopping=True, verbose=True)
@@ -25,6 +27,9 @@ class BCIModel():
         self.scaler = StandardScaler()
 
     def fit(self, X, y=None):
+        print(X.shape)
+        X = X[:, self.ch_mask]
+        print(X.shape)
         X = self.prefilter.apply(X)
         for csp_pool, label in zip(self.csp_pools, self.states_labels):
             csp_pool.fit(X, y == label)
@@ -47,6 +52,7 @@ class BCIModel():
         return accuracies
 
     def apply(self, chunk: np.ndarray):
+        chunk = chunk[:, self.ch_mask]
         chunk = self.prefilter.apply(chunk)
         chunk = self.csp_transformer.apply(chunk)
         chunk = self.var_detector.apply(chunk)
@@ -55,11 +61,11 @@ class BCIModel():
         return predicted_labels
 
 class BCISignal():
-    def __init__(self, fs, ch_names, name, id, bands=None, states_labels=None, indexes=None):
+    def __init__(self, fs, montage, name, id, bands=None, states_labels=None, indexes=None):
         bands = bands if bands is not None else BANDS_DEFAULT
         states_labels = states_labels if states_labels is not None else STATES_LABELS_DEFAULT
         indexes = indexes if indexes is not None else INDEXES_DEFAULT
-        self.model_args = [fs, bands, ch_names, states_labels, indexes]
+        self.model_args = [fs, bands, montage, states_labels, indexes]
         self.model = BCIModel(*self.model_args)
         self.current_sample = 0
         self.name = name

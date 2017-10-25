@@ -109,13 +109,12 @@ class Protocol:
                 self.timer.stop()
 
             # get recorded raw data
-            channels_names = self.ch_names
             if raw_file is not None and protocols_seq is not None:
                 x = load_h5py_protocols_raw(raw_file, [j for j in range(len(protocols_seq)-1)])
                 x.append(raw)
             else:
                 raise AttributeError('Attributes protocol_seq and raw_file should be not a None')
-            pos = ch_names_to_2d_pos(channels_names)
+
 
         # automatic fit bci (protocol names should be in the bci_labels dictionary keys below)
         if self.auto_bci_fit:
@@ -129,7 +128,8 @@ class Protocol:
             bci_signal.fit_model(X, y)
 
         if self.ssd_in_the_end:
-            signal_manager = SignalsSSDManager(self.signals, x, pos, channels_names, self, signals, protocols,
+            pos = ch_names_to_2d_pos(self.ch_names)
+            signal_manager = SignalsSSDManager(self.signals, x, pos, self.ch_names, self, signals, protocols,
                                                sampling_freq=self.freq, protocol_seq=protocols_seq, marks=marks)
             signal_manager.test_signal.connect(lambda: self.experiment.start_test_protocol(
                 protocols[signal_manager.combo_protocols.currentIndex()]

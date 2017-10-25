@@ -1,6 +1,6 @@
 import mne
 import pandas as pd
-
+from ..helpers.az_proj import azimuthal_equidistant_projection
 
 class Montage(pd.DataFrame):
     CHANNEL_TYPES = ['EEG', 'MAG', 'GRAD', 'OTHER']
@@ -27,29 +27,34 @@ class Montage(pd.DataFrame):
         self.loc[len(self)] = {'name': name, 'type': type, 'pos_x': pos[0], 'pos_y': pos[1]}
 
     def get_names(self, type='ALL'):
-        if type in self.CHANNEL_TYPES:
-            return list(self[self['type'] == type]['name'])
-        elif type == 'ALL':
-            return list(self['name'])
-        else:
-            raise TypeError('Bad channels type')
+        return list(self[self.get_mask(type)]['name'])
 
     def get_pos(self, type='ALL'):
+        return (self[self.get_mask(type)][['pos_x', 'pos_y']]).as_matrix()
+
+    def get_mask(self, type='ALL'):
         if type in self.CHANNEL_TYPES:
-            return (self[self['type']==type][['pos_x', 'pos_y']]).as_matrix()
+            return (self['type'] == type).as_matrix()
         elif type == 'ALL':
-            return self[['pos_x', 'pos_y']].as_matrix()
+            return (self['type'] == self['type']).as_matrix()
         else:
             raise TypeError('Bad channels type')
 
     @staticmethod
     def load_layout(name):
-        layout = mne.channels.read_layout(name)
+        if name == 'EEG1005':
+            layout = mne.channels.read_montage('standard_1005')
+            layout.pos = azimuthal_equidistant_projection(layout.pos)
+            layout.names = layout.ch_names
+        else:
+            layout = mne.channels.read_layout(name)
         layout.names = list(map(str.upper, layout.names))
         return layout
 
 if __name__ == '__main__':
     m = Montage(['cz', 'fp1', 'FP2', 'AUX1', 'MEG 2631', 'MEg 2632'])
-
-    print(m.get_names())
-    print(m.get_pos())
+    print(m)
+    print(m.get_names('EEG'))
+    print(m.get_pos('EEG'))
+    print(len(m))
+    print(m.get_mask('EEG'))

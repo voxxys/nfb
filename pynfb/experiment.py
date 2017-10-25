@@ -19,6 +19,7 @@ from .signals import DerivedSignal, CompositeSignal, BCISignal
 from .windows import MainWindow
 from ._titles import WAIT_BAR_MESSAGES
 import mne
+from .inlets.montage import Montage
 
 
 # helpers
@@ -308,6 +309,8 @@ class Experiment():
         self.n_channels = self.stream.get_n_channels()
         self.n_channels_other = self.stream.get_n_channels_other()
         channels_labels = self.stream.get_channels_labels()
+        montage = Montage(channels_labels)
+        print(montage)
 
         self.seconds = 2 * self.freq
         self.raw_std = None
@@ -338,7 +341,7 @@ class Experiment():
                                   for ind, signal in enumerate(self.params['vSignals']['CompositeSignal'])]
 
         # bci signals
-        self.bci_signals = [BCISignal(self.freq, channels_labels, signal['sSignalName'], ind)
+        self.bci_signals = [BCISignal(self.freq, montage, signal['sSignalName'], ind)
                             for ind, signal in enumerate(self.params['vSignals']['DerivedSignal']) if signal['bBCIMode']]
 
         self.signals += self.composite_signals

@@ -60,7 +60,7 @@ class ChannelsSelector:
             exclude_indices = []
 
         # exclude not valid channels
-        exclude_indices += [j for j, isvalid in enumerate(names_isvalid) if not isvalid]
+        # exclude_indices += [j for j, isvalid in enumerate(names_isvalid) if not isvalid]
 
         # exclude subtractive channel
         if self.sub_channel_index is not None:
