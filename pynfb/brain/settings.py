@@ -1,8 +1,7 @@
 from pyqtgraph.Qt import QtGui
 from pyqtgraph.parametertree import ParameterTree, parameterTypes as pTypes
 
-from .slider import SliderParameter # Importing will register 'slider' type
-
+from . import slider  # Importing will register 'slider' type used in parameter dicts
 
 class MyGroupParameter(pTypes.GroupParameter):
     def __init__(self, **opts):
@@ -39,8 +38,8 @@ class SourceSpaceWidgetPainterSettings(MyGroupParameter):
     COLORMAP_LIMITS_LOCAL = 'local'
     COLORMAP_LIMITS_MANUAL = 'manual'
     COLORMAP_LIMITS_MODES = [COLORMAP_LIMITS_GLOBAL, COLORMAP_LIMITS_MANUAL, COLORMAP_LIMITS_LOCAL]
-    COLORMAP_BUFFER_LENGTH_MAX = 40000.0
-    COLORMAP_BUFFER_LENGTH_DEFAULT = 6000.0
+    COLORMAP_BUFFER_LENGTH_MAX = 40000
+    COLORMAP_BUFFER_LENGTH_DEFAULT = 6000
 
     def __init__(self, fs):
         opts = {'name': 'Visualization settings', 'type': 'group', 'value': 'true'}
@@ -51,8 +50,10 @@ class SourceSpaceWidgetPainterSettings(MyGroupParameter):
         cmap_children = [
             {'name': 'Mode', 'type': 'list', 'values': self.COLORMAP_LIMITS_MODES, 'value': 'global'},
             {'name': 'Lock current limits', 'type': 'bool', 'value': False, },
-            {'name': 'Buffer length', 'type': 'slider', 'value': self.COLORMAP_BUFFER_LENGTH_DEFAULT / self.fs,
-                                      'limits': (0, self.COLORMAP_BUFFER_LENGTH_MAX / self.fs), 'prec': 3},
+            {'name': 'Buffer length in seconds',
+                'type': 'slider', 'value': self.COLORMAP_BUFFER_LENGTH_DEFAULT / self.fs,
+                'limits': (0, self.COLORMAP_BUFFER_LENGTH_MAX / self.fs), 'prec': 3,
+                'suffix': ' s', 'title': 'Buffer length'},
             {'name': 'Upper limit', 'type': 'float', 'readonly': True, 'decimals': 3},
             {'name': 'Threshold pct', 'type': 'slider', 'suffix': '%', 'readonly': False, 'limits': (0, 100),
                                       'value': 50, 'prec': 0},
@@ -96,13 +97,15 @@ class SourceSpaceReconstructorSettings(MyGroupParameter):
 
         # Local desynchronisation
         desync_children = [
-            {'name': 'Apply', 'type': 'bool', 'value': False},
-            {'name': 'Window width', 'type': 'slider', 'suffix': '', 'readonly': False,
-             'limits': (0.0 / self.fs, 1000.0 / self.fs), 'value': 0.050, 'prec': 3},
-            {'name': 'Lag', 'type': 'slider', 'suffix': ' s', 'readonly': False,
-             'limits': (0.0 / self.fs, 10000.0 / self.fs), 'value': 1.000, 'prec': 3},
+            {'name': 'Apply', 'type': 'bool', 'value': False, 'readonly': True},
+            {'name': 'Window width in seconds', 'title': 'Window width',
+                'type': 'slider', 'suffix': ' s', 'readonly': False,
+                'limits': (0.0 / self.fs, 1000.0 / self.fs), 'value': 0.050, 'prec': 3},
+            {'name': 'Lag in seconds', 'title': 'Lag',
+                'type': 'slider', 'suffix': ' s', 'readonly': False,
+                'limits': (0.0 / self.fs, 10000.0 / self.fs), 'value': 1.000, 'prec': 3},
         ]
-        desync = MyGroupParameter(name='Linear desynchronisation', children=desync_children)
+        desync = MyGroupParameter(name='Local desynchronisation', children=desync_children)
         self.addChild(desync)
 
 class SourceSpaceSettings(MyGroupParameter):

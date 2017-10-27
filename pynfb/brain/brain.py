@@ -10,49 +10,70 @@ from matplotlib import cm
 from pyqtgraph import opengl as gl
 import nibabel as nib
 from scipy import sparse
-import matplotlib.colors as mpl_colors
-from OpenGL.GL import (GL_ONE, GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA, GL_FUNC_ADD, GL_MAX, GL_BLEND,
-                       GL_ALPHA_TEST, GL_DEPTH_TEST,
-                       GL_CULL_FACE, GL_FRONT, GL_FRONT_FACE, GL_BACK)
+from scipy.signal import convolve2d
 
 from ..protocols import Protocol
 from ..protocols.widgets import Painter
 from ..signal_processing import filters
 from .settings import (SourceSpaceWidgetPainterSettings as PainterSettings,
                        SourceSpaceReconstructorSettings as ReconstructorSettings)
+from .ring_buffer import RingBuffer
 
 
-# Todo: implement or use something from filters
-class EnvelopeExtractor(object):
-    def __init__(self):
-        return super().__init__()
+class TransformerWithBuffer(object):
+    def __init__(self, row_cnt, maxlen):
+        self.buffer = RingBuffer(row_cnt=row_cnt, maxlen=maxlen)
+        self.invalidation_scheduled = False
 
-    def apply(self, sources):
-        return sources
+    def _apply(self, input):
+        raise NotImplementedError
 
-    def reset(self):
-        pass
+    def apply(self, input):
+        if self.invalidation_scheduled is True:
+            self.buffer.clear()
+            self.invalidation_scheduled = False
+        return self._apply(input)
 
-# Todo: implement
-class LinearDesync(object):
-    def __init__(self, window_width, lag, fs):
-        return super().__init__()
+    def schedule_invalidation(self):
+        self.invalidation_scheduled = True
 
-    def apply(self, sources):
-        return sources
 
-    def reset(self):
-        pass
+class LocalDesync(TransformerWithBuffer):
+    def __init__(self, window_width, lag, row_cnt):
+        self.window_width = window_width
+        self.lag = lag
+        self.n_channels = row_cnt
+
+        # maxlen of the buffer is the least it takes to calculate linear desync when exactly one new sample comes
+        self.maxlen = self.window_width + self.lag - 1
+        if self.maxlen >= 0: # Dummy LocalDesync object can be created by passing widow_width=0, lag=0 -> maxlen == -1
+            super().__init__(row_cnt=row_cnt, maxlen=self.maxlen)
+
+    def _apply(self, input):
+        together = np.hstack((self.buffer.data, input ** 2))
+        self.buffer.extend(input ** 2)
+
+        sliding_sums = convolve2d(together, np.ones((1, self.window_width)))
+        with np.errstate(divide='ignore'):
+            baseline = sliding_sums[:, :-self.lag]
+            ratios = np.where(baseline == 0, 0, sliding_sums[:, self.lag:] / baseline)
+
+        # There might be more, as much or less samples in ratios as there are in input. And we need to return exactly
+        # the same amount for the following calculations that use buffering to not get confused.
+        sample_cnt = input.shape[1]
+        ratio_cnt = ratios.shape[1]
+        return np.hstack((input[:, 0:(sample_cnt - ratio_cnt)],
+                          ratios[:, -sample_cnt:]))
+
 
 class SourceSpaceReconstructor(Protocol):
     def __init__(self, stream, **kwargs):
-        kwargs['ssd_in_the_end'] = True
         super().__init__(signals=None, **kwargs)
 
         inverse_operator = self.read_inverse_operator()
         self._forward_model_matrix = self._assemble_forward_model_matrix(inverse_operator)
         self.source_vertex_idx = self.extract_source_vertex_idx(inverse_operator)
-
+        self.source_cnt = self.source_vertex_idx.shape[0]
 
         self.fs = stream.get_frequency()
         self.n_channels = stream.get_n_channels()
@@ -65,12 +86,14 @@ class SourceSpaceReconstructor(Protocol):
         self.initiate_linear_filter()
 
         self.extract_envelope = self.settings.extract_envelope.value()
-        self.envelope_extractor = None
+        self.envelope_extractor_constructor = (
+            lambda: filters.ExponentialMatrixSmoother(factor=0.9, column_cnt=self.source_cnt))
+        self.envelope_extractor = self.envelope_extractor_constructor()
         self.initiate_envelope_extractor()
 
-        self.apply_linear_desync = self.settings.linear_desynchronisation.apply.value()
-        self.linear_desync = None
-        self.initiate_linear_desync()
+        self.apply_local_desync = self.settings.local_desynchronisation.apply.value()
+        self.local_desync = LocalDesync(window_width=0, lag=0, row_cnt=self.n_channels)
+        self.initiate_local_desync()
 
         self.connect_settings()
 
@@ -118,8 +141,8 @@ class SourceSpaceReconstructor(Protocol):
 
         # Any change to the linear filter means that everything after it should be reset
         linear_filter_settings = self.settings.linear_filter
-        linear_filter_settings.sigTreeStateChanged.connect(self.envelope_extractor.reset)
-        linear_filter_settings.sigTreeStateChanged.connect(self.linear_desync.reset)
+        linear_filter_settings.sigTreeStateChanged.connect(self.initiate_envelope_extractor)
+        linear_filter_settings.sigTreeStateChanged.connect(self.local_desync.schedule_invalidation)
 
         linear_filter_settings.apply.sigValueChanged.connect(self.linear_filter_switched)
         linear_filter_settings.lower_cutoff.sigValueChanged.connect(self.initiate_linear_filter)
@@ -127,13 +150,13 @@ class SourceSpaceReconstructor(Protocol):
 
         # Envelope
         self.settings.extract_envelope.sigValueChanged.connect(self.extract_envelope_switched)
-        self.settings.extract_envelope.sigValueChanged.connect(self.linear_desync.reset)
+        self.settings.extract_envelope.sigValueChanged.connect(self.local_desync.schedule_invalidation)
 
         # Linear desynchronisation
-        lin_desync_settings = self.settings.linear_desynchronisation
-        lin_desync_settings.apply.sigValueChanged.connect(self.linear_desync_switched)
-        lin_desync_settings.window_width.sigValueChanged.connect(self.initiate_linear_desync)
-        lin_desync_settings.lag.sigValueChanged.connect(self.initiate_linear_desync)
+        local_desync_settings = self.settings.local_desynchronisation
+        local_desync_settings.apply.sigValueChanged.connect(self.local_desync_switched)
+        local_desync_settings.window_width_in_seconds.sigValueChanged.connect(self.initiate_local_desync)
+        local_desync_settings.lag_in_seconds.sigValueChanged.connect(self.initiate_local_desync)
 
     def linear_filter_switched(self, param, value):
         self.apply_linear_filter = value
@@ -154,25 +177,25 @@ class SourceSpaceReconstructor(Protocol):
         self.extract_envelope = value
 
     def initiate_envelope_extractor(self):
-        self.envelope_extractor = EnvelopeExtractor()
+        self.envelope_extractor = self.envelope_extractor_constructor()
 
-    def linear_desync_switched(self, param, value):
-        self.apply_linear_desync = value
+    def local_desync_switched(self, param, value):
+        self.apply_local_desync = value
 
-    def initiate_linear_desync(self):
-        lin_desync_settings = self.settings.linear_desynchronisation
-        window_width = lin_desync_settings.window_width.value()
-        lag = lin_desync_settings.lag.value()
-        self.linear_desync = LinearDesync(window_width=window_width, lag=lag, fs=self.fs)
+    def initiate_local_desync(self):
+        lin_desync_settings = self.settings.local_desynchronisation
+        window_width = int(lin_desync_settings.window_width_in_seconds.value() * self.fs)
+        lag = int(lin_desync_settings.lag_in_seconds.value() * self.fs)
+        self.local_desync = LocalDesync(window_width=window_width, lag=lag, row_cnt=self.source_cnt)
 
     def transform_sources(self, sources):
         result = sources
 
         if self.extract_envelope is True:
-            result = self.envelope_extractor.apply(result)
+            result = self.envelope_extractor.apply(np.abs(result))
 
-        if self.apply_linear_desync is True:
-            result = self.linear_desync.apply(result)
+        if self.apply_local_desync is True:
+            result = self.local_desync.apply(result.T).T # LocalDesync assumes that samples are in columns, thus .T
 
         return result
 
@@ -228,8 +251,10 @@ class RangeBuffer:
         if self.invalidation_scheduled is True:
             self.max_buffer.clear()
             self.invalidation_scheduled = False
+
         if take_abs:
             sources = np.abs(sources)
+
         self.max_buffer.extend(self.robust_max(sources))
         self.vmax = max(self.head())
 
@@ -239,9 +264,8 @@ class RangeBuffer:
         start = max(stop - self.current_buffer_length, 0)
         return itertools.islice(self.max_buffer, start, stop)
 
-    def buffer_length_changed(self, param, new_buffer_length):
-        # qt slot
-        self.current_buffer_length = int(new_buffer_length * self.fs)
+    def update_buffer_length(self, new_buffer_length):
+        self.current_buffer_length = new_buffer_length
 
     def invalidate(self):
         self.invalidation_scheduled = True
@@ -270,9 +294,9 @@ class SourceSpaceWidgetPainter(Painter):
         self.lock_current_limits = self.settings.colormap.lock_current_limits.value()
         self.vmax = None
 
-        self.colormap_buffer_length = self.settings.colormap.buffer_length.value() * self.fs # from time to # of samples
+        self.colormap_buffer_length = int(self.settings.colormap.buffer_length_in_seconds.value() * self.fs) # from time to # of samples
         self.colormap_threshold_pct = self.settings.colormap.threshold_pct.value()
-        self.range_buffer = RangeBuffer(self.colormap_buffer_length)
+        self.range_buffer = RangeBuffer(buffer_length=self.colormap_buffer_length)
 
         self.smoothing_matrix = self.read_smoothing_matrix()
 
@@ -382,7 +406,10 @@ class SourceSpaceWidgetPainter(Painter):
         cmap_settings.mode.sigValueChanged.connect(self.mode_changed)
         cmap_settings.upper_limit.sigValueChanged.connect(self.upper_limit_changed)
         cmap_settings.threshold_pct.sigValueChanged.connect(self.colormap_threshold_pct_changed)
-        cmap_settings.buffer_length.sigValueChanged.connect(self.range_buffer.buffer_length_changed)
+        cmap_settings.buffer_length_in_seconds.sigValueChanged.connect(self.range_buffer_length_changed)
+
+    def range_buffer_length_changed(self, param, length_in_seconds):
+        self.range_buffer.update_buffer_length(int(length_in_seconds * self.fs))
 
     @staticmethod
     def read_smoothing_matrix():
