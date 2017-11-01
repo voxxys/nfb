@@ -35,3 +35,18 @@ class RingBuffer(object):
     def data(self):
         return self._data[:, :self._current_sample_cnt]
 
+
+class RingBufferNoRoll(RingBuffer):
+    def extend(self, array):
+        self.check_shape(array)
+
+        new_sample_cnt = array.shape[1]
+        total_sample_cnt = self._current_sample_cnt + new_sample_cnt
+        samples_to_pop_cnt = max(total_sample_cnt - self.maxlen, 0)
+        samples_to_keep_cnt = self._current_sample_cnt - samples_to_pop_cnt
+
+        self._current_sample_cnt = min(total_sample_cnt, self.maxlen)  # the number of samples after adding the new ones
+
+        self._data = np.roll(self._data, shift=-samples_to_pop_cnt, axis=1)  # pop samples that are too old to keep
+        # Write new samples. Every new sample that fits goes in
+        self._data[:, samples_to_keep_cnt:self._current_sample_cnt] = array[:, -self.maxlen:]
