@@ -181,7 +181,7 @@ def game_loop():
     coin_startY = -200
     coin_speed = 2
 
-    planet = planets[0]
+    #planet = planets[0]
     planet_size = 500
     planet_startX = random.randrange(-300, display_width-300)
     planet_startY = -600
@@ -212,11 +212,11 @@ def game_loop():
         if chunk is not None:
             state = chunk[-1, 0]
 
-        if state == 1:
+        if state > 0:
             x_change = -4
-        elif state == 2:
+        else:
             x_change = 4
-
+        print(state)
         clock.tick(60)  # frames per second
         parallax += 1
         parallax += boost
@@ -275,7 +275,7 @@ def game_loop():
             coin_startX = random.randrange(50, display_width - 50)
 
         if planet_startY > display_hight:
-            planet = planets[random.randrange(len(planets))]
+            #planet = planets[random.randrange(len(planets))]
             planet_startY = -planet_size
             planet_startX = random.randrange(500, display_width - 500)
 
@@ -347,10 +347,10 @@ backgroundImg = load_image('background.png')
 
 # loading explosion image
 
-explosion_1 = load_image('explosion_1.tiff')
-explosion_1 = pygame.transform.scale(explosion_1, (150, 150))
-explosion_2 = load_image('explosion_2.tiff')
-explosion_2 = pygame.transform.scale(explosion_2, (150, 150))
+#explosion_1 = load_image('explosion_1.tiff')
+#explosion_1 = pygame.transform.scale(explosion_1, (150, 150))
+#explosion_2 = load_image('explosion_2.tiff')
+#explosion_2 = pygame.transform.scale(explosion_2, (150, 150))
 
 # loading demon images
 
@@ -371,16 +371,16 @@ coins = [coin_1, coin_2, coin_3, coin_4]
 
 # loading demon images
 
-planet_1 = load_image('planet_1.tiff')
-planet_2 = load_image('planet_2.tiff')
-planet_3 = load_image('planet_3.tiff')
-planet_4 = load_image('planet_4.tiff')
-planet_5 = load_image('planet_5.tiff')
-planet_6 = load_image('planet_6.tiff')
-planet_7 = load_image('planet_7.tiff')
-planet_8 = load_image('planet_8.tiff')
+#planet_1 = load_image('planet_1.tiff')
+#planet_2 = load_image('planet_2.tiff')
+#planet_3 = load_image('planet_3.tiff')
+#planet_4 = load_image('planet_4.tiff')
+#planet_5 = load_image('planet_5.tiff')
+#planet_6 = load_image('planet_6.tiff')
+#planet_7 = load_image('planet_7.tiff')
+#planet_8 = load_image('planet_8.tiff')
 
-planets = [planet_1, planet_2, planet_3, planet_4, planet_5, planet_6, planet_7, planet_8]
+#planets = [planet_1, planet_2, planet_3, planet_4, planet_5, planet_6, planet_7, planet_8]
 
 # loading title image
 
