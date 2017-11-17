@@ -5,7 +5,7 @@ from pylsl import StreamInfo, StreamOutlet
 
 def simulate_bci_signal(fs, chunk_size=8, verbose=False):
     # setup stream
-    info = StreamInfo(name='NFBLab_data', type='', channel_count=1, nominal_srate=fs)
+    info = StreamInfo(name='lipa', type='', channel_count=1, nominal_srate=fs)
     channels = info.desc().append_child("channels")
     channels.append_child("channel").append_child_value("name", 'BCI')
     print('Stream info:\n\tname: {}, fs: {}Hz, channels: {}'.format(info.name(), int(info.nominal_srate()), ['BCI']))

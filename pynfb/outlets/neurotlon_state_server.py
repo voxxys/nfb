@@ -19,7 +19,7 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
             self.send_header('Content-type', 'application/json')
             self.send_header('Access-Control-Allow-Origin', '*')
             self.end_headers()
-            with open("../bci_current_state.pkl", "r") as fp:
+            with open("bci_current_state.pkl", "r") as fp:
                 state = fp.read()
             # Send message back to client
             message = { "state": "{}".format(int(state)+1), "result": "true"}

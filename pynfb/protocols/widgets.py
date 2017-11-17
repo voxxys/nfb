@@ -100,8 +100,8 @@ class BarFeedbackProtocolWidgetPainter(Painter):
 
     def prepare_widget(self, widget):
         super(BarFeedbackProtocolWidgetPainter, self).prepare_widget(widget)
-        self.p1 = widget.plot(self.x, np.zeros_like(self.x), pen=pg.mkPen(229, 223, 213)).curve
-        self.p2 = widget.plot(self.x, np.zeros_like(self.x)-5, pen=pg.mkPen(229, 223, 213)).curve
+        self.p1 = widget.plot(self.x, np.zeros_like(self.x), pen=pg.mkPen(255, 255, 255, width=3)).curve
+        self.p2 = widget.plot(self.x, np.zeros_like(self.x)-5, pen=pg.mkPen(255, 255, 255, width=3)).curve
         fill = pg.FillBetweenItem(self.p1, self.p2, brush=(229, 223, 213, 25))
         self.fill = fill
         widget.addItem(fill)
@@ -155,7 +155,7 @@ class BaselineProtocolWidgetPainter(Painter):
 
     def prepare_widget(self, widget):
         super(BaselineProtocolWidgetPainter, self).prepare_widget(widget)
-        self.text_item = pg.TextItem(html='<center><font size="7" color="#e5dfc5">{}</font></center>'.format(self.text),
+        self.text_item = pg.TextItem(html='<center><font size="20" color="#e5dfc5">{}</font></center>'.format(self.text),
                                 anchor=(0.5, 0.5))
         self.text_item.setTextWidth(500)
         widget.addItem(self.text_item)

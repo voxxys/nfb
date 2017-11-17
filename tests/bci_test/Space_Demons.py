@@ -203,19 +203,28 @@ def game_loop():
 
     pygame.mixer.Sound.play(soundtrack, loops=-1)
 
-    lsl = LSLInlet(name='NFBLab_data')
+    lsl = LSLInlet(name='lipa')
     state = 0
 
-
+    discrete = 1 #TODO: CHANGE TYPE !!!
     while not gameExit:
         chunk = lsl.get_next_chunk()
         if chunk is not None:
-            state = chunk[-1, 0]
-
-        if state > 0:
-            x_change = -4
+            state = chunk[-1, 1] #TODO: CHANGE STATE !!!
         else:
-            x_change = 4
+            print('None')
+        if discrete:
+            if state == 2:
+                x_change = 4
+            elif state == 0:
+                x_change = -4
+            else:
+                x_change = 0
+        else:
+            if state > 0:
+                x_change = -4
+            else:
+                x_change = 4
         print(state)
         clock.tick(60)  # frames per second
         parallax += 1
