@@ -150,6 +150,7 @@ class Coherence(BaseFilter):
 
 class ExponentialSmoother(BaseFilter):
     def __init__(self, factor):
+        factor += 0.007 #TODO: waaaat
         self.a = [1, -factor]
         self.b = [1 - factor]
         self.zi = np.zeros((max(len(self.a), len(self.b)) - 1, ))

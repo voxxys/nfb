@@ -199,6 +199,7 @@ class SignalsSSDManager(QtGui.QDialog):
         self.bci_signals = [signal for signal in signals if isinstance(signal, BCISignal)]
         self.init_signals = deepcopy(self.signals)
         self.all_signals = signals
+        self.protocol_seq = protocol_seq
         self.x = x
         self.pos = pos
         self.marks = marks
@@ -263,6 +264,7 @@ class SignalsSSDManager(QtGui.QDialog):
                 self.name = 'bci'
         bci_fit_widget = BCIFitWidget(BCISignalMock())
         bci_fit_widget.fit_clicked.connect(self.bci_fit_action)
+        bci_fit_widget.fit_2states_clicked.connect(self.bci_fit2_action)
 
         # bottom layout
         main_layout.addWidget(bci_fit_widget)
@@ -436,6 +438,24 @@ class SignalsSSDManager(QtGui.QDialog):
         print('y', y.shape)
         self.bci_signals[0].fit_model(X, y)
         print('bxi print action')
+
+    def bci_fit2_action(self):
+        indexes = self.get_checked_protocols()
+        print(indexes)
+        protocols = np.unique(concatenate(indexes)).astype(int)
+        X = np.concatenate([x for j, x in enumerate(self.x) if j in protocols])
+        self.signals[0].scaling_flag = False
+        self.signals[0].update(X)
+        xx = self.signals[0].current_chunk
+        import pylab as plt
+        ff, axes = plt.subplots(2)
+        axes[0].plot((xx - xx.mean())/ xx.std())
+        print(np.concatenate([[p]*len(x) for x, p in zip(self.x, self.protocol_seq)]))
+        axes[1].plot(np.concatenate([[p]*len(x) for x, p in zip(self.x, self.protocol_seq)]))
+        plt.show()
+        self.signals[0].std = xx.std()
+        self.signals[0].mean = xx.mean()
+        self.signals[0].scaling_flag = True
 
 
 if __name__ == '__main__':

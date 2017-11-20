@@ -121,6 +121,8 @@ class DerivedSignal():
 
         self.current_chunk = current_chunk
         self.current_sample = current_chunk[-1]
+        with open("bci_current_signal.pkl", "w") as fp:
+            fp.write(str(self.current_sample))
         pass
 
     def update_statistics(self, raw=None, emulate=False, from_acc=False,

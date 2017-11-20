@@ -20,6 +20,7 @@ class ProtocolWidget(pg.PlotWidget):
         self.hideAxis('bottom')
         self.hideAxis('left')
         self.setBackgroundBrush(pg.mkBrush('#252120'))
+        # self.setBackgroundBrush(pg.mkBrush('#048bcd'))
         self.reward_str = '<font size="4" color="#B48375">Reward: </font><font size="5" color="#91C7A9">{}</font>'
         self.reward = pg.TextItem(html=self.reward_str.format(0))
         self.reward.setPos(-4.7, 4.7)
@@ -155,6 +156,7 @@ class BaselineProtocolWidgetPainter(Painter):
 
     def prepare_widget(self, widget):
         super(BaselineProtocolWidgetPainter, self).prepare_widget(widget)
+        # self.text_item = pg.TextItem(html=r'<center><font size="20" color="#e5dfc5">{}</font><br><img src="C:\Users\Nikolai\Desktop\Neurobotics\BrainComputer\public\images\marinet\seaweed02.png" width="150"><img src="C:\Users\Nikolai\Desktop\Neurobotics\BrainComputer\public\images\marinet\seaweed02.png" width="150"><img src="C:\Users\Nikolai\Desktop\Neurobotics\BrainComputer\public\images\marinet\seaweed02.png" width="150"><br><img src="C:\Users\Nikolai\PycharmProjects\nfb\pynfb\protocols\submarine.png" width="150"><br><img src="C:\Users\Nikolai\Desktop\Neurobotics\BrainComputer\public\images\marinet\seaweed02.png" width="150"><img src="C:\Users\Nikolai\Desktop\Neurobotics\BrainComputer\public\images\marinet\seaweed02.png" width="150"><img src="C:\Users\Nikolai\Desktop\Neurobotics\BrainComputer\public\images\marinet\seaweed02.png" width="150"></center>'.format(self.text),
         self.text_item = pg.TextItem(html='<center><font size="20" color="#e5dfc5">{}</font></center>'.format(self.text),
                                 anchor=(0.5, 0.5))
         self.text_item.setTextWidth(500)
