@@ -8,6 +8,10 @@ import os
 
 # HTTPRequestHandler class
 class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
+    def __init__(self, *args, **kwargs):
+        super(testHTTPServer_RequestHandler, self).__init__(*args, **kwargs)
+        self.state = 0
+
     # GET
     def do_GET(self):
         if self.path in ['/getlaststate']:
@@ -19,18 +23,23 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
             self.send_header('Content-type', 'application/json')
             self.send_header('Access-Control-Allow-Origin', '*')
             self.end_headers()
-            with open("../bci_current_signal.pkl", "r") as fp:
-                state = fp.read()
-            print(state)
-            print(float(state))
-            border = 0.0001
-            state = float(state)
-            if state > border:
-                state = 1
-            elif state < -border:
-                state = 3
+            if True:
+                with open("../bci_current_signal.pkl", "r") as fp:
+                    state = fp.read()
+                print(state)
+                print(float(state))
+                border = 0.2
+                state = float(state)
+                if state > border:
+                    state = 1
+                elif state < -border*0.1:
+                    state = 3
+                else:
+                    state = 2
             else:
-                state = 0
+                with open("../bci_current_state.pkl", "r") as fp:
+                    state = fp.read()
+                state = [1, 2, 3][int(state)]
             #state = 1 if float(state) > 0 else 3
             # Send message back to client
             message = { "state": "{}".format(int(state)), "result": "true"}

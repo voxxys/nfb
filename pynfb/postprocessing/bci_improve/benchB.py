@@ -13,8 +13,32 @@ from pynfb.signal_processing.filters import ExponentialSmoother, ButterBandEnvel
 from pynfb.signals import DerivedSignal
 from pynfb.signals.bci import BCISignal
 import seaborn as sns
+import statsmodels.nonparametric.api as smnp
+
 
 a = QApplication([])
+
+
+def get_kde_data(data):
+    kde = smnp.KDEUnivariate(data)
+    kde.fit()
+    return kde.support, kde.density
+
+
+def find_border(data1, data2):
+    grid1, kde1 = get_kde_data(data1)
+    grid2, kde2 = get_kde_data(data2)
+    grid = np.sort(np.concatenate((grid1, grid2)))
+    kde1 = np.interp(grid, grid1, kde1)
+    kde2 = np.interp(grid, grid2, kde2)
+
+    #plt.figure()
+    #plt.plot(grid, kde1)
+    #plt.plot(grid, kde2)
+    #plt.show()
+
+    inds = np.arange(len(grid))
+    return grid[np.argmax(kde1) + np.argmin(np.abs(kde1 - kde2)[(inds > np.argmax(kde1)) & (inds < np.argmax(kde2))])]
 
 
 # load data
@@ -61,7 +85,7 @@ def select_states(data, labels):
 
 
 subj = 'ad3'
-files = [r'C:\Users\Nikolai\Desktop\neurotlon_data\D3\motors_leftlegs_11-20_13-21-13\experiment_data.h5']
+files = [r'C:\Users\Nikolai\Desktop\neurotlon_data\D4\motors_leftlegs_11-22_13-19-36\experiment_data.h5']
 
 x = []
 y = []
@@ -73,6 +97,8 @@ for ff in files:
 # y = np.concatenate(y)
 x = x[0]
 y = y[0]
+print(y)
+print(len(x))
 
 if False:
     # fit bci
@@ -85,15 +111,16 @@ try:
     filt = np.load('filt_{}.npy'.format(subj))
 except FileNotFoundError:
     (rej, filt, topo, _unmix, _bandpass, _) = ICADialog.get_rejection(np.concatenate(x), channels, fs, mode='ica')
-    # (_rej, filt, topo, _unmix, _bandpass, _) = ICADialog.get_rejection(np.concatenate(list(x[y=='Right']) + list(x[y=='Tongue'])), channels, fs, mode='csp')
+    #(_rej, filt, topo, _unmix, _bandpass, _) = ICADialog.get_rejection(np.concatenate(list(x[y=='Left']) + list(x[y=='Legs'])), channels, fs, mode='csp')
     # filt, topography, bandpass, rejections = SelectSSDFilterWidget.select_filter_and_bandpass(np.concatenate(x), ch_names_to_2d_pos(channels), channels, sampling_freq=fs)
     np.save('filt_{}.npy'.format(subj), filt)
 
-print(dict(zip(channels, filt)))
+
 
 #filt *= 0
 #filt[channels.index('Cz')] = 1
-
+#filt = np.concatenate([filt, [0, 0, 0, 0]])
+#print(dict(zip(channels, filt)))
 
 df = pd.DataFrame()
 for j, (xx, yy) in enumerate(zip(x, y)):
@@ -106,7 +133,7 @@ signal = DerivedSignal(ind=1, bandpass_high=20, bandpass_low=17, name='legs', n_
               estimator_type='envdetector', temporal_filter_type='butter', smoother_type='exp', filter_order=2)
 
 signal2 = DerivedSignal(ind=1, bandpass_high=20, bandpass_low=17, name='legs', n_channels=len(channels), spatial_filter=filt,
-              disable_spectrum_evaluation=False, n_samples=500, smoothing_factor=0.99299, source_freq=fs,
+              disable_spectrum_evaluation=False, n_samples=500, smoothing_factor=0.9925, source_freq=fs,
               estimator_type='envdetector', temporal_filter_type='butter', smoother_type='exp', filter_order=2)
 
 #import seaborn as sns
@@ -116,6 +143,7 @@ states = ['Legs', 'Left', 'Middle']
 t = 0
 df_signal = pd.DataFrame()
 
+
 for j, (xx, yy) in enumerate(zip(x, y)):
     signal.update(xx)
     signal2.update(xx)
@@ -124,7 +152,31 @@ for j, (xx, yy) in enumerate(zip(x, y)):
     plt.plot(np.arange(t, t + len(xx)) / fs, signal2.current_chunk, '--', c=cm[states.index(yy)])
     t += len(xx)
 
+
+
 plt.show()
+
+
+df_signal['signal'] = (df_signal['signal'] - df_signal['signal'].mean()) / df_signal['signal'].std()
+
+df_signal = df_signal[(df_signal['times']>2)]
+high_legs = np.percentile(df_signal[df_signal['state'] == 'Legs']['signal'], 90)
+low_left = np.percentile(df_signal[df_signal['state'] == 'Left']['signal'], 10)
+print(high_legs)
+print(low_left)
+#print(sum((df_signal['state'] == 'Middle') & (df_signal['signal'] < low_left) & (df_signal['signal'] > high_legs)) / sum(df_signal['state'] == 'Middle'))
+
+
+for state in states[:2]:
+    sss = df_signal[(df_signal['state'] == state) & (df_signal['times']>3)]['signal']
+    plt.vlines([np.percentile(sss, 80), np.percentile(sss, 20)], 0, 1, {'Legs': cm[0], 'Left': cm[1], 'Middle': cm[2]}[state])
+    sns.distplot(sss, norm_hist=True)
+
+plt.vlines(find_border(
+    df_signal[(df_signal['state'] == 'Legs') & (df_signal['times']>3)]['signal'],
+    df_signal[(df_signal['state'] == 'Left') & (df_signal['times']>3)]['signal']), 0, 1)
+plt.show()
+
 print(df_signal)
 sns.tsplot(df_signal, time='times', unit='trial', condition='state', value='signal', ci='sd', estimator=np.mean,
            color={'Legs': cm[0], 'Left': cm[1], 'Middle': cm[2]})

@@ -444,6 +444,8 @@ class SignalsSSDManager(QtGui.QDialog):
         print(indexes)
         protocols = np.unique(concatenate(indexes)).astype(int)
         X = np.concatenate([x for j, x in enumerate(self.x) if j in protocols])
+        Y = np.concatenate([[self.protocol_seq[j]]*len(x) for j, x in enumerate(self.x) if j in protocols])
+        print(Y)
         self.signals[0].scaling_flag = False
         self.signals[0].update(X)
         xx = self.signals[0].current_chunk
@@ -452,9 +454,13 @@ class SignalsSSDManager(QtGui.QDialog):
         axes[0].plot((xx - xx.mean())/ xx.std())
         print(np.concatenate([[p]*len(x) for x, p in zip(self.x, self.protocol_seq)]))
         axes[1].plot(np.concatenate([[p]*len(x) for x, p in zip(self.x, self.protocol_seq)]))
+
+        m = (np.percentile(xx[Y == 'Legs'], 85) + np.percentile(xx[Y == 'Left'], 15)) / 2
+
         plt.show()
         self.signals[0].std = xx.std()
-        self.signals[0].mean = xx.mean()
+        self.signals[0].mean = m
+        print(m, xx.mean())
         self.signals[0].scaling_flag = True
 
 
