@@ -5,8 +5,8 @@ import expyriment.stimuli
 import expyriment.stimuli.extras
 from PyQt4 import QtGui, QtCore
 import numpy as np
-from ...helpers.gabor import GaborPatch
-from ...helpers.cross import ABCCross
+from pynfb.helpers.gabor import GaborPatch
+from pynfb.helpers.cross import ABCCross
 import pygame
 
 
@@ -19,11 +19,17 @@ WHITE = (255, 255, 255)
 class PsyExperiment:
     def __init__(self, exp, detection_task=False, feedback=True):
         self.exp = exp
-
         # init stimulus
+        # gabor
         self.gabor = self.set_gabor(-1, 0.5)
+
+        # crosses
         self.cross = ABCCross()
         self.cross2 = ABCCross(width=1.5)
+
+        # photo rectangle
+        self.photo_rect = expyriment.stimuli.Rectangle(size=(100, 100), position=(1920/2-50, 1080/2-50))
+
         self.present = False
 
         # trial counter
@@ -41,7 +47,7 @@ class PsyExperiment:
         self.is_waiting = False
         self.presentation_sequence = [self.present_pre_stimulus, self.wait_prestim, self.present_stimulus,
                                       self.wait_random]
-        self.detection_task_sequence = [self.present_stimulus, self.wait_random, self.run_detection_task,
+        self.detection_task_sequence = [self.wait_random, self.present_stimulus, self.wait_random, self.run_detection_task,
                                         self.present_pre_stimulus, self.wait_inf]
         self.sequence = self.detection_task_sequence if detection_task else self.presentation_sequence
         self.present_stimulus_index = self.sequence.index(self.present_stimulus)
@@ -76,7 +82,7 @@ class PsyExperiment:
 
     def run_trial(self, sample):
         self.current_sample = sample
-        print(self.current_sample)
+        #print(self.current_sample)
         self.sequence[self.current_action]()
         stimulus_presented = self.current_action == self.present_stimulus_index
         if not self.is_waiting:
@@ -107,22 +113,25 @@ class PsyExperiment:
         self.gabor.preload()
         self.cross.preload()
         self.cross2.preload()
+        self.photo_rect.preload()
 
     def present_pre_stimulus(self):
         self.cross.present(clear=True, update=True)
 
     def present_stimulus(self):
         # present + hide gabor and change cross
-        self.present = bool(np.random.randint(0, 2))
+        self.present = bool(np.random.randint(0, 2)) + 1
         t = 0
+        tic = time()
         if self.present:
-            t = self.gabor.present(clear=False, update=False)
-        t += self.cross2.present(clear=False, update=True)
-        t += self.cross.present()
+            t += self.gabor.present(clear=False, update=False)
 
+        t += self.cross2.present(clear=False, update=False)
+        t += self.photo_rect.present(clear=False, update=True)
+        t += self.cross.present()
         # print time
         if DEBUG:
-            print(t)
+            print('total_time', time() - tic, 'stim_time', t)
 
     def run_detection_task1(self):
         # detection task
@@ -188,15 +197,16 @@ class PsyExperiment:
 if __name__ == '__main__':
     def run_exp():
         control.defaults.initialize_delay = 0
+        # control.defaults.open_gl = 2
         #control.defaults.window_mode = True
         exp_env = design.Experiment(background_colour=BLACK)
         control.initialize(exp_env)
-        exp = PsyExperiment(exp_env, detection_task=True)
+        exp = PsyExperiment(exp_env, detection_task=False)
         exp.preload_stimuli()
         #sleep(5)
 
         while True:
-            exp.run_trial()
+            exp.run_trial(50000)
 
         control.end()
 
