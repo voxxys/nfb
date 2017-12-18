@@ -318,7 +318,7 @@ class SubjectWindow(SecondaryWindow):
         return ProtocolWidget()
 
     def update_protocol_state(self, samples, reward, chunk_size=1, is_half_time=False):
-        self.current_protocol.update_state(samples=samples, reward=reward, chunk_size=chunk_size,
+        return self.current_protocol.update_state(samples=samples, reward=reward, chunk_size=chunk_size,
                                            is_half_time=is_half_time)
 
 

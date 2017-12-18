@@ -1,9 +1,9 @@
 import time
-
+from PyQt4 import QtCore
 import numpy as np
 import pyqtgraph as pg
 
-from ..protocols.psycho.cross_present import PsyExperiment
+from pynfb.protocols.psycho.cross_present import PsyExperiment
 
 
 class ProtocolWidget(pg.PlotWidget):
@@ -13,10 +13,10 @@ class ProtocolWidget(pg.PlotWidget):
         self.setYRange(-width, width)
         self.setXRange(-width, width)
         size = 500
-        self.setMaximumWidth(size)
-        self.setMaximumHeight(size)
-        self.setMinimumWidth(size)
-        self.setMinimumHeight(size)
+        #self.setMaximumWidth(size)
+        #self.setMaximumHeight(size)
+        #self.setMnimumWidth(size)
+        #self.setMinimumHeight(size)
         self.hideAxis('bottom')
         self.hideAxis('left')
         self.setBackgroundBrush(pg.mkBrush('#252120'))
@@ -91,7 +91,7 @@ class CircleFeedbackProtocolWidgetPainter(Painter):
         pass
 
 
-class BarFeedbackProtocolWidgetPainter(Painter):
+class BarFeedbackProtocolWidgetPainter2(Painter):#TODO: remove Mock
     def __init__(self, noise_scaler=2, show_reward=False, radius = 3, circle_border=0, m_threshold=1):
         super(BarFeedbackProtocolWidgetPainter, self).__init__(show_reward=show_reward)
         self.x = np.linspace(-1, 1, 100)
@@ -124,6 +124,70 @@ class BarFeedbackProtocolWidgetPainter(Painter):
         self.p1.setData(self.x, np.zeros_like(self.x)+max(min(sample, 5), -5))
         self.p2.setData(self.x, np.zeros_like(self.x)-5)
         pass
+
+class BarFeedbackProtocolWidgetPainter(Painter):
+    def __init__(self, noise_scaler=2, show_reward=False, radius = 3, circle_border=0, m_threshold=1):
+        super(BarFeedbackProtocolWidgetPainter, self).__init__(show_reward=show_reward)
+        self.x = np.linspace(-1, 1, 100)
+        self.widget = None
+        self.counter = 0
+        self.reward_counter = 0
+        self.m_threshold = m_threshold
+        self.timer = time.time()
+
+
+    def update_reward(self):
+        self.points.setHtml(self.points_str.format(self.reward_counter))
+
+    def prepare_widget(self, widget):
+        super(BarFeedbackProtocolWidgetPainter, self).prepare_widget(widget)
+        self.p1 = widget.plot(self.x, np.zeros_like(self.x), pen=pg.mkPen(229, 223, 213)).curve
+        self.p2 = widget.plot(self.x, np.zeros_like(self.x)-5, pen=pg.mkPen(229, 223, 213)).curve
+        widget.plot([-1, -1], [-5, 5], pen=pg.mkPen(229, 223, 213))
+        widget.plot([1, 1], [-5, 5], pen=pg.mkPen(229, 223, 213))
+        for k in range(11):
+            widget.plot(self.x, np.zeros_like(self.x) - 5 + k, pen=pg.mkPen(229, 223, 213))
+        self.fill = pg.FillBetweenItem(self.p1, self.p2, brush=(229, 223, 213, 255))
+        #self.fill2 = pg.FillBetweenItem(self.p3, self.p2, brush=(229, 223, 213))
+        widget.addItem(self.fill)
+
+        self.points_str = '<font size="5" color="#B48375">Reward: </font><font size="5" color="#91C7A9">{}</font>'
+        self.points = pg.TextItem(html=self.points_str.format(0))
+        self.points.setPos(-4.7, 4.7)
+        widget.addItem(self.points)
+
+        r1 = widget.plot([4, 5], [5, 5], pen=pg.mkPen(0, 0, 0)).curve
+        r2 = widget.plot([4, 5], [4, 4], pen=pg.mkPen(0, 0, 0)).curve
+        self.rect = pg.FillBetweenItem(r1, r2, brush=(255, 255, 255))
+        widget.addItem(self.rect)
+
+    def set_red_state(self, flag):
+        pass
+
+    def redraw_state(self, sample, m_sample):
+        stimulus_presented = 0
+        if m_sample is not None:
+            self.set_red_state(m_sample > self.m_threshold)
+        if np.ndim(sample) > 0:
+            sample = np.sum(sample)
+        if self.give_reward(sample) and time.time() - self.timer > 1:
+            self.timer = time.time()
+            self.counter = (self.counter + 1) % 10
+            stimulus_presented = 1
+            if self.counter == 0:
+                self.reward_counter += 1
+                self.update_reward()
+                stimulus_presented = 2
+            self.p1.setData(self.x, np.zeros_like(self.x)+ self.counter + 1 - 5)
+            self.p2.setData(self.x, np.zeros_like(self.x)-5)
+            self.rect.setBrush(255, 255, 255)
+            QtCore.QTimer.singleShot(50, lambda: self.rect.setBrush(255, 255, 255, 0))
+        return stimulus_presented
+
+
+    @staticmethod
+    def give_reward(sample):
+        return sample > 2.5
 
 class PsyProtocolWidgetPainter(Painter):
     def __init__(self, detection=False):
