@@ -91,7 +91,7 @@ class CircleFeedbackProtocolWidgetPainter(Painter):
         pass
 
 
-class BarFeedbackProtocolWidgetPainter2(Painter):#TODO: remove Mock
+class BarFeedbackProtocolWidgetPainter(Painter):#TODO: remove Mock
     def __init__(self, noise_scaler=2, show_reward=False, radius = 3, circle_border=0, m_threshold=1):
         super(BarFeedbackProtocolWidgetPainter, self).__init__(show_reward=show_reward)
         self.x = np.linspace(-1, 1, 100)
@@ -125,10 +125,12 @@ class BarFeedbackProtocolWidgetPainter2(Painter):#TODO: remove Mock
         self.p2.setData(self.x, np.zeros_like(self.x)-5)
         pass
 
-class BarFeedbackProtocolWidgetPainter(Painter):
+class DiscreteBarFeedbackProtocolWidgetPainter(Painter):
     def __init__(self, noise_scaler=2, show_reward=False, radius = 3, circle_border=0, m_threshold=1):
-        super(BarFeedbackProtocolWidgetPainter, self).__init__(show_reward=show_reward)
-        self.x = np.linspace(-1, 1, 100)
+        super(DiscreteBarFeedbackProtocolWidgetPainter, self).__init__(show_reward=show_reward)
+
+        self.bar_width = 0.5
+        self.x = np.linspace(-self.bar_width, self.bar_width, 100)
         self.widget = None
         self.counter = 0
         self.reward_counter = 0
@@ -141,23 +143,30 @@ class BarFeedbackProtocolWidgetPainter(Painter):
 
     def prepare_widget(self, widget):
         super(BarFeedbackProtocolWidgetPainter, self).prepare_widget(widget)
-        self.p1 = widget.plot(self.x, np.zeros_like(self.x), pen=pg.mkPen(229, 223, 213)).curve
+        self.p1 = widget.plot(self.x, np.zeros_like(self.x)-4, pen=pg.mkPen(229, 223, 213)).curve
         self.p2 = widget.plot(self.x, np.zeros_like(self.x)-5, pen=pg.mkPen(229, 223, 213)).curve
-        widget.plot([-1, -1], [-5, 5], pen=pg.mkPen(229, 223, 213))
-        widget.plot([1, 1], [-5, 5], pen=pg.mkPen(229, 223, 213))
+        widget.plot([-self.bar_width, -self.bar_width], [-5, 5], pen=pg.mkPen(229, 223, 213))
+        widget.plot([self.bar_width, self.bar_width], [-5, 5], pen=pg.mkPen(229, 223, 213))
         for k in range(11):
             widget.plot(self.x, np.zeros_like(self.x) - 5 + k, pen=pg.mkPen(229, 223, 213))
         self.fill = pg.FillBetweenItem(self.p1, self.p2, brush=(229, 223, 213, 255))
         #self.fill2 = pg.FillBetweenItem(self.p3, self.p2, brush=(229, 223, 213))
         widget.addItem(self.fill)
 
-        self.points_str = '<font size="5" color="#B48375">Reward: </font><font size="5" color="#91C7A9">{}</font>'
+        self.points_str = '<font size="5" color="#91C7A9">{}$</font>'
         self.points = pg.TextItem(html=self.points_str.format(0))
         self.points.setPos(-4.7, 4.7)
+        self.points.setScale(4)
         widget.addItem(self.points)
 
-        r1 = widget.plot([4, 5], [5, 5], pen=pg.mkPen(0, 0, 0)).curve
-        r2 = widget.plot([4, 5], [4, 4], pen=pg.mkPen(0, 0, 0)).curve
+        # fix cross
+        self.cross = pg.TextItem(html='<font size="5" color="#FFFFFF">+</font>', anchor=(0.5, 0.5))
+        self.cross.setScale(2)
+        self.cross.setPos(0, self.counter + 1.5 - 5)
+        widget.addItem(self.cross)
+
+        r1 = widget.plot([5, 6], [6, 6], pen=pg.mkPen(0, 0, 0)).curve
+        r2 = widget.plot([5, 6], [5, 5], pen=pg.mkPen(0, 0, 0)).curve
         self.rect = pg.FillBetweenItem(r1, r2, brush=(255, 255, 255))
         widget.addItem(self.rect)
 
@@ -178,16 +187,18 @@ class BarFeedbackProtocolWidgetPainter(Painter):
                 self.reward_counter += 1
                 self.update_reward()
                 stimulus_presented = 2
+            if self.counter == 9:
+                QtCore.QTimer.singleShot(500, lambda: self.p1.setData(self.x, np.zeros_like(self.x)-5))
             self.p1.setData(self.x, np.zeros_like(self.x)+ self.counter + 1 - 5)
-            self.p2.setData(self.x, np.zeros_like(self.x)-5)
             self.rect.setBrush(255, 255, 255)
             QtCore.QTimer.singleShot(50, lambda: self.rect.setBrush(255, 255, 255, 0))
+            self.cross.setPos(0, (self.counter + 1)%10 - 5 +0.5)
         return stimulus_presented
 
 
     @staticmethod
     def give_reward(sample):
-        return sample > 2.5
+        return sample > 2
 
 class PsyProtocolWidgetPainter(Painter):
     def __init__(self, detection=False):
