@@ -125,9 +125,9 @@ class BarFeedbackProtocolWidgetPainter(Painter):#TODO: remove Mock
         self.p2.setData(self.x, np.zeros_like(self.x)-5)
         pass
 
-class DiscreteBarFeedbackProtocolWidgetPainter(Painter):
+class BarFeedbackProtocolWidgetPainter(Painter):
     def __init__(self, noise_scaler=2, show_reward=False, radius = 3, circle_border=0, m_threshold=1):
-        super(DiscreteBarFeedbackProtocolWidgetPainter, self).__init__(show_reward=show_reward)
+        super(BarFeedbackProtocolWidgetPainter, self).__init__(show_reward=show_reward)
 
         self.bar_width = 0.5
         self.x = np.linspace(-self.bar_width, self.bar_width, 100)
@@ -345,8 +345,8 @@ if __name__ == '__main__':
     b = BarFeedbackProtocolWidgetPainter()
     b.prepare_widget(w)
     timer = QtCore.QTimer()
-    timer.start(1000/30)
-    timer.timeout.connect(lambda: b.redraw_state(np.random.normal(scale=3), np.random.normal(scale=0.1)))
+    timer.start(1000/500)
+    timer.timeout.connect(lambda: b.redraw_state(np.random.normal(), np.random.normal(scale=0.1)))
     a.exec_()
     #for k in range(10000):
     #    sleep(1/30)
