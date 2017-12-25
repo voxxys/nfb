@@ -125,7 +125,7 @@ class BarFeedbackProtocolWidgetPainter(Painter):#TODO: remove Mock
         self.p2.setData(self.x, np.zeros_like(self.x)-5)
         pass
 
-class BarFeedbackProtocolWidgetPainter(Painter):
+class DiscreteBarFeedbackProtocolWidgetPainter(Painter):
     def __init__(self, noise_scaler=2, show_reward=False, radius = 3, circle_border=0, m_threshold=1):
         super(BarFeedbackProtocolWidgetPainter, self).__init__(show_reward=show_reward)
 
@@ -198,7 +198,7 @@ class BarFeedbackProtocolWidgetPainter(Painter):
 
     @staticmethod
     def give_reward(sample):
-        return sample > 2
+        return sample > 1
 
 class PsyProtocolWidgetPainter(Painter):
     def __init__(self, detection=False):

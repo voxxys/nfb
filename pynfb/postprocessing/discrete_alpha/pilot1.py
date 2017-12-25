@@ -4,13 +4,13 @@ import pandas as pd
 import pylab as plt
 import numpy as np
 
-f = h5py.File(r'C:\Users\Nikolai\PycharmProjects\nfb\pynfb\results\discrete_bar_test_12-20_20-52-27\experiment_data.h5')
+f = h5py.File(r'C:\Users\Nikolai\PycharmProjects\nfb\pynfb\results\discrete_bar_test_12-22_19-37-03\experiment_data.h5')
 fs = 500
 df_all = pd.DataFrame()
 get_all_data = lambda name: np.concatenate([f['protocol{}/{}'.format(k+1, name)] for k in range(3)])
 df_all['time'] = get_all_data('timestamp_data')
 df_all['raw'] = get_all_data('raw_data')[:, 0]
-df_all['photo_events'] = get_all_data('raw_data')[:, 1]
+df_all['photo_events'] = get_all_data('raw_data')[:, -1]
 df_all['nfb_events'] = get_all_data('mark_data')
 df_all['signal'] = get_all_data('signals_data')[:, 0]
 df_all['block'] = np.concatenate([[k+1]*len(f['protocol{}/timestamp_data'.format(k+1)]) for k in range(3)])
@@ -44,15 +44,27 @@ plt.show()
 
 # FB analysis
 df = df_all[df_all['block'] == 3]
+T = 500
+h = np.percentile(df['hilbert_env'], 100-100./T)
+h2 = np.percentile(df['hilbert_env'], 100*(1 - 1/T)**(1/T))
+h3 = np.mean([df['hilbert_env'].iloc[t:t + T].max() for t in range(0, len(df), T)])
+h4 = df['hilbert_env'].rolling(T).max().mean()
+h5 = df['hilbert_env'].rolling(2*T).max().mean()
+plt.plot(df['hilbert_env'])
+plt.plot([0, len(df)], [h4, h4])
+plt.plot([0, len(df)], [h5, h5])
+plt.show()
+
+print(100-100./T, sum(df['hilbert_env']>h)/len(df), 100*(1 - 1/T)**(1/T), sum(df['hilbert_env']>h2)/len(df), sum(df['hilbert_env']>h3)/len(df), sum(df['hilbert_env']>h4)/len(df))
 # plot raw and events
 plt.plot(df['time'], df['raw'], alpha=0.4)
 plt.plot(df['time'], df['filtfilt'])
 plt.plot(df['time'], df['hilbert_env'])
 plt.plot(df['time'], df['nfb_events'])
-plt.plot(df['time'], df['photo_events'])
+#plt.plot(df['time'], df['photo_events'])
 plt.legend(['raw', 'filtfilt 9-11Hz', 'hilbert env', 'nfb lab trigger', 'photo response'])
-plt.ylim(-0.00005, 0.00006)
-plt.xlim(df['time'].iloc[127000], df['time'].iloc[129000])
+#plt.ylim(-0.00005, 0.00006)
+#plt.xlim(df['time'].iloc[127000], df['time'].iloc[129000])
 plt.xlabel('time, s')
 plt.ylabel('voltage, V')
 plt.tight_layout()
