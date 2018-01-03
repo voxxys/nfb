@@ -8,13 +8,27 @@ from pynfb.inlets.montage import Montage
 from scipy.signal import *
 import seaborn as sns
 
+import numpy as np
 from pynfb.signal_processing.filters import ButterFilter
-from pynfb.signal_processing.helpers import get_outliers_mask
+def get_outliers_mask(data_raw: np.ndarray, iter_numb=2, std=7):
+    data_pwr = data_raw
+    indexes = np.arange(data_pwr.shape[0])
+    for i in range(iter_numb):
+        mask = np.abs(data_pwr - data_pwr.mean()) < std * data_pwr.std()
+        #plt.plot(~mask)
+        mask = ~(pd.Series(~mask).rolling(3*fs, center=True).mean() > 0)
+        #plt.plot(~mask)
+        #plt.show()
+        indexes = indexes[mask]
+        data_pwr = data_pwr[mask]
+    print('Dropped {} outliers'.format(data_raw.shape[0] - len(indexes)))
+    outliers_mask = np.ones(shape=(data_raw.shape[0], ))
+    outliers_mask[indexes] = 0
+    return outliers_mask.astype(bool)
 cm = sns.color_palette()
 
 work_dir = r'C:\Users\Nikolai\Desktop\bci_nfb_bci\bci_nfb_bci'
 desc_file = 'info_mock.json'
-import numpy as np
 
 with open('{}/{}'.format(work_dir, desc_file)) as f:
     desc = json.loads(f.read())
@@ -38,17 +52,29 @@ for subj, days in enumerate(desc['subjects'][:]):
 
             df = pd.DataFrame(np.concatenate(data), columns=['fb'])
             df['t'] = np.arange(len(df)) / fs
-            df['fb'] = df['fb'][df['fb'] < 3*df['fb'].std()]
+
+            df['block_name'] = np.concatenate([[p] * len(d) for p, d in zip(p_names, data)])
+            df['block_number'] = np.concatenate([[j + 1] * len(d) for j, d in enumerate(data)])
+
+            data = [f['protocol{}/raw_data'.format(k + 1)][:] for k in range(len(p_names))]
+            eeg = np.concatenate(data)
+            spatial = f['protocol15/signals_stats/left/spatial_filter'][:]
+
+            #f = plt.figure()
+            df['SMR'] = np.dot(eeg, spatial)
+            #plt.plot(df['SMR'])
+            df = df[~get_outliers_mask(df['SMR'])]
+            #plt.plot(df['SMR'])
+            #plt.show()
+
             df['fb_roll'] = df['fb'].rolling(20*fs, center=True, min_periods=1).median()
             df['fb_roll_25'] = df['fb'].rolling(20 * fs, center=True, min_periods=1).quantile(0.25)
             df['fb_roll_75'] = df['fb'].rolling(20 * fs, center=True, min_periods=1).quantile(0.75)
-            df['block_name'] = np.concatenate([[p] * len(d) for p, d in zip(p_names, data)])
-            df['block_number'] = np.concatenate([[j + 1] * len(d) for j, d in enumerate(data)])
             del data
 
-        blocks = ['FB', 'Rest', 'Baseline']
+        blocks = ['FB', 'Baseline', 'Rest']
         #axes[subj, 3 * day + 2].plot(df['SMR'][~df['block_name'].isin(states)], c=cm[3])
-        lines_to_plot = [None]*3
+        lines_to_plot = [None]*len(blocks)
         for b in df['block_number'].unique():
             b_name = df['block_name'][df['block_number'] == b].iloc[0]
 
