@@ -13,8 +13,24 @@ from pynfb.signal_processing.helpers import get_outliers_mask
 cm = sns.color_palette()
 
 work_dir = r'C:\Users\Nikolai\Desktop\bci_nfb_bci\bci_nfb_bci'
-desc_file = 'info_mock.json'
+desc_file = 'info.json'
 import numpy as np
+
+def get_outliers_mask(data_raw: np.ndarray, iter_numb=2, std=7):
+    data_pwr = data_raw
+    indexes = np.arange(data_pwr.shape[0])
+    for i in range(iter_numb):
+        mask = np.abs(data_pwr - data_pwr.mean()) < std * data_pwr.std()
+        #plt.plot(~mask)
+        mask = ~(pd.Series(~mask).rolling(3*fs, center=True).mean() > 0)
+        #plt.plot(~mask)
+        #plt.show()
+        indexes = indexes[mask]
+        data_pwr = data_pwr[mask]
+    print('Dropped {} outliers'.format(data_raw.shape[0] - len(indexes)))
+    outliers_mask = np.ones(shape=(data_raw.shape[0], ))
+    outliers_mask[indexes] = 0
+    return outliers_mask.astype(bool)
 
 with open('{}/{}'.format(work_dir, desc_file)) as f:
     desc = json.loads(f.read())
@@ -23,8 +39,11 @@ with open('{}/{}'.format(work_dir, desc_file)) as f:
 fig, axes = plt.subplots(len(desc['subjects']), 9)
 sns.despine(fig, left=True)
 
+topos = []
 for subj, days in enumerate(desc['subjects'][:]):
+    topos.append([])
     for day, exp_name in enumerate(days):
+
         exp_data_path = '{}\{}\{}'.format(work_dir, exp_name, 'experiment_data.h5')
         print(exp_data_path)
 
@@ -41,13 +60,14 @@ for subj, days in enumerate(desc['subjects'][:]):
             spatial = f['protocol15/signals_stats/left/spatial_filter'][:]
             bandpass = f['protocol15/signals_stats/left/bandpass'][:]
             df['SMR'] = np.dot(df[channels], spatial)
-            df['SMR'] = df['SMR'].iloc[~get_outliers_mask(df[['SMR']], std=3, iter_numb=3)]
+            df = df.iloc[~get_outliers_mask(df['SMR'])]
 
             # restore ica topographies
             # df[channels] = fft_filter(df[channels], fs, [0.05, 45])
             b_filter = ButterFilter((3, 45), fs, len(channels))
             ica_data = b_filter.apply(df[channels][df['block_number'] < 13])
             topography = np.dot(np.dot(ica_data.T, ica_data), spatial)
+            topos[subj].append(topography)
         plot_topomap(spatial, montage.get_pos(), axes=axes[subj, day*3], show=False, contours=None)
         plot_topomap(topography, montage.get_pos(), axes=axes[subj, day * 3 + 1], show=False, contours=None)
 
@@ -82,3 +102,6 @@ plt.figlegend(lines_to_plot, [ 'Open AFTER', 'Left AFTER', 'Right AFTER', 'Open 
 
 plt.show()
 
+import pickle
+with open('topos.pickle', 'wb') as f:
+    pickle.dump(topos, f)
