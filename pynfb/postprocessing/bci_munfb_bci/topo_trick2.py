@@ -52,26 +52,28 @@ plt.show()
 
 df.to_csv('topo_trick.csv', index=False)
 
-df1 = pd.read_excel(r'C:\Users\Nikolai\Desktop\bci_nfb_bci\bci_nfb_bci\acc-points (4).xlsx')
-print('df1', df1)
-acc = (df1.loc[df1['bef']==0, 'acc'].as_matrix()+ df1.loc[df1['bef']==1, 'acc'].as_matrix())/2
-print(acc.shape, vals.shape)
+df1 = pd.read_excel(r'C:\Users\Nikolai\Desktop\bci_nfb_bci\bci_nfb_bci\acc-points (5).xlsx')
+print(df1)
+stat = pd.DataFrame(columns=['mon', 'acc', 'group'])
+for group_name in ['Real', 'Mock']:
+    group = df1[df1['group'] == group_name]
+    group_top = df[df['Group'] == group_name]
+    for subj in range(1, 8):
+        s = group[group['subj'] == subj]
+        s_top = group_top[group_top['Subj'] == subj]
+        days = sorted(s['day'].unique())
+        for d in range(2, len(days)+1):
+            stat.loc[len(stat)] = {
+                'mon': s_top.loc[s_top['Day']==d, 'Val'].mean() - s_top.loc[s_top['Day']==d-1, 'Val'].mean(),
+                'acc': s.loc[s['day']==d, 'acc'].mean() - s.loc[s['day']==d-1, 'acc'].mean(),
+                'group': group_name
+            }
+
 from scipy import stats
+get_p = lambda x: stats.linregress(x['mon'], x['acc']).pvalue
 
-acc2 =
-dd = pd.DataFrame()
-dd['acc'] = acc
-dd['val'] = vals
-dd['Group'] = df.sort_values(['gg', 'Day'])['Group'].as_matrix()
-
-dd1 = dd
-sns.regplot('val', 'acc', dd1, label='BOTH: $val = k \cdot acc + const$\np-value($k$) = {:.3f}'.format(stats.linregress(dd1['acc'], dd1['val']).pvalue))
-
-dd1 = dd[dd['Group'] == 'Real']
-sns.regplot('val', 'acc', dd1, label='REAL: $val = k \cdot acc + const$\np-value($k$) = {:.3f}'.format(stats.linregress(dd1['acc'], dd1['val']).pvalue))
-
-dd1 = dd[dd['Group'] == 'Mock']
-sns.regplot('val', 'acc', dd1, label='MOCK: $val = k \cdot acc + const$\np-value($k$) = {:.3f}'.format(stats.linregress(dd1['acc'], dd1['val']).pvalue))
-
+sns.regplot('mon', 'acc', stat, label='BOTH: $acc = k \cdot mon + const$\np-value($k$) = {:.3f}'.format(get_p(stat)))
+sns.regplot('mon', 'acc', stat[stat['group']=='Real'], label='REAL: $acc = k \cdot mon + const$\np-value($k$) = {:.3f}'.format(get_p(stat[stat['group']=='Real'])))
+sns.regplot('mon', 'acc', stat[stat['group']=='Mock'], label='MOCK: $acc = k \cdot mon + const$\np-value($k$) = {:.3f}'.format(get_p(stat[stat['group']=='Mock'])))
 plt.legend()
 plt.show()
