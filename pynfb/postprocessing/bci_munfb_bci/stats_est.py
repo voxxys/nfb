@@ -16,23 +16,23 @@ fs = 500
 cm = sns.color_palette()
 
 
-stats = pd.DataFrame(columns=['group', 'subj', 'day', 'hand', 'mean', '50', '75', '25', 'block_number', 'block_name'])
+stats = pd.DataFrame(columns=['group', 'subj', 'day', 'mean', '50', '75', '25', 'block_number', 'block_name'])
 
-for group in ['Real', 'Mock']:
+for group in ['Real']:
     desc = open_desc(group)
     print(desc)
     for subj, days in enumerate(desc['subjects'][:]):
         for day, exp_name in enumerate(days[:]):
-            exp_data_path = '{}\{}.pkl'.format(work_dir, exp_name)
+            exp_data_path = '{}\{}2.pkl'.format(work_dir, exp_name)
             df = pd.read_pickle(exp_data_path, 'gzip')
             #df['before'] = df['block_number'] <= 12
-            df['logenv'] = df['env']
+            df['logenv'] = np.log(df['env'])
             for block in df['block_number'].unique():
                 block_name = df.loc[df['block_number']==block, 'block_name'].iloc[0]
                 dfb = df.loc[df['block_number']==block, 'logenv']
                 stats.loc[len(stats)] = {
-                    'group': group, 'subj': subj+1, 'day': day+1, 'hand': desc['hand'][subj][day], 'mean': dfb.mean(),
+                    'group': group, 'subj': subj+1, 'day': day+1, 'mean': dfb.mean(),
                     '50': dfb.quantile(0.5), '75': dfb.quantile(0.75), '25': dfb.quantile(0.25),
                     'block_number': block, 'block_name': block_name}
 
-stats.to_csv('stats_bci_mu_bci_nonlog.csv', index=False)
+stats.to_csv('stats_bci_mu_bci_full_norm.csv', index=False)

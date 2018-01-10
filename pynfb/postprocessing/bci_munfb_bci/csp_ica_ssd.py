@@ -19,7 +19,7 @@ if __name__ == '__main__':
     #print(np.shape(channels))
     #print(np.shape(x))
     #print(np.shape(marks))
-    file = r'C:\Users\Nikolai\Desktop\bci_nfb_bci\bci_nfb_bci\bci_mu_ica_S4_d3_08-25_15-02-43\experiment_data.h5'
+    file = r'C:\Users\Nikolai\Desktop\bci_nfb_bci\bci_nfb_bci\bci_mu_ica_S5_d2_08-24_16-25-25\experiment_data.h5'
     with h5py.File(file) as f:
         fs, channels, protocol_names = get_info(f, [])
         x = [f['protocol{}/raw_data'.format(k+1)][:] for k in range(12)]
@@ -40,7 +40,7 @@ if __name__ == '__main__':
     from scipy.signal import welch
 
     np.save('spat-ssd.npy', signals[0].spatial_filter)
-    plt.plot(*welch(np.dot(np.concatenate(x), signals[0].spatial_filter), fs))
+    plt.plot(*welch(np.dot(np.concatenate(x), signals[0].spatial_filter), fs*4))
     plt.show()
     #plt.plot(np.arange(50000) / 258, marks * np.max(np.dot(x, signals[0].spatial_filter)))
     #plt.show()

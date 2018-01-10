@@ -7,7 +7,7 @@ from mne.viz import plot_topomap
 from pynfb.inlets.montage import Montage
 from pynfb.signal_processing.filters import ButterFilter
 
-file = r'C:\Users\Nikolai\Desktop\bci_nfb_bci\bci_nfb_bci\bci_mu_ica_S4_d3_08-25_15-02-43\experiment_data.h5'
+file = r'C:\Users\Nikolai\Desktop\bci_nfb_bci\bci_nfb_bci\bci_mu_ica_S5_d2_08-24_16-25-25\experiment_data.h5'
 with h5py.File(file) as f:
     fs, channels, protocol_names = get_info(f, [])
     x = np.concatenate([f['protocol{}/raw_data'.format(k + 1)][:] for k in range(12)])

@@ -70,6 +70,8 @@ for subj, days in enumerate(desc['subjects'][:]):
 
             df['band'] = df['SMR']*0
             df['env'] = df['SMR']*0
+            print('norm', df.loc[::100, 'SMR'].std())
+            df.loc[:, 'SMR'] = df['SMR'] / df.loc[::100, 'SMR'].std()
             for k in df['block_number'].unique():
                 df.loc[df['block_number'] == k, 'band'] = fft_filter(df['SMR'][df['block_number'] == k], fs, bandpass)
                 df.loc[df['block_number'] == k, 'env'] = np.abs(hilbert(df['band'][df['block_number'] == k]))
@@ -78,7 +80,7 @@ for subj, days in enumerate(desc['subjects'][:]):
             df2['fb_roll'] = df['env'].rolling(20*fs, center=True, min_periods=1).median()
             df2['fb_roll_25'] = df['env'].rolling(20 * fs, center=True, min_periods=1).quantile(0.25)
             df2['fb_roll_75'] = df['env'].rolling(20 * fs, center=True, min_periods=1).quantile(0.75)
-            df.to_pickle(exp_name + '.pkl', compression='gzip')
+            df.to_pickle(exp_name + '2.pkl', compression='gzip')
             del data
 
         blocks = ['FB', 'Baseline', 'Rest', 'Left', 'Right', 'Open']
