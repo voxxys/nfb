@@ -30,10 +30,8 @@ class testHTTPServer_RequestHandler(BaseHTTPRequestHandler):
                 print(float(state))
                 border = 0.2
                 state = float(state)
-                if state > border:
+                if state > 0:
                     state = 1
-                elif state < -border*0.1:
-                    state = 3
                 else:
                     state = 2
             else:

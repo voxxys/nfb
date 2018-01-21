@@ -455,11 +455,11 @@ class SignalsSSDManager(QtGui.QDialog):
         print(np.concatenate([[p]*len(x) for x, p in zip(self.x, self.protocol_seq)]))
         axes[1].plot(np.concatenate([[p]*len(x) for x, p in zip(self.x, self.protocol_seq)]))
 
-        m = (np.percentile(xx[Y == 'Legs'], 85) + np.percentile(xx[Y == 'Left'], 15)) / 2
+        m = (np.percentile(xx[Y == 'Motor'], 85) + np.percentile(xx[Y == 'Rest'], 15)) / 2
 
         plt.show()
         self.signals[0].std = xx.std()
-        self.signals[0].mean = m
+        self.signals[0].mean = xx.mean()
         print(m, xx.mean())
         self.signals[0].scaling_flag = True
 
