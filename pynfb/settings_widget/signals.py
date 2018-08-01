@@ -1,4 +1,4 @@
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore
 
 from pynfb.io.defaults import vectors_defaults as defaults
 from pynfb.settings_widget import FileSelectorLine
@@ -93,7 +93,7 @@ class SignalsSettingsWidget(QtGui.QWidget):
             self.signals_dialogs.append(SignalDialog(self, signal_name=signal['sSignalName']))
             self.list.addItem(item)
         if self.list.currentRow() < 0:
-            self.list.setItemSelected(self.list.item(0), True)
+            self.list.item(0).setSelected(True)
 
 
 class SignalDialog(QtGui.QDialog):
@@ -177,7 +177,7 @@ class BandWidget(QtGui.QWidget):
         self.high.setRange(0, 250)
         self.high.setValue(250)
         bandpass_layout = QtGui.QHBoxLayout(self)
-        bandpass_layout.setMargin(0)
+        bandpass_layout.setContentsMargins(0,0,0,0)
         label = QtGui.QLabel('low:')
         label.setMaximumWidth(20)
         bandpass_layout.addWidget(label)
@@ -203,7 +203,7 @@ class TemporalSettings(QtGui.QWidget):
 
         # filter type
         self.filter_type = QtGui.QComboBox()
-        for protocol_type in ['fft', 'butter', 'complexdem']:
+        for protocol_type in ['fft', 'butter', 'complexdem', 'cfir']:
             self.filter_type.addItem(protocol_type)
 
         # filter order
@@ -226,14 +226,20 @@ class TemporalSettings(QtGui.QWidget):
         self.smoother_factor.setRange(0, 1)
         self.smoother_factor.setValue(0.3)
 
+        # artificial delay
+        self.art_delay = QtGui.QSpinBox()
+        self.art_delay.setRange(0, 5000)
+        self.art_delay.setValue(0)
+
         layout = QtGui.QFormLayout(self)
         layout.addRow('&Type:', self.type)
         layout.addRow('&Band:', self.band)
         layout.addRow('&Filter type:', self.filter_type)
-        layout.addRow('&Window size:', self.win_size)
+        layout.addRow('&Window size [samp.]:', self.win_size)
         layout.addRow('&Filter order:', self.order)
         layout.addRow('&Smoother type:', self.smoother_type)
         layout.addRow('&Smoother factor:', self.smoother_factor)
+        layout.addRow('&Artif. delay [ms]:', self.art_delay)
 
         # setup disable
         self.smoother_type.currentIndexChanged.connect(self.smoother_type_changed)
@@ -262,8 +268,8 @@ class TemporalSettings(QtGui.QWidget):
 
     def filter_type_changed(self):
         if self.filter_type.isEnabled():
-            self.win_size.setEnabled(self.filter_type.currentText() == 'fft')
-            self.order.setEnabled(self.filter_type.currentText() != 'fft')
+            self.win_size.setEnabled(self.filter_type.currentText() in ['fft', 'cfir'])
+            self.order.setEnabled(self.filter_type.currentText() not in ['fft', 'cfir'])
 
     def smoother_type_changed(self):
         if self.smoother_type.isEnabled():
@@ -283,6 +289,7 @@ class TemporalSettings(QtGui.QWidget):
         self.smoother_type.setCurrentIndex(
             self.smoother_type.findText(dict['sTemporalSmootherType'], QtCore.Qt.MatchFixedString))
         self.smoother_factor.setValue(dict['fSmoothingFactor'])
+        self.art_delay.setValue(dict['iDelayMs'])
         self.type_changed()
         self.filter_type_changed()
         self.smoother_type_changed()
@@ -299,6 +306,7 @@ class TemporalSettings(QtGui.QWidget):
         params['fTemporalFilterButterOrder'] = self.order.value()
         params['sTemporalSmootherType'] = self.smoother_type.currentText()
         params['fSmoothingFactor'] = self.smoother_factor.value()
+        params['iDelayMs'] = self.art_delay.value()
         return params
 
 if __name__ == '__main__':

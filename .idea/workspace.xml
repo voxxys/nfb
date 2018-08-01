@@ -1,0 +1,567 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="ca1d1624-896d-458e-883a-e002e6eedf5c" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/nfb_centerout.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/source/alpha-nfb-example-stats.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/source/alpha-nfb-example.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/source/alpha_nfb_example.rst" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/source/index.rst" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/source/requirements.rst" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pynfb/postprocessing/alpha_delay/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pynfb/postprocessing/bci_munfb_bci/extract_smr_filters.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pynfb/postprocessing/bci_munfb_bci/stats_slopes.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pynfb/postprocessing/bci_munfb_bci/stats_slopes_an.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pynfb/postprocessing/bci_munfb_bci/stats_slopes_std_dyn.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pynfb/postprocessing/eeg_shielded_room.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pynfb/postprocessing/mu_or_not/compare_envs.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pynfb/postprocessing/mu_or_not/compare_envs_df.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pynfb/postprocessing/mu_or_not/extract_spat_filters.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pynfb/postprocessing/mu_or_not/extract_spat_filters2.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pynfb/postprocessing/mu_or_not/meta.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pynfb/postprocessing/mu_or_not/plot_filters.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pynfb/postprocessing/mu_or_not/plot_treatment_c3c3.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pynfb/postprocessing/mu_or_not/postproc.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pynfb/postprocessing/mu_or_not/repr_exp.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pynfb/postprocessing/mu_or_not/reproduce_report.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pynfb/postprocessing/mu_or_not/reproduce_report_add_smr.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pynfb/postprocessing/paper_alpha_ex.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pynfb/postprocessing/paper_bci_ex.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pynfb/postprocessing/paper_bci_ex2.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pynfb/postprocessing/paper_bcii_ex.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pynfb/postprocessing/predict_alpha/analyse_pps.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pynfb/postprocessing/predict_alpha/fourth_look.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pynfb/postprocessing/predict_alpha/second_look.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pynfb/postprocessing/predict_alpha/third_look.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pynfb/postprocessing/vibro_smr/apply_smr_filters.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pynfb/postprocessing/vibro_smr/extract_smr_filters.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pynfb/postprocessing/vibro_smr/extract_smr_filters_emg.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pynfb/postprocessing/vibro_smr/sfft_smr.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pynfb/postprocessing/vibro_smr/sfft_smr_desync.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pynfb/postprocessing/vibro_smr/sfft_smr_desync_smr.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pynfb/postprocessing/vibro_smr/sfft_smr_desync_stat.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pynfb/postprocessing/vibro_smr/sfft_smr_desync_stat_copy.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pynfb/postprocessing/vibro_smr/sfft_smr_desync_stat_dyn.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pynfb/postprocessing/vibro_smr/sfft_smr_desync_stat_specgram.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pynfb/postprocessing/vibro_smr/sfft_smr_desync_stat_specgram_control.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pynfb/postprocessing/vibro_smr/vibr_smr_dynamic.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pynfb/results/experiment_08-01_14-26-48/experiment_data.h5" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pynfb/results/experiment_08-01_14-26-48/settings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pynfb/results/experiment_08-01_14-26-48/stream_info.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pynfb/run_design.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/requirements_conda.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/requirements_pip.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/audio/convert_to_fif.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/audio/lsl_inlet.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/audio/play_and_record.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/classifier/load_signal_design.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/classifier/restore_online_signal.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/designs/Fp1.filt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/designs/add_delay.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/designs/alpha_nfb_settings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/designs/bci_2states_settings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/lego/ev3test.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/lego/lego_api.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/mitsar/alpha_p4_nfb_training.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/utils/load_results.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/utils/lsl_transformer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/experiment.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/experiment.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/generators.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/generators.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/helpers/beep.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/helpers/beep.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/helpers/cross.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/helpers/expyriment.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/helpers/gabor.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/helpers/roi_spatial_filter.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/helpers/roi_spatial_filter.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/inlets/channels_selector.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/inlets/channels_selector.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/inlets/lsl_inlet.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/inlets/lsl_inlet.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/inlets/lsl_widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/inlets/lsl_widgets.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/inlets/montage.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/inlets/montage.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/io/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/io/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/io/defaults.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/io/defaults.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/io/hdf5.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/io/hdf5.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/io/xml_.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/io/xml_.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/outlets/bci_lsl_stream.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/outlets/bci_lsl_stream.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/outlets/neurotlon_state_server.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/outlets/neurotlon_state_server.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/outlets/signals_outlet.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/outlets/signals_outlet.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/postprocessing/alpha_ica.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/postprocessing/alpha_ica.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/postprocessing/csp3.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/postprocessing/csp3.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/postprocessing/mu_csp.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/postprocessing/mu_csp.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/postprocessing/mu_ica.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/postprocessing/mu_ica.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/postprocessing/mu_pz.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/postprocessing/mu_pz.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/postprocessing/s3_what_similar.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/postprocessing/s3_what_similar.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/postprocessing/utils/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/postprocessing/utils/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/postprocessing/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/postprocessing/widgets.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/protocols/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/protocols/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/protocols/psycho/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/postprocessing/vibro_smr/auc-erd-test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/protocols/psycho/cross_present.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/protocols/signals_manager/band_selector.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/protocols/signals_manager/band_selector.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/protocols/signals_manager/scored_components_table.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/protocols/signals_manager/scored_components_table.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/protocols/ssd/interactive_barplot.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/protocols/ssd/interactive_barplot.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/protocols/ssd/sliders.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/protocols/ssd/sliders.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/protocols/ssd/sliders_csp.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/protocols/ssd/sliders_csp.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/protocols/ssd/topomap_canvas.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/protocols/ssd/topomap_canvas.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/protocols/ssd/topomap_selector.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/protocols/ssd/topomap_selector.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/protocols/ssd/topomap_selector_ica.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/protocols/ssd/topomap_selector_ica.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/protocols/user_inputs.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/protocols/user_inputs.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/protocols/video/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/protocols/video/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/protocols/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/protocols/widgets.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/run_bci_experiment.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/run_bci_experiment.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/settings_widget/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/settings_widget/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/settings_widget/composite_signals.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/settings_widget/composite_signals.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/settings_widget/general.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/settings_widget/general.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/settings_widget/inlet.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/settings_widget/inlet.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/settings_widget/protocol_sequence.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/settings_widget/protocol_sequence.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/settings_widget/protocols.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/settings_widget/protocols.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/settings_widget/protocols_group.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/settings_widget/protocols_group.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/settings_widget/signals.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/settings_widget/signals.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/signal_processing/decompositions.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/signal_processing/decompositions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/signal_processing/filters.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/signal_processing/filters.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/signals/derived.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/signals/derived.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/specviewer.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/specviewer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/widgets/bci_fit.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/widgets/bci_fit.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/widgets/channel_trouble.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/widgets/channel_trouble.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/widgets/check_table.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/widgets/check_table.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/widgets/helpers.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/widgets/helpers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/widgets/multi_topographies.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/widgets/multi_topographies.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/widgets/parameter_slider.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/widgets/parameter_slider.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/widgets/rejections_editor.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/widgets/rejections_editor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/widgets/signal_viewers.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/widgets/signal_viewers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/widgets/signals_painter.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/widgets/signals_painter.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/widgets/spatial_filter_setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/widgets/spatial_filter_setup.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/widgets/spatial_filter_widget.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/widgets/spatial_filter_widget.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/widgets/topography.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/widgets/topography.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/widgets/update_signals_dialog.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/widgets/update_signals_dialog.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/windows/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/windows/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/pre_post_csp/s0.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/pre_post_csp/s0.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/psy_tests/gabor_presenting.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/psy_tests/gabor_presenting.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/psy_tests/qt_plus_expyriment.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/psy_tests/qt_plus_expyriment.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/psy_tests/two_gabors_presenting.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/psy_tests/two_gabors_presenting.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/pyqtg_experiments/new_raw_signal_drawer.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/pyqtg_experiments/new_raw_signal_drawer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/sloreta/average_brain.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/sloreta/average_brain.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/sloreta/average_brain_min.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/sloreta/average_brain_min.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/sloreta/average_brain_reg.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/sloreta/average_brain_reg.py" afterDir="false" />
+    </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FUSProjectUsageTrigger">
+    <session id="1498012307">
+      <usages-collector id="statistics.lifecycle.project">
+        <counts>
+          <entry key="project.open.time.1" value="1" />
+          <entry key="project.opened" value="1" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.extensions.open">
+        <counts>
+          <entry key="py" value="21" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.types.open">
+        <counts>
+          <entry key="Python" value="21" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.extensions.edit">
+        <counts>
+          <entry key="py" value="77" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.types.edit">
+        <counts>
+          <entry key="Python" value="77" />
+        </counts>
+      </usages-collector>
+    </session>
+  </component>
+  <component name="FileEditorManager">
+    <leaf>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pynfb/protocols/ssd/topomap_selector_ica.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="17">
+              <caret line="1" column="42" selection-start-line="1" selection-start-column="42" selection-end-line="1" selection-end-column="42" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pynfb/protocols/user_inputs.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="17">
+              <caret line="1" column="42" selection-start-line="1" selection-start-column="42" selection-end-line="1" selection-end-column="42" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/pynfb/protocols/widgets.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="317">
+              <caret line="237" column="25" selection-start-line="237" selection-start-column="25" selection-end-line="237" selection-end-column="25" />
+              <folding>
+                <element signature="e#0#11#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pynfb/protocols/__init__.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="170">
+              <caret line="10" column="36" selection-start-line="10" selection-start-column="36" selection-end-line="10" selection-end-column="36" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pynfb/protocols/signals_manager/scored_components_table.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="17">
+              <caret line="1" column="42" selection-start-line="1" selection-start-column="42" selection-end-line="1" selection-end-column="42" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pynfb/protocols/ssd/sliders_csp.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state>
+              <caret column="42" selection-start-column="42" selection-end-column="42" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pynfb/experiment.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="208">
+              <caret line="21" column="122" selection-start-line="21" selection-start-column="122" selection-end-line="21" selection-end-column="122" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pynfb/windows/__init__.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="208">
+              <caret line="292" column="47" selection-start-line="292" selection-start-column="47" selection-end-line="292" selection-end-column="47" />
+              <folding>
+                <element signature="e#0#9#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pynfb/main.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="306">
+              <caret line="39" column="51" selection-start-line="39" selection-start-column="51" selection-end-line="39" selection-end-column="51" />
+              <folding>
+                <element signature="e#0#10#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pynfb/settings_widget/protocols.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="399">
+              <caret line="69" column="35" selection-start-line="69" selection-start-column="35" selection-end-line="69" selection-end-column="35" />
+              <folding>
+                <element signature="e#0#31#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>QtGui</find>
+      <find>PyQt4</find>
+      <find>QtGui.</find>
+      <find>psy</find>
+      <find>setMargin(0)</find>
+      <find>setContentMargins(0,0,0,0)</find>
+      <find>self.list.setItemSelected(self.list.item(0), True)</find>
+      <find>QPropertyAnimation</find>
+      <find>selec</find>
+      <find>color</find>
+      <find>pg</find>
+      <find>pg.Qt</find>
+    </findStrings>
+    <replaceStrings>
+      <replace>PyQt5</replace>
+      <replace>QtWidgets</replace>
+      <replace>QtWidgets.</replace>
+      <replace>setContentMargins(0,0,0,0)</replace>
+      <replace>setContentsMargins(0,0,0,0)</replace>
+      <replace>self.list.item(0).setSelected(True)</replace>
+    </replaceStrings>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/pynfb/inlets/channels_selector.py" />
+        <option value="$PROJECT_DIR$/pynfb/protocols/ssd/sliders.py" />
+        <option value="$PROJECT_DIR$/pynfb/protocols/ssd/interactive_barplot.py" />
+        <option value="$PROJECT_DIR$/pynfb/protocols/ssd/topomap_selector.py" />
+        <option value="$PROJECT_DIR$/pynfb/protocols/ssd/topomap_selector_ica.py" />
+        <option value="$PROJECT_DIR$/pynfb/protocols/user_inputs.py" />
+        <option value="$PROJECT_DIR$/pynfb/protocols/__init__.py" />
+        <option value="$PROJECT_DIR$/pynfb/protocols/signals_manager/scored_components_table.py" />
+        <option value="$PROJECT_DIR$/pynfb/protocols/ssd/sliders_csp.py" />
+        <option value="$PROJECT_DIR$/pynfb/experiment.py" />
+        <option value="$PROJECT_DIR$/pynfb/main.py" />
+        <option value="$PROJECT_DIR$/pynfb/settings_widget/protocols.py" />
+        <option value="$PROJECT_DIR$/pynfb/windows/__init__.py" />
+        <option value="$PROJECT_DIR$/pynfb/protocols/widgets.py" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="85" />
+    <option name="y" value="25" />
+    <option name="width" value="1750" />
+    <option name="height" value="969" />
+  </component>
+  <component name="ProjectView">
+    <navigator proportions="" version="1">
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="Scope" />
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="nfb_centerout" type="b2602c69:ProjectViewProjectNode" />
+              <item name="nfb_centerout" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="nfb_centerout" type="b2602c69:ProjectViewProjectNode" />
+              <item name="nfb_centerout" type="462c0819:PsiDirectoryNode" />
+              <item name="pynfb" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="nfb_centerout" type="b2602c69:ProjectViewProjectNode" />
+              <item name="nfb_centerout" type="462c0819:PsiDirectoryNode" />
+              <item name="pynfb" type="462c0819:PsiDirectoryNode" />
+              <item name="protocols" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="ca1d1624-896d-458e-883a-e002e6eedf5c" name="Default Changelist" comment="" />
+      <created>1533121115279</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1533121115279</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
+    <editor active="true" />
+    <layout>
+      <window_info id="Favorites" side_tool="true" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.24983476" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info anchor="bottom" id="Version Control" />
+      <window_info anchor="bottom" id="Python Console" />
+      <window_info anchor="bottom" id="Terminal" />
+      <window_info anchor="bottom" id="Event Log" side_tool="true" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Run" order="2" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+    </layout>
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/pynfb/inlets/channels_selector.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="31" column="54" selection-start-line="31" selection-start-column="54" selection-end-line="31" selection-end-column="54" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pynfb/widgets/helpers.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-187">
+          <caret line="10" selection-start-line="10" selection-end-line="10" />
+          <folding>
+            <element signature="e#0#42#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pynfb/protocols/ssd/sliders.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="42" selection-start-column="42" selection-end-column="42" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pynfb/protocols/ssd/csp.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <folding>
+            <element signature="e#0#50#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pynfb/protocols/ssd/interactive_barplot.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="42" selection-start-column="33" selection-end-column="42" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pynfb/protocols/ssd/topomap_selector.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="13" column="17" selection-start-line="13" selection-start-column="17" selection-end-line="13" selection-end-column="17" />
+          <folding>
+            <element signature="e#0#34#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pynfb/protocols/ssd/topomap_selector_ica.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="1" column="42" selection-start-line="1" selection-start-column="42" selection-end-line="1" selection-end-column="42" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pynfb/protocols/user_inputs.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="1" column="42" selection-start-line="1" selection-start-column="42" selection-end-line="1" selection-end-column="42" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pynfb/protocols/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="170">
+          <caret line="10" column="36" selection-start-line="10" selection-start-column="36" selection-end-line="10" selection-end-column="36" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pynfb/protocols/signals_manager/scored_components_table.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="1" column="42" selection-start-line="1" selection-start-column="42" selection-end-line="1" selection-end-column="42" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pynfb/protocols/ssd/sliders_csp.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="42" selection-start-column="42" selection-end-column="42" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pynfb/experiment.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="208">
+          <caret line="21" column="122" selection-start-line="21" selection-start-column="122" selection-end-line="21" selection-end-column="122" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pynfb/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="306">
+          <caret line="39" column="51" selection-start-line="39" selection-start-column="51" selection-end-line="39" selection-end-column="51" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pynfb/settings_widget/protocols.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="399">
+          <caret line="69" column="35" selection-start-line="69" selection-start-column="35" selection-end-line="69" selection-end-column="35" />
+          <folding>
+            <element signature="e#0#31#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pynfb/windows/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="208">
+          <caret line="292" column="47" selection-start-line="292" selection-start-column="47" selection-end-line="292" selection-end-column="47" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pynfb/protocols/widgets.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="317">
+          <caret line="237" column="25" selection-start-line="237" selection-start-column="25" selection-end-line="237" selection-end-column="25" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>

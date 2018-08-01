@@ -1,5 +1,5 @@
 import h5py
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore, QtWidgets
 from mne import create_info
 from mne.io import RawArray
 from mne.preprocessing import ICA
@@ -23,25 +23,29 @@ def mutual_info(x, y, bins=100):
     return mi
 
 
-class ICADialog(QtGui.QDialog):
-    def __init__(self, raw_data, channel_names, fs, parent=None, unmixing_matrix=None, mode='ica', filters=None,
+class ICADialog(QtWidgets.QDialog):
+    def __init__(self, raw_data, channel_names, fs, parent=None, decomposition=None, mode='ica', filters=None,
                  scores=None, states=None, labels=None, _stimulus_split=False, marks=None):
         super(ICADialog, self).__init__(parent)
         self.setWindowTitle(mode.upper())
         self.setMinimumWidth(800)
         self.setMinimumHeight(400)
 
-        if mode == 'csp':
-            if not _stimulus_split:
-                self.decomposition = CSPDecomposition(channel_names, fs)
-                if labels is None:
-                    labels = np.zeros(raw_data.shape[0])
-                    labels[len(labels)//2:] = 1
-            else:
-                self.decomposition = CSPDecompositionStimulus(channel_names, fs)
-                labels = marks
-        elif mode == 'ica':
-            self.decomposition = ICADecomposition(channel_names, fs)
+
+        if decomposition is None:
+            if mode == 'csp':
+                if not _stimulus_split:
+                    self.decomposition = CSPDecomposition(channel_names, fs)
+                    if labels is None:
+                        labels = np.zeros(raw_data.shape[0])
+                        labels[len(labels)//2:] = 1
+                else:
+                    self.decomposition = CSPDecompositionStimulus(channel_names, fs)
+                    labels = marks
+            elif mode == 'ica':
+                self.decomposition = ICADecomposition(channel_names, fs)
+        else:
+            self.decomposition = decomposition
 
         # attributes
         self.sampling_freq = fs
@@ -57,7 +61,8 @@ class ICADialog(QtGui.QDialog):
 
         # unmixing matrix estimation
         timer = time()
-        self.decomposition.fit(self.raw_data, self.labels)
+        if decomposition is None:
+            self.decomposition.fit(self.raw_data, self.labels)
         self.scores = self.decomposition.scores
         self.unmixing_matrix = self.decomposition.filters
         self.topographies = self.decomposition.topographies
@@ -75,18 +80,18 @@ class ICADialog(QtGui.QDialog):
         print('Table drawing time elapsed = {}s'.format(time() - timer))
 
         # reject selected button
-        self.reject_button = QtGui.QPushButton('Reject selection')
-        self.spatial_button = QtGui.QPushButton('Make spatial filter')
-        self.add_to_all_checkbox = QtGui.QCheckBox('Add to all signals')
+        self.reject_button = QtWidgets.QPushButton('Reject selection')
+        self.spatial_button = QtWidgets.QPushButton('Make spatial filter')
+        self.add_to_all_checkbox = QtWidgets.QCheckBox('Add to all signals')
         self.reject_button.setMaximumWidth(150)
         self.spatial_button.setMaximumWidth(150)
         self.reject_button.clicked.connect(self.reject_and_close)
         self.spatial_button.clicked.connect(self.spatial_and_close)
 
         # layout
-        layout = QtGui.QVBoxLayout(self)
+        layout = QtWidgets.QVBoxLayout(self)
         layout.addWidget(self.table)
-        self.update_band_checkbox = QtGui.QCheckBox('Update band')
+        self.update_band_checkbox = QtWidgets.QCheckBox('Update band')
 
         # setup sliders
         self.sliders = Sliders(fs, reg_coef=(mode == 'csp'), stimulus_split=_stimulus_split)
@@ -97,19 +102,19 @@ class ICADialog(QtGui.QDialog):
 
         # ica mutual sorting
         if mode == 'ica':
-            sort_layout = QtGui.QHBoxLayout()
-            self.sort_combo = QtGui.QComboBox()
+            sort_layout = QtWidgets.QHBoxLayout()
+            self.sort_combo = QtWidgets.QComboBox()
             self.sort_combo.setMaximumWidth(100)
             self.sort_combo.addItems(channel_names)
             self.sort_combo.setCurrentIndex(self.decomposition.sorted_channel_index)
             self.sort_combo.currentIndexChanged.connect(self.sort_by_mutual)
-            sort_layout.addWidget(QtGui.QLabel('Sort by: '))
+            sort_layout.addWidget(QtWidgets.QLabel('Sort by: '))
             sort_layout.addWidget(self.sort_combo)
             sort_layout.setAlignment(QtCore.Qt.AlignLeft)
             layout.addLayout(sort_layout)
 
         # buttons
-        buttons_layout = QtGui.QHBoxLayout()
+        buttons_layout = QtWidgets.QHBoxLayout()
         buttons_layout.setAlignment(QtCore.Qt.AlignLeft)
         buttons_layout.addWidget(self.reject_button)
         buttons_layout.addWidget(self.spatial_button)
@@ -161,15 +166,15 @@ class ICADialog(QtGui.QDialog):
         self.table.redraw(self.components, self.topographies, self.unmixing_matrix, self.scores)
 
     @classmethod
-    def get_rejection(cls, raw_data, channel_names, fs, unmixing_matrix=None, mode='ica', states=None, labels=None, _stimulus_split=False, marks=None):
+    def get_rejection(cls, raw_data, channel_names, fs, decomposition=None, mode='ica', states=None, labels=None, _stimulus_split=False, marks=None):
         wait_bar = WaitMessage(mode.upper() + WAIT_BAR_MESSAGES['CSP_ICA']).show_and_return()
-        selector = cls(raw_data, channel_names, fs, unmixing_matrix=unmixing_matrix, mode=mode, states=states, labels=labels, _stimulus_split=_stimulus_split, marks=marks)
+        selector = cls(raw_data, channel_names, fs, decomposition=decomposition, mode=mode, states=states, labels=labels, _stimulus_split=_stimulus_split, marks=marks)
         wait_bar.close()
         result = selector.exec_()
         bandpass = selector.bandpass if selector.update_band_checkbox.isChecked() else None
         return (selector.rejection,
                 selector.spatial, selector.topography,
-                selector.unmixing_matrix,
+                selector.decomposition,
                 bandpass,
                 selector.add_to_all_checkbox.isChecked())
 
@@ -177,7 +182,7 @@ class ICADialog(QtGui.QDialog):
 if __name__ == '__main__':
     import numpy as np
 
-    app = QtGui.QApplication([])
+    app = QtWidgets.QApplication([])
     n_channels = 3
     fs = 100
 

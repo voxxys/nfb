@@ -1,4 +1,4 @@
-from PyQt4 import QtGui
+from PyQt5 import QtGui
 
 inlet_types = ['lsl', 'lsl_from_file', 'lsl_generator', 'ftbuffer']
 
@@ -29,7 +29,7 @@ class InletSettingsWidget(QtGui.QWidget):
         # layout.addWidget(self.stream_name)
         # layout.addWidget(self.raw_path)
         layout.addWidget(self.raw_select_button)
-        layout.setMargin(0)
+        layout.setContentsMargins(0,0,0,0)
         self.setLayout(layout)
         self.combo.currentIndexChanged.connect(self.combo_changed_event)
         self.combo.setCurrentIndex(inlet_types.index(self.parent().params['sInletType']))
@@ -94,7 +94,7 @@ class EventsInletSettingsWidget(QtGui.QWidget):
         layout = QtGui.QHBoxLayout(self)
         layout.addWidget(self.use_events)
         layout.addWidget(self.name_edit)
-        layout.setMargin(0)
+        layout.setContentsMargins(0,0,0,0)
         self.reset()
 
     def use_events_changed_action(self):

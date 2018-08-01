@@ -1,4 +1,4 @@
-from PyQt4 import QtGui
+from PyQt5 import QtGui
 
 from pynfb.io.xml_ import get_lsl_info_from_xml
 from pynfb.signals import DerivedSignal

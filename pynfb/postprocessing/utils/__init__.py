@@ -1,8 +1,10 @@
 import numpy as np
-from numpy.fft import fftfreq
-from scipy.fftpack import rfft, irfft
-
+from scipy.signal import welch
+from scipy import fftpack
+import h5py
 from pynfb.io.xml_ import get_lsl_info_from_xml
+import pandas as pd
+import pylab as plt
 
 
 def dc_blocker(x, r=0.99):
@@ -14,19 +16,19 @@ def dc_blocker(x, r=0.99):
 
 
 def fft_filter(x, fs, band=(9, 14)):
-    w = fftfreq(x.shape[0], d=1. / fs * 2)
-    f_signal = rfft(x, axis=0)
+    w = fftpack.rfftfreq(x.shape[0], d=1. / fs)
+    f_signal = fftpack.rfft(x, axis=0)
     cut_f_signal = f_signal.copy()
     cut_f_signal[(w < band[0]) | (w > band[1])] = 0
-    cut_signal = irfft(cut_f_signal, axis=0)
+    cut_signal = fftpack.irfft(cut_f_signal, axis=0)
     return cut_signal
 
 
 def get_power2(x, fs, band, n_sec=5):
     n_steps = int(n_sec * fs)
-    w = fftfreq(n_steps, d=1. / fs * 2)
+    w = fftpack.fftfreq(n_steps, d=1. / fs * 2)
     print(len(range(0, x.shape[0] - n_steps, n_steps)))
-    pows = [2*np.sum(rfft(x[k:k+n_steps])[(w > band[0]) & (w < band[1])]**2)/n_steps
+    pows = [2*np.sum(fftpack.rfft(x[k:k+n_steps])[(w > band[0]) & (w < band[1])]**2)/n_steps
             for k in range(0, x.shape[0] - n_steps, n_steps)]
     return np.array(pows)
 
@@ -155,6 +157,73 @@ def find_lag(x, target, fs=None, show=False):
         plt.show()
     return lag
 
+def get_main_freq(x, fs, band_range=(8, 15), secperseg=4):
+    f, pxx = welch(x, fs, nperseg=fs*secperseg)
+    pxx[(f < band_range[0]) | (f > band_range[1])] = 0
+    return f[np.argmax(pxx)]
+
+def get_main_band(x, fs, band_range=(8, 15), band_width=2, secperseg=4):
+    main_freq = get_main_freq(x, fs, band_range, secperseg)
+    return [main_freq - band_width/2, main_freq + band_width/2]
+
+def band_hilbert(x, fs, band, N=None, axis=-1):
+    x = np.asarray(x)
+    Xf = fftpack.fft(x, N, axis=axis)
+    w = fftpack.fftfreq(x.shape[0], d=1. / fs)
+    Xf[(w < band[0]) | (w > band[1])] = 0
+    x = fftpack.ifft(Xf, axis=axis)
+    return 2*x
+
+
+def load_data(file_path, drop_channels=()):
+    with h5py.File(file_path) as f:
+        fs, channels, p_names = get_info(f, drop_channels)
+        data = [f['protocol{}/raw_data'.format(k + 1)][:] for k in range(len(p_names))]
+
+        df = pd.DataFrame(np.concatenate(data), columns=channels)
+        df['block_name'] = np.concatenate([[p]*len(d) for p, d in zip(p_names, data)])
+        df['block_number'] = np.concatenate([[j + 1]*len(d) for j, d in enumerate(data)])
+
+    return df, fs, p_names, channels
+
+def load_signals_data(file_path, drop_channels=()):
+    with h5py.File(file_path) as f:
+        fs, channels, p_names = get_info(f, drop_channels)
+        data = [f['protocol{}/signals_data'.format(k + 1)][:] for k in range(len(p_names))]
+        df = pd.DataFrame(np.concatenate(data), columns=list(f['protocol0/signals_stats']))
+    return df
+
+
+def runica(x, fs, channels, mode='ica'):
+    from PyQt5.QtGui import QApplication
+    from pynfb.protocols.ssd.topomap_selector_ica import ICADialog
+    a = QApplication([])
+    ica = ICADialog(x, channels, fs, mode=mode)
+    ica.exec_()
+    a.exit()
+    return ica.spatial, ica.topography
+
+def runica2(x, fs, channels, names=('Right', 'Left'), mode='ica'):
+    from PyQt5.QtGui import QApplication
+    from pynfb.protocols.ssd.topomap_selector_ica import ICADialog
+    a = QApplication([])
+    res = []
+    decomposition = None
+    for n in names:
+        print('*** Select component for condition: ' + n)
+        ica = ICADialog(x, channels, fs, decomposition=decomposition, mode=mode)
+        ica.exec_()
+        res.append(np.array((ica.spatial, ica.topography)))
+        decomposition = ica.decomposition
+    a.exit()
+    return res
+
 
 if __name__ == '__main__':
-    get_colors()
+    from mne.viz import plot_topomap
+    from pynfb.inlets.montage import Montage
+    from pynfb.generators import ch_names32
+    montage = Montage(ch_names32)
+    spatial, topo = runica(np.random.normal(size=(100000, 32)), 1000, montage.get_names(), mode='csp')
+    plot_topomap(spatial, montage.get_pos())
+    plot_topomap(topo, montage.get_pos())

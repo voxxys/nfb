@@ -8,9 +8,9 @@ from ..helpers.beep import SingleBeep
 from ..io.hdf5 import load_h5py_protocols_raw
 from ..protocols.user_inputs import SelectSSDFilterWidget
 from ..protocols.widgets import (CircleFeedbackProtocolWidgetPainter, BarFeedbackProtocolWidgetPainter,
-                                     PsyProtocolWidgetPainter, BaselineProtocolWidgetPainter,
+                                     BaselineProtocolWidgetPainter,
                                      ThresholdBlinkFeedbackProtocolWidgetPainter, VideoProtocolWidgetPainter, TrialsProtocolWidgetPainter, CenterOutProtocolWidgetPainter)
-									 
+
 from ..signals import CompositeSignal, DerivedSignal, BCISignal
 
 from ..widgets.helpers import ch_names_to_2d_pos
@@ -23,7 +23,8 @@ class Protocol:
                  mock_samples_path=(None, None), show_reward=False, reward_signal_id=0, reward_threshold=0.,
                  ssd_in_the_end=False, timer=None, freq=500, mock_previous=0, drop_outliers=0, stats_type='meanstd',
                  experiment=None, pause_after=False, reverse_mock_previous=False, m_signal_index=None,
-                 shuffle_mock_previous=None, beep_after=False, as_mock=False, auto_bci_fit=False, montage=None):
+                 shuffle_mock_previous=None, beep_after=False, as_mock=False, auto_bci_fit=False, montage=None,
+                 random_over_time=0):
         """ Constructor
         :param signals: derived signals
         :param source_signal_id: base signal id, or None if 'All' signals using
@@ -39,6 +40,7 @@ class Protocol:
         self.mock_samples_file_path, self.mock_samples_protocol = mock_samples_path
         self.name = name
         self.duration = duration
+        self.random_over_time = random_over_time
         self.widget_painter = None
         self.signals = signals
         self.source_signal_id = source_signal_id
@@ -531,18 +533,6 @@ class SSDProtocol(Protocol):
         kwargs['ssd_in_the_end'] = True
         super().__init__(signals, **kwargs)
         self.widget_painter = BaselineProtocolWidgetPainter(text=text, show_reward=self.show_reward)
-
-
-class PsyProtocol(Protocol):
-    def __init__(self, signals, detection, name='Psy', **kwargs):
-        kwargs['name'] = name
-        super().__init__(signals, **kwargs)
-        self.widget_painter = PsyProtocolWidgetPainter(detection)
-        pass
-
-    def close_protocol(self, **kwargs):
-        self.widget_painter.close()
-        super(PsyProtocol, self).close_protocol(**kwargs)
 
 
 def main():

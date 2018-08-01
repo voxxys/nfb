@@ -4,9 +4,8 @@ import time
 
 import numpy as np
 import pyqtgraph as pg
-from PyQt4 import QtGui, QtCore
-from PyQt4.QtCore import pyqtSignal
-from expyriment import control, design
+from PyQt5 import QtGui, QtCore, QtWidgets
+from PyQt5.QtCore import pyqtSignal
 
 from pynfb.brain import SourceSpaceRecontructor
 from pynfb.brain import SourceSpaceWidget
@@ -30,13 +29,13 @@ class LSLPlotDataItem(pg.PlotDataItem):
         return x, y
 
 
-class PlayerButtonsWidget(QtGui.QWidget):
+class PlayerButtonsWidget(QtWidgets.QWidget):
     start_clicked = pyqtSignal()
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         # init buttons
-        self.start = QtGui.QPushButton('')
-        self.restart = QtGui.QPushButton('')
+        self.start = QtWidgets.QPushButton('')
+        self.restart = QtWidgets.QPushButton('')
         # set icons
         self.start.setIcon(QtGui.QIcon(static_path + '/imag/play-button.png'))
         self.restart.setIcon(QtGui.QIcon(static_path + '/imag/replay.png'))
@@ -50,7 +49,7 @@ class PlayerButtonsWidget(QtGui.QWidget):
         self.start.setCheckable(True)
         self.restart.setEnabled(False)
         # init layer
-        layer = QtGui.QHBoxLayout()
+        layer = QtWidgets.QHBoxLayout()
         self.setLayout(layer)
         layer.addWidget(self.start)
         layer.addWidget(self.restart)
@@ -62,7 +61,7 @@ class PlayerButtonsWidget(QtGui.QWidget):
         styles += styles[::-1]
 
         # animation doesn't work for strings but provides an appropriate delay
-        animation = QtCore.QPropertyAnimation(self.start, 'styleSheet')
+        animation = QtCore.QPropertyAnimation(self.start, b'styleSheet')
         animation.setDuration(40)
 
         states = [QtCore.QState() for style in styles]
@@ -95,16 +94,16 @@ class PlayerButtonsWidget(QtGui.QWidget):
         self.restart.setEnabled(False)
 
 
-class PlayerLineInfo(QtGui.QWidget):
+class PlayerLineInfo(QtWidgets.QWidget):
     def __init__(self, protocols_names, protocols_durations=[], **kwargs):
         super().__init__(**kwargs)
 
         # init layout
-        layer = QtGui.QHBoxLayout()
+        layer = QtWidgets.QHBoxLayout()
         self.setLayout(layer)
 
         # status widget
-        self.status = QtGui.QLabel()
+        self.status = QtWidgets.QLabel()
         layer.addWidget(self.status)
 
         #
@@ -131,13 +130,12 @@ class PlayerLineInfo(QtGui.QWidget):
         self.init()
 
 
-class MainWindow(QtGui.QMainWindow):
+class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, current_protocol, protocols, signals, n_signals=1, parent=None, n_channels=32,
                  max_protocol_n_samples=None,
                  experiment=None, freq=500,
                  plot_raw_flag=True, plot_signals_flag=True, plot_source_space_flag=False, show_subject_window=True,
-                 channels_labels=None,
-                 subject_backend_expyriment=False):
+                 channels_labels=None):
         super(MainWindow, self).__init__(parent)
 
         # Which windows to draw:
@@ -158,7 +156,7 @@ class MainWindow(QtGui.QMainWindow):
         self._first_time_start_press = True
 
         # timer label
-        self.timer_label = QtGui.QLabel('tf')
+        self.timer_label = QtWidgets.QLabel('tf')
 
         # signals viewer
         self.signals_viewer = DerivedSignalViewer(freq, [signal.name for signal in signals])
@@ -168,11 +166,11 @@ class MainWindow(QtGui.QMainWindow):
         self.n_channels = n_channels
         self.n_samples = 2000
 
-        self.plot_raw_checkbox = QtGui.QCheckBox('plot raw')
+        self.plot_raw_checkbox = QtWidgets.QCheckBox('plot raw')
         self.plot_raw_checkbox.setChecked(plot_raw_flag)
-        self.plot_signals_checkbox = QtGui.QCheckBox('plot signals')
+        self.plot_signals_checkbox = QtWidgets.QCheckBox('plot signals')
         self.plot_signals_checkbox.setChecked(plot_signals_flag)
-        self.autoscale_raw_chekbox = QtGui.QCheckBox('autoscale')
+        self.autoscale_raw_chekbox = QtWidgets.QCheckBox('autoscale')
         self.autoscale_raw_chekbox.setChecked(True)
 
         # topomaper
@@ -203,11 +201,8 @@ class MainWindow(QtGui.QMainWindow):
 
         # subject window
         if show_subject_window:
-            if not subject_backend_expyriment:
-                self.subject_window = SubjectWindow(self, current_protocol)
-                self.subject_window.show()
-            else:
-                self.subject_window = ExpyrimentSubjectWindow(self, current_protocol)
+            self.subject_window = SubjectWindow(self, current_protocol)
+            self.subject_window.show()
             self._subject_window_want_to_close = False
         else:
             self.subject_window = None
@@ -228,7 +223,7 @@ class MainWindow(QtGui.QMainWindow):
     def update_statistics_lines(self):
         pass
 
-    def redraw_signals(self, samples, chunk, samples_counter):
+    def redraw_signals(self, samples, chunk, samples_counter, n_samples):
 
         # derived signals
         if self.plot_signals_checkbox.isChecked():
@@ -245,8 +240,8 @@ class MainWindow(QtGui.QMainWindow):
         if self.time_counter % 10 == 0:
             t_curr = time.time()
             self.timer_label.setText(
-                'samples:\t{}\ttime:\t{:.1f}\tfps:\t{:.2f}\tchunk size:\t{}\t '
-                    .format(samples_counter, t_curr - self.t0, 1. / (t_curr - self.t) * 10, chunk.shape[0]))
+                'samples:\t{}\t/{:.0f}\ttime:\t{:.1f}\tfps:\t{:.2f}\tchunk size:\t{}\t '
+                    .format(samples_counter, n_samples, t_curr - self.t0, 1. / (t_curr - self.t) * 10, chunk.shape[0]))
             self.t = t_curr
         self.time_counter += 1
         self.time_counter1 += 1
@@ -270,7 +265,7 @@ class MainWindow(QtGui.QMainWindow):
         self._first_time_start_press = False
 
 
-class SecondaryWindow(QtGui.QMainWindow):
+class SecondaryWindow(QtWidgets.QMainWindow):
 
     # Must be implemented to return a central widget object in subclasses
     def create_figure(self):
@@ -285,8 +280,8 @@ class SecondaryWindow(QtGui.QMainWindow):
         self.current_protocol = current_protocol
 
         # add central widget
-        widget = QtGui.QWidget()
-        layout = QtGui.QHBoxLayout()
+        widget = QtWidgets.QWidget()
+        layout = QtWidgets.QHBoxLayout()
         widget.setLayout(layout)
         self.figure = self.create_figure()
         layout.addWidget(self.figure)
@@ -321,46 +316,9 @@ class SubjectWindow(SecondaryWindow):
         return self.current_protocol.update_state(samples=samples, reward=reward, chunk_size=chunk_size,
                                            is_half_time=is_half_time, samples_counter=samples_counter)
 
-
-class CustomExperiment(design.Experiment):
-    def clear_all(self):
-        pass
-
-    def update_reward(self, reward):
-        pass
-
-    def show_reward(self, flag):
-        pass
-
-
-class ExpyrimentSubjectWindow:
-    def __init__(self, parent, current_protocol, **kwargs):
-        control.defaults.initialize_delay = 0
-        #control.defaults.window_mode = True
-        self.exp = CustomExperiment(background_colour=(0, 0, 0))
-
-        self.figure = ProtocolWidget()
-        self.current_protocol = current_protocol
-
-        # prepare widget
-        self.current_protocol.widget_painter.prepare_widget(self.exp)
-
-    def update_protocol_state(self, samples, reward, chunk_size=1, is_half_time=False, samples_counter=None):
-        if not self.exp.is_initialized:
-            control.initialize(self.exp)
-        else:
-            return self.current_protocol.update_state(samples, reward, chunk_size=chunk_size, is_half_time=is_half_time, samples_counter=samples_counter)
-
-    def change_protocol(self, new_protocol):
-        self.current_protocol = new_protocol
-        self.current_protocol.widget_painter.prepare_widget(self.exp)
-
-    def close(self):
-        control.end()
-
 def main():
     print(static_path)
-    app = QtGui.QApplication(sys.argv)
+    app = QtWidgets.QApplication(sys.argv)
     widget = PlayerButtonsWidget()
     widget.show()
     sys.exit(app.exec_())

@@ -1,5 +1,5 @@
 import sys
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore
 import numpy as np
 from pynfb.widgets.helpers import ch_names_to_2d_pos
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
@@ -20,8 +20,8 @@ class TopographicMapCanvas(FigureCanvas):
         FigureCanvas.__init__(self, self.fig)
         self.setParent(parent)
         FigureCanvas.setSizePolicy(self,
-                                   QtGui.QSizePolicy.Expanding,
-                                   QtGui.QSizePolicy.Expanding)
+                                   QtWidgets.QSizePolicy.Expanding,
+                                   QtWidgets.QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
 
     def update_figure(self, data, pos=None, names=None, show_names=None, show_colorbar=True, central_text=None,
@@ -87,7 +87,7 @@ class TopographicMapCanvas(FigureCanvas):
 
 
 if __name__ == '__main__':
-    qApp = QtGui.QApplication(sys.argv)
+    qApp = QtWidgets.QApplication(sys.argv)
     aw = TopographicMapCanvas()
     timer = QtCore.QTimer(qApp)
     timer.timeout.connect(aw.test_update_figure)

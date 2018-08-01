@@ -1,7 +1,7 @@
 import os
 import sys
 
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore
 
 from pynfb.experiment import Experiment
 from pynfb.io.xml_ import xml_file_to_params

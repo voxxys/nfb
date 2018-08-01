@@ -1,4 +1,4 @@
-from PyQt4 import QtGui
+from PyQt5 import QtGui
 
 from pynfb.io.defaults import vectors_defaults as defaults
 from pynfb.settings_widget import FileSelectorLine
@@ -60,7 +60,7 @@ class CompositeSignalsSettingsWidget(QtGui.QWidget):
             self.signals_dialogs.append(CompositeSignalDialog(self, signal_name=signal['sSignalName']))
             self.list.addItem(item)
         if self.list.currentRow() < 0:
-            self.list.setItemSelected(self.list.item(0), True)
+            self.list.item(0).setSelected(True)
 
 
 class CompositeSignalDialog(QtGui.QDialog):

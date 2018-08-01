@@ -1,10 +1,10 @@
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore
 
 from pynfb.io.defaults import vectors_defaults as defaults
 
 protocol_default = defaults['vProtocols']['FeedbackProtocol'][0]
-protocols_types = ['Baseline', 'Feedback', 'ThresholdBlink', 'Video', 'Psy', 'Trials','CenterOut']
 
+protocols_types = ['Baseline', 'Feedback', 'ThresholdBlink', 'Video', 'Psy', 'Trials','CenterOut']
 
 class ProtocolsSettingsWidget(QtGui.QWidget):
     def __init__(self, **kwargs):
@@ -54,8 +54,7 @@ class ProtocolsSettingsWidget(QtGui.QWidget):
             self.dialogs.append(ProtocolDialog(self, protocol_name=signal['sProtocolName']))
             self.list.addItem(item)
         if self.list.currentRow() < 0:
-            self.list.setItemSelected(self.list.item(0), True)
-
+            self.list.item(0).setSelected(True)
 
 class FileSelectorLine(QtGui.QWidget):
     def __init__(self, **kwargs):
@@ -90,10 +89,16 @@ class ProtocolDialog(QtGui.QDialog):
         self.form_layout.addRow('&Name:', self.name)
 
         # duration spin box
-        self.duration = QtGui.QSpinBox()
-        self.duration.setRange(0, 1000000)
+        self.duration = QtGui.QDoubleSpinBox()
+        self.duration.setRange(0.1, 1000000)
         # self.duration.setValue(protocol_default['fDuration'])
         self.form_layout.addRow('&Duration [s]:', self.duration)
+
+        # duration spin box
+        self.random_over_time = QtGui.QDoubleSpinBox()
+        self.random_over_time.setRange(0, 1000000)
+        # self.duration.setValue(protocol_default['fDuration'])
+        self.form_layout.addRow('&Random over time [s]:', self.random_over_time)
 
         # update statistics in the end end ssd analysis in the end check boxes
         self.ssd_in_the_end = QtGui.QCheckBox()
@@ -110,7 +115,7 @@ class ProtocolDialog(QtGui.QDialog):
 
         stats_widget = QtGui.QWidget()
         stats_layout = QtGui.QHBoxLayout(stats_widget)
-        stats_layout.setMargin(0)
+        stats_layout.setContentsMargins(0,0,0,0)
         stats_layout.addWidget(self.update_statistics)
         stats_layout.addWidget(self.update_statistics_type)
         self.form_layout.addRow('&Update statistics:', stats_widget)
@@ -305,6 +310,7 @@ class ProtocolDialog(QtGui.QDialog):
     def reset_items(self):
         current_protocol = self.params[self.parent().list.currentRow()]
         self.duration.setValue(current_protocol['fDuration'])
+        self.random_over_time.setValue(current_protocol['fRandomOverTime'])
         self.update_statistics.setChecked(current_protocol['bUpdateStatistics'])
         self.update_statistics_type.setCurrentIndex(['meanstd', 'max'].index(current_protocol['sStatisticsType']))
         self.update_statistics_type.setEnabled(self.update_statistics.isChecked())
@@ -359,6 +365,7 @@ class ProtocolDialog(QtGui.QDialog):
         current_signal_index = self.parent().list.currentRow()
         self.params[current_signal_index]['sProtocolName'] = self.name.text()
         self.params[current_signal_index]['fDuration'] = self.duration.value()
+        self.params[current_signal_index]['fRandomOverTime'] = self.random_over_time.value()
         self.params[current_signal_index]['bUpdateStatistics'] = int(self.update_statistics.isChecked())
         self.params[current_signal_index]['sStatisticsType'] = self.update_statistics_type.currentText()
         self.params[current_signal_index]['bBeepAfter'] = int(self.beep_after.isChecked())

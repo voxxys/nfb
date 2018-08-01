@@ -14,6 +14,7 @@ general_defaults = OrderedDict([
 
 vectors_defaults = OrderedDict([
     ('bDC', 0),
+    ('sPrefilterBand', 'None None'),
     ('sExperimentName', 'experiment'),
     ('sInletType', 'lsl'),
     ('sStreamName', 'NVX136_Data'),
@@ -44,7 +45,8 @@ vectors_defaults = OrderedDict([
             ('sTemporalType', 'envdetector'),
             ('sTemporalFilterType', 'fft'),
             ('fTemporalFilterButterOrder', 2),
-            ('sTemporalSmootherType', 'exp')
+            ('sTemporalSmootherType', 'exp'),
+            ('iDelayMs', 0)
             # ('sType', 'plain')
         ])]),
         ('CompositeSignal', [OrderedDict([     # DerivedSignal is list!
@@ -64,6 +66,7 @@ vectors_defaults = OrderedDict([
             # ('bStopAfter', False),
             # ('bShowFBRect', False),
             ('fDuration', 10),
+            ('fRandomOverTime', 0),
             # ('fThreshold', ''),
             ('fbSource', 'All'),
             # ('iNComp', ''),
@@ -98,7 +101,8 @@ vectors_defaults = OrderedDict([
             ('sName', 'Group'),
             ('sList', ''),
             ('sNumberList', ''),
-            ('bShuffle', 0)
+            ('bShuffle', 0),
+            ('sSplitBy', ''),
     ])])])),
     ('vPSequence', OrderedDict([
         ('s', ['Protocol'])])),

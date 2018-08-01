@@ -2,7 +2,7 @@ import expyriment
 
 from expyriment import control, design, misc
 import expyriment.stimuli
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore
 
 def run_exp():
     #control.run_test_suite()

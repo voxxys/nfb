@@ -3,7 +3,7 @@ import expyriment
 from expyriment import control, design, misc
 import expyriment.stimuli
 import expyriment.stimuli.extras
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore
 import numpy as np
 
 from pynfb.helpers.gabor import GaborPatch
