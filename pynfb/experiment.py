@@ -16,7 +16,7 @@ from .inlets.channels_selector import ChannelsSelector
 from .io.hdf5 import save_h5py, load_h5py, save_signals, load_h5py_protocol_signals, save_xml_str_to_hdf5_dataset
 from .io.xml_ import params_to_xml_file, params_to_xml, get_lsl_info_from_xml
 from .io import read_spatial_filter
-from .protocols import BaselineProtocol, TrialsProtocol, FeedbackProtocol, ThresholdBlinkFeedbackProtocol, VideoProtocol, PsyProtocol
+from .protocols import BaselineProtocol, TrialsProtocol, FeedbackProtocol, ThresholdBlinkFeedbackProtocol, VideoProtocol, PsyProtocol, CenterOutProtocol
 from .signals import DerivedSignal, CompositeSignal, BCISignal
 from .windows import MainWindow
 from ._titles import WAIT_BAR_MESSAGES
@@ -40,6 +40,7 @@ class Experiment():
         self.activate_trouble_catching = False
         self.main = None
         self.saved_state = 100
+        self.saved_state_arr = [-11235 for i in range(4)]
         self.restart()
         pass
 
@@ -124,6 +125,10 @@ class Experiment():
                     if current_protocol.istrials:
                         [mark,state] = self.subject.update_protocol_state(samples, self.reward, chunk_size=chunk.shape[0],
                                       is_half_time=is_half_time, samples_counter = self.samples_counter)
+                    
+                    elif current_protocol.iscenterout:
+                        [mark,state] = self.subject.update_protocol_state(samples, self.reward, chunk_size=chunk.shape[0],
+                                      is_half_time=is_half_time, samples_counter = self.samples_counter)
                     else:
                         mark = self.subject.update_protocol_state(samples, self.reward, chunk_size=chunk.shape[0],
                                                               is_half_time=is_half_time, samples_counter = self.samples_counter)
@@ -137,6 +142,13 @@ class Experiment():
                     self.state_recorder[self.samples_counter - chunk.shape[0]:self.samples_counter] = self.saved_state*np.ones(statereclen)
                     
                     self.saved_state = state
+                elif current_protocol.iscenterout:
+                    statereclen = self.state_recorder[self.samples_counter - chunk.shape[0]:self.samples_counter].shape[0]
+                    self.state_recorder[self.samples_counter - chunk.shape[0]:self.samples_counter] = self.saved_state_arr[0]*np.ones(statereclen)
+                    self.par_recorder[self.samples_counter - chunk.shape[0]:self.samples_counter] = self.saved_state_arr[1]*np.ones(statereclen)
+                    self.posx_recorder[self.samples_counter - chunk.shape[0]:self.samples_counter] = self.saved_state_arr[2]*np.ones(statereclen)
+                    self.posy_recorder[self.samples_counter - chunk.shape[0]:self.samples_counter] = self.saved_state_arr[3]*np.ones(statereclen)
+                    self.saved_state_arr = state
                 else:
                     self.mark_recorder[self.samples_counter - chunk.shape[0]:self.samples_counter] = 0
                     self.mark_recorder[self.samples_counter-1] = int(mark or 0)
@@ -208,7 +220,10 @@ class Experiment():
                      protocol_name=self.protocols_sequence[self.current_protocol_index].name,
                      mock_previous=self.protocols_sequence[self.current_protocol_index].mock_previous,
                      mark_data=self.mark_recorder[:self.samples_counter],
-                     state_data=self.state_recorder[:self.samples_counter])
+                     state_data=self.state_recorder[:self.samples_counter],
+                     par_data=self.par_recorder[:self.samples_counter],
+                     posx_data=self.posx_recorder[:self.samples_counter],
+                     posy_data=self.posy_recorder[:self.samples_counter])
 
         # reset samples counter
         previous_counter = self.samples_counter
@@ -442,6 +457,13 @@ class Experiment():
                         #pic4_path=protocol['sPic4Path'],
                         # add here: pics, start to pic, pic to end, trial duration
                         **kwargs))
+            
+            elif protocol['sFb_type'] == 'CenterOut':
+                self.protocols.append(
+                    CenterOutProtocol(
+                        self.signals,
+                        pic1_path=protocol['sPic1Path'],
+                        **kwargs))
                 
             elif protocol['sFb_type'] in ['Feedback', 'CircleFeedback']:
                 self.protocols.append(
@@ -516,6 +538,10 @@ class Experiment():
         self.raw_recorder = np.zeros((max_protocol_n_samples * 110 // 100, self.n_channels)) * np.nan
 
         self.state_recorder = np.zeros((max_protocol_n_samples * 110 // 100)) * np.nan
+        self.par_recorder = np.zeros((max_protocol_n_samples * 110 // 100)) * np.nan
+        self.posx_recorder = np.zeros((max_protocol_n_samples * 110 // 100)) * np.nan
+        self.posy_recorder = np.zeros((max_protocol_n_samples * 110 // 100)) * np.nan
+        
         self.timestamp_recorder = np.zeros((max_protocol_n_samples * 110 // 100)) * np.nan
 
         self.raw_recorder_other = np.zeros((max_protocol_n_samples * 110 // 100, self.n_channels_other)) * np.nan

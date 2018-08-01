@@ -43,7 +43,7 @@ def load_h5py_all_samples(file_path, raw=True):
 
 
 def save_signals(file_path, signals, group_name='protocol0', raw_data=None, timestamp_data=None, signals_data=None,
-                 raw_other_data=None, reward_data=None, protocol_name='unknown', mock_previous=0, mark_data=None, state_data=None):
+                 raw_other_data=None, reward_data=None, protocol_name='unknown', mock_previous=0, mark_data=None, state_data=None, par_data=None, posx_data=None, posy_data=None):
 
     print('Signals stats saving', group_name)
     with h5py.File(file_path, 'a') as f:
@@ -86,6 +86,15 @@ def save_signals(file_path, signals, group_name='protocol0', raw_data=None, time
             main_group.create_dataset('mark_data', data=mark_data, compression="gzip")
         if state_data is not None:
             main_group.create_dataset('state_data', data=state_data, compression="gzip")
+        if state_data is not None:
+            main_group.create_dataset('par_data', data=par_data, compression="gzip")
+        if state_data is not None:
+            main_group.create_dataset('posx_data', data=posx_data, compression="gzip")
+        if state_data is not None:
+            main_group.create_dataset('posy_data', data=posy_data, compression="gzip")
+            
+            
+            
 
     pass
 

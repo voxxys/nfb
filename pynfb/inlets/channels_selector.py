@@ -10,6 +10,7 @@ class ChannelsSelector:
         self.inlet = inlet
         self.events_inlet = events_inlet
         names = [n.upper() for n in self.inlet.get_channels_labels()]
+        print(self.inlet.get_channels_labels())
         names = [''.join([ch if ch.isalnum() else ' ' for ch in name]).split()[0] for name in names]
         if self.events_inlet is not None:
             names += [EVENTS_CHANNEL_NAME]

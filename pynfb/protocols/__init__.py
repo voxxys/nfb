@@ -9,7 +9,7 @@ from ..io.hdf5 import load_h5py_protocols_raw
 from ..protocols.user_inputs import SelectSSDFilterWidget
 from ..protocols.widgets import (CircleFeedbackProtocolWidgetPainter, BarFeedbackProtocolWidgetPainter,
                                      PsyProtocolWidgetPainter, BaselineProtocolWidgetPainter,
-                                     ThresholdBlinkFeedbackProtocolWidgetPainter, VideoProtocolWidgetPainter, TrialsProtocolWidgetPainter)
+                                     ThresholdBlinkFeedbackProtocolWidgetPainter, VideoProtocolWidgetPainter, TrialsProtocolWidgetPainter, CenterOutProtocolWidgetPainter)
 									 
 from ..signals import CompositeSignal, DerivedSignal, BCISignal
 
@@ -56,6 +56,7 @@ class Protocol:
         self.beep_after = beep_after
         self.as_mock = as_mock
         self.istrials = 0
+        self.iscenterout = 0
         self.auto_bci_fit = auto_bci_fit
 
         pass
@@ -236,7 +237,9 @@ class TrialsProtocol(Protocol):
                 
                 cur_ev_time = all_events_times[-1] + after_red_arrow_t
                 
-                [seq,times] = self.construct_dir_epoch(10,4,500,400) #[np.zeros(40),np.zeros(40)]#
+                #[seq,times] = self.construct_dir_epoch(10,4,500,1000) #[np.zeros(40),np.zeros(40)]#
+                [seq,times] = self.construct_dir_epoch_2(4,1000,0,i,8)
+                
                 times = times + cur_ev_time
                 
                 all_events_seq = np.concatenate((all_events_seq, seq))
@@ -315,7 +318,7 @@ class TrialsProtocol(Protocol):
                     
                     this_trial[pos_to_switch_with] = this_trial[0] 
                     this_trial[0] = new_first
-                
+
             fullseq[4*i:(4*i + 4)] = this_trial
         
         num_events = num_arrow_flashes*2
@@ -327,8 +330,170 @@ class TrialsProtocol(Protocol):
         event_seq_dir_epoch[::2] = fullseq
         
         return event_seq_dir_epoch, event_times_dir_epoch
+    
+    def construct_dir_epoch_2(self,num_states,stim_on_t,stim_off_t,target,rarity):
+        num_target_flashes = 5
+        num_total_flashes_0 = rarity*num_target_flashes
+        num_nontarget_flashes = (num_total_flashes_0 - num_target_flashes)//(num_states - 1)
+        #num_total_flashes = num_nontarget_flashes*(num_states-1) + num_target_flashes
+        
+        seq = []
+        
+        for i in np.arange(1,num_states+1):
+            if(i == target):
+                seq = seq + [i]*num_target_flashes
+            else:
+                seq = seq + [i]*num_nontarget_flashes
+                
+        seq = np.random.permutation(np.array(seq)).astype(int)
+        
+        num_events = seq.shape[0]*2
+        event_seq_dir_epoch = np.zeros([num_events],dtype=np.int)
+        
+        event_times_dir_epoch = np.zeros([num_events])
+        event_times_dir_epoch = np.arange(0,num_events*stim_on_t,stim_on_t)/float(1000)
+        
+        event_seq_dir_epoch[::2] = seq
+        
+        return event_seq_dir_epoch, event_times_dir_epoch
 
+class CenterOutProtocol(Protocol):
+    def __init__(self, signals, name='CenterOut', update_statistics_in_the_end=True, pic1_path='', #pic2_path, pic3_path, pic4_path,
+                 **kwargs):
+        kwargs['name'] = name
+        kwargs['update_statistics_in_the_end'] = update_statistics_in_the_end
+        super().__init__(signals, **kwargs)
+        self.widget_painter = CenterOutProtocolWidgetPainter()
+        self.is_half_time = False
+        self.beep = SingleBeep()
 
+        
+        
+        self.is_first_update = True
+        self.iscenterout = 1
+        
+        self.cur_state = 0
+        self.elapsed = 0
+        self.cur_par=0
+        self.startHover=-1
+        self.hoverEnough=0
+        self.hoverCircle=-1
+        evnts=[]
+        tmp=[0,0,0]
+        
+        # Construct events sequence with corresponding times
+        
+#        (start)
+#        - 2s -        
+#        center on, outer passive 0 wait
+#        - 2s -
+#        center on, outer show (random) 1 showStart
+#        - 1s -
+#        center on, outer passive 0 wait
+#        - 1s -
+#        center angle (random), outer passive 2 showSpan
+#        - 2s -
+#        center dissapear, outer passive 3 getResponse
+#        - 4s -
+#        --
+
+#           timings, types, time to wait on the guessed circle and starting pause (better no less then 4 secs) 
+        timings=[2,1,1,1,3]
+        #timings=[0.1,0.1,0.1,1,0.1]
+        types=[0,1,0,2,3]
+        self.onCircle=1
+        start_pause=5
+             
+        for i in range(0,5*50,5):
+            for j in range(5):
+                if i==0 and j==0:
+                    tmp[0]=0
+                    tmp[1]=start_pause
+                    tmp[2]=0
+                else:
+                    tmp[0]=types[j]
+                    tmp[1]=evnts[i+j-1][1]+timings[j]
+                    if types[j]==1:
+                        tmp[2]=random.randint(0,7)
+                    elif types[j]==2:
+                        tmp[2]=random.randint(-7,7)
+                    else:
+                        tmp[2]=0
+                evnts.append([tmp[k] for k in range(len(tmp))])
+        #print(evnts)
+        
+        self.evnts=evnts    
+        self.pos_in_events_times = 0
+
+    def update_state(self, samples, reward, chunk_size=1, is_half_time=False, samples_counter=None):
+        #if(samples_counter is not None):
+        
+        if(self.is_first_update):
+            self.is_first_update = False
+            self.protocol_start_time=time.time()
+            self.elapsed = 0
+            self.pos_in_events_times=0
+            self.widget_painter.goFullScreen()
+        
+        self.elapsed = time.time() - self.protocol_start_time
+
+        self.check_times()
+        
+        [self.posx, self.posy]=self.widget_painter.getMousePos()
+        
+        if self.cur_state==3:
+            dat= self.widget_painter.checkHover(self.posx, self.posy)
+            if self.hoverEnough==1:
+                if dat[1]==0 or self.hoverCircle!=dat[0]:
+                    self.hoverEnough=-1
+                    self.startHover=-1
+                else:
+                    self.widget_painter.showCorrect(self.cur_par,self.hoverCircle,1)
+                    
+            elif self.hoverEnough==0:
+                self.widget_painter.showCorrect(self.cur_par,self.hoverCircle,0)
+                if dat[1]==1 and self.hoverCircle==dat[0]:
+                    if self.startHover==-1:
+                        self.startHover=self.elapsed
+                    elif self.elapsed>=self.startHover+self.onCircle:
+                        self.hoverEnough=1
+                else:
+                    self.startHover=-1
+            self.hoverCircle=dat[0]                                       
+                    
+        return None, [self.cur_state, self.cur_par, self.posx, self.posy]
+                
+
+    def check_times(self):
+        if(self.pos_in_events_times < len(self.evnts)):
+            #print(self.elapsed)
+            #print(self.evnts[self.pos_in_events_times][1])
+            if(self.elapsed > self.evnts[self.pos_in_events_times][1]):
+                self.pos_in_events_times = self.pos_in_events_times + 1;
+                if(self.pos_in_events_times < len(self.evnts)):
+                    #self.widget_painter.img.setImage(self.widget_painter.image_0)
+                    self.cur_state = self.evnts[self.pos_in_events_times][0]
+                    self.cur_par = self.evnts[self.pos_in_events_times][2]
+                    if self.cur_state==1:
+                        self.startSpan=self.cur_par
+                    elif self.cur_state==2:
+                        self.plusSpan=self.cur_par
+                    elif self.cur_state==3:
+                        self.cur_par=(8+self.plusSpan+self.startSpan)%8
+                        self.startHover=-1
+                        self.hoverEnough=0
+                    self.widget_painter.doStuff(self.cur_state,self.cur_par)
+                    self.widget_painter.prev_par=self.cur_par
+                    self.widget_painter.prev_state=self.cur_state
+                    self.check_times()
+
+            
+    def close_protocol(self, **kwargs):
+        self.is_half_time = False
+        self.beep = SingleBeep()
+        self.widget_painter.set_message('')
+        super(CenterOutProtocol, self).close_protocol(**kwargs)
+        #self.widget_painter.set_message(self.text)
 
 class FeedbackProtocol(Protocol):
     def __init__(self, signals, name='Feedback', circle_border=0, m_threshold=1, **kwargs):
