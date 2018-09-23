@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/nfb.iml" filepath="$PROJECT_DIR$/.idea/nfb.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/.idea/nfb_centerout.iml" filepath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/.idea/nfb_centerout.iml" />
+      <module fileurl="file://E:/REPOS/nfb_centerout_w_nores/nfb_fix_nores/.idea/nfb_fix_nores.iml" filepath="E:/REPOS/nfb_centerout_w_nores/nfb_fix_nores/.idea/nfb_fix_nores.iml" />
+    </modules>
+  </component>
+</project>

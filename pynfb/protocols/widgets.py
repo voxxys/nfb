@@ -3,6 +3,8 @@ import time
 import numpy as np
 import pyqtgraph as pg
 
+from scipy.misc import imread
+
 
 class ProtocolWidget(pg.PlotWidget):
     def __init__(self, **kwargs):
@@ -235,6 +237,61 @@ class VideoProtocolWidgetPainter(Painter):
                 self.frame_counter = (self.frame_counter + 1) % self.n_frames
                 self.img.setImage(self.video.get_data(self.frame_counter))
             pass
+
+
+class FingersProtocolWidgetPainter(Painter):
+
+    def prepare_widget(self, widget):
+
+        newx = 1920
+        newy = 1080
+
+        self.widget = widget
+
+        self.widget.setYRange(-newy / 2, newy / 2)
+        self.widget.setXRange(-newx / 2, newx / 2)
+        self.widget.setMaximumWidth(newx)
+        self.widget.setMaximumHeight(newy)
+
+        self.plotItem = widget.plotItem
+
+        self.images = [imread('F:/fingers/' + str(image_num) + '.png') for image_num in np.arange(22)]
+
+        self.img = pg.ImageItem(anchor=(0, 0))
+
+        self.img.rotate(-90)
+        self.img.setX(-newx / 2)
+        self.img.setY(newy / 2)
+
+        self.img.setImage(self.images[0])
+
+        widget.addItem(self.img)
+
+        self.widget = widget
+
+        widget.setBackgroundBrush(pg.mkBrush('#606060'))
+
+    def change_pic(self, num_pic):
+
+        self.img.setImage(self.images[num_pic])
+
+    def redraw_state(self):
+        pass
+
+    def set_message(self, text):
+        pass
+
+    def goFullScreen(self):
+        self.widget.parentWidget().parentWidget().showFullScreen()
+
+        newx = 1920
+        newy = 1080
+        self.widget.setYRange(-newy / 2, newy / 2)
+        self.widget.setXRange(-newx / 2, newx / 2)
+        self.widget.setMaximumWidth(newx)
+        self.widget.setMaximumHeight(newy)
+        self.widget.setMinimumWidth(newx)
+        self.widget.setMinimumHeight(newy)
 
 
 if __name__ == '__main__':

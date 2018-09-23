@@ -18,7 +18,7 @@ from .io.hdf5 import save_h5py, load_h5py, save_signals, load_h5py_protocol_sign
     save_channels_and_fs
 from .io.xml_ import params_to_xml_file, params_to_xml, get_lsl_info_from_xml
 from .io import read_spatial_filter
-from .protocols import BaselineProtocol, FeedbackProtocol, ThresholdBlinkFeedbackProtocol, VideoProtocol
+from .protocols import BaselineProtocol, FeedbackProtocol, ThresholdBlinkFeedbackProtocol, VideoProtocol, FingersProtocol
 from .signals import DerivedSignal, CompositeSignal, BCISignal
 from .windows import MainWindow
 from ._titles import WAIT_BAR_MESSAGES
@@ -433,6 +433,11 @@ class Experiment():
                     VideoProtocol(
                         self.signals,
                         video_path=protocol['sVideoPath'],
+                        **kwargs))
+            elif protocol['sFb_type'] == 'Fingers':
+                self.protocols.append(
+                    FingersProtocol(
+                        self.signals,
                         **kwargs))
             else:
                 raise TypeError('Undefined protocol type \"{}\"'.format(protocol['sFb_type']))

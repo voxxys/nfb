@@ -9,10 +9,15 @@ from ..io.hdf5 import load_h5py_protocols_raw
 from ..protocols.user_inputs import SelectSSDFilterWidget
 from ..protocols.widgets import (CircleFeedbackProtocolWidgetPainter, BarFeedbackProtocolWidgetPainter,
                                  BaselineProtocolWidgetPainter, ThresholdBlinkFeedbackProtocolWidgetPainter,
+                                 FingersProtocolWidgetPainter,
                                  VideoProtocolWidgetPainter)
 from ..signals import CompositeSignal, DerivedSignal, BCISignal
 from ..widgets.helpers import ch_names_to_2d_pos
 from ..widgets.update_signals_dialog import SignalsSSDManager
+
+import pickle as pkl
+import time
+import random
 
 
 class Protocol:
@@ -230,6 +235,195 @@ class SSDProtocol(Protocol):
         kwargs['ssd_in_the_end'] = True
         super().__init__(signals, **kwargs)
         self.widget_painter = BaselineProtocolWidgetPainter(text=text, show_reward=self.show_reward)
+
+
+class FingersProtocol(Protocol):
+    def __init__(self, signals, name='Fingers', update_statistics_in_the_end=True,
+                 **kwargs):
+        kwargs['name'] = name
+        kwargs['update_statistics_in_the_end'] = update_statistics_in_the_end
+        super().__init__(signals, **kwargs)
+        self.widget_painter = FingersProtocolWidgetPainter()
+
+        self.is_half_time = False
+        self.beep = SingleBeep()
+
+        self.elapsed = 0
+
+        self.is_first_update = True
+        self.cur_state = 100
+        self.istrials = 1
+
+        # Construct events sequence with corresponding times
+
+        all_events_seq = np.array([0], dtype=np.int)
+        all_events_times = np.array([0], dtype=np.int)
+
+        # start after 5 seconds
+        cur_ev_time = 3
+
+        time_rest = 2
+        time_prepare = 1
+        time_move_signal = 1
+        time_move = 2
+        time_stop_signal = 1
+
+        fingers_set = np.arange(1, 11)
+        # fingers_set = np.arange(1,3)
+        numreps = 10
+
+        fingers_list = np.tile(fingers_set, numreps)
+        fingers_list_in_order = np.random.permutation(fingers_list)
+
+        for j in np.arange(len(fingers_list_in_order)):
+            i = fingers_list_in_order[j]
+            finger_events = np.array([i, i + 10, 0, 21, 0], dtype=np.int);
+            finger_event_times = cur_ev_time + np.cumsum(
+                [time_rest, time_prepare, time_move_signal, time_move, time_stop_signal]);
+
+            # time_stop, time_stop+time_rest, time_stop+time_rest+time_prepare, time_stop+time_rest+time_prepare+time_move]);
+
+            all_events_seq = np.concatenate((all_events_seq, finger_events))
+            all_events_times = np.concatenate((all_events_times, finger_event_times))
+
+            cur_ev_time = all_events_times[-1]
+
+        self.pos_in_events_times = 0
+        self.events_seq = all_events_seq
+        self.events_times = all_events_times
+        with open("backup_fingers_events_seq.pkl", "wb") as f:
+            pkl.dump(all_events_seq, f)
+        with open("backup_fingers_all_events_times.pkl", "wb") as f:
+            pkl.dump(all_events_times, f)
+
+    def update_state(self, samples, reward, chunk_size=1, is_half_time=False, samples_counter=None):
+        # if(samples_counter is not None):
+
+        if (self.is_first_update):
+            self.is_first_update = False
+            self.protocol_start_time = time.time()
+            self.elapsed = 0
+            self.widget_painter.goFullScreen()
+
+        self.elapsed = time.time() - self.protocol_start_time
+
+        self.check_times()
+
+        return None, self.cur_state
+
+    def check_times(self):
+        if (self.pos_in_events_times < len(self.events_times) - 1):
+
+            if (self.elapsed > self.events_times[self.pos_in_events_times + 1]):
+                self.pos_in_events_times = self.pos_in_events_times + 1;
+
+                if (self.pos_in_events_times < len(self.events_times)):
+
+                    self.cur_state = self.events_seq[self.pos_in_events_times]
+
+                    self.widget_painter.change_pic(self.cur_state)
+
+                    self.check_times()
+
+    def close_protocol(self, **kwargs):
+        self.is_half_time = False
+        self.beep = SingleBeep()
+        self.widget_painter.set_message('')
+        super(FingersProtocol, self).close_protocol(**kwargs)
+        # self.widget_painter.set_message(self.text)
+
+    def construct_dir_epoch(self, num_trials_in_dir_epoch, num_states, stim_on_t, stim_off_t):
+        num_arrow_flashes = num_states * num_trials_in_dir_epoch
+        fullseq = np.zeros([num_arrow_flashes])
+
+        for i in np.arange(num_trials_in_dir_epoch):
+
+            this_trial = np.random.permutation(np.array([1, 2, 3, 4])).astype(int)
+            # this_trial = np.array([1, 2, 3, 4]).astype(int)
+
+            if (i > 0):
+                last_num_prev_trial = fullseq[(4 * i - 1)]
+                first_num_this_trial = this_trial[0]
+
+                if (last_num_prev_trial == first_num_this_trial):
+                    pos_to_switch_with = random.randint(1, 3)
+
+                    new_first = this_trial[pos_to_switch_with]
+
+                    this_trial[pos_to_switch_with] = this_trial[0]
+                    this_trial[0] = new_first
+
+            fullseq[4 * i:(4 * i + 4)] = this_trial
+
+        num_events = num_arrow_flashes * 2
+        event_seq_dir_epoch = np.zeros([num_events], dtype=np.int)
+
+        event_times_dir_epoch = np.zeros([num_events])
+        event_times_dir_epoch = np.arange(0, num_events * stim_on_t, stim_on_t) / float(1000)
+
+        event_seq_dir_epoch[::2] = fullseq
+
+        return event_seq_dir_epoch, event_times_dir_epoch
+
+    def construct_finger_trial(self, num_trials_in_dir_epoch, num_states, stim_on_t, stim_off_t):
+
+        num_arrow_flashes = num_states * num_trials_in_dir_epoch
+        fullseq = np.zeros([num_arrow_flashes])
+
+        for i in np.arange(num_trials_in_dir_epoch):
+
+            this_trial = np.random.permutation(np.array([1, 2, 3, 4])).astype(int)
+            # this_trial = np.array([1, 2, 3, 4]).astype(int)
+
+            if (i > 0):
+                last_num_prev_trial = fullseq[(4 * i - 1)]
+                first_num_this_trial = this_trial[0]
+
+                if (last_num_prev_trial == first_num_this_trial):
+                    pos_to_switch_with = random.randint(1, 3)
+
+                    new_first = this_trial[pos_to_switch_with]
+
+                    this_trial[pos_to_switch_with] = this_trial[0]
+                    this_trial[0] = new_first
+
+            fullseq[4 * i:(4 * i + 4)] = this_trial
+
+        num_events = num_arrow_flashes * 2
+        event_seq_dir_epoch = np.zeros([num_events], dtype=np.int)
+
+        event_times_dir_epoch = np.zeros([num_events])
+        event_times_dir_epoch = np.arange(0, num_events * stim_on_t, stim_on_t) / float(1000)
+
+        event_seq_dir_epoch[::2] = fullseq
+
+        return event_seq_dir_epoch, event_times_dir_epoch
+
+    def construct_dir_epoch_2(self, num_states, stim_on_t, stim_off_t, target, rarity):
+        num_target_flashes = 5
+        num_total_flashes_0 = rarity * num_target_flashes
+        num_nontarget_flashes = (num_total_flashes_0 - num_target_flashes) // (num_states - 1)
+        # num_total_flashes = num_nontarget_flashes*(num_states-1) + num_target_flashes
+
+        seq = []
+
+        for i in np.arange(1, num_states + 1):
+            if (i == target):
+                seq = seq + [i] * num_target_flashes
+            else:
+                seq = seq + [i] * num_nontarget_flashes
+
+        seq = np.random.permutation(np.array(seq)).astype(int)
+
+        num_events = seq.shape[0] * 2
+        event_seq_dir_epoch = np.zeros([num_events], dtype=np.int)
+
+        event_times_dir_epoch = np.zeros([num_events])
+        event_times_dir_epoch = np.arange(0, num_events * stim_on_t, stim_on_t) / float(1000)
+
+        event_seq_dir_epoch[::2] = seq
+
+        return event_seq_dir_epoch, event_times_dir_epoch
 
 
 def main():

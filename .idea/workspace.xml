@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="807bc505-ddff-4a96-ae2d-a8e04810258c" name="Default Changelist" comment="">
+      <change beforePath="E:/REPOS/nfb_centerout_w_nores/nfb_fix_nores/pynfb/all_events_times.pkl" beforeDir="false" afterPath="E:/REPOS/nfb_centerout_w_nores/nfb_fix_nores/pynfb/all_events_times.pkl" afterDir="false" />
+      <change beforePath="E:/REPOS/nfb_centerout_w_nores/nfb_fix_nores/pynfb/events_seq.pkl" beforeDir="false" afterPath="E:/REPOS/nfb_centerout_w_nores/nfb_fix_nores/pynfb/events_seq.pkl" afterDir="false" />
+      <change beforePath="E:/REPOS/nfb_centerout_w_nores/nfb_fix_nores/pynfb/protocols/__init__.py" beforeDir="false" afterPath="E:/REPOS/nfb_centerout_w_nores/nfb_fix_nores/pynfb/protocols/__init__.py" afterDir="false" />
+      <change beforePath="E:/REPOS/nfb_centerout_w_nores/nfb_fix_nores/pynfb/protocols/widgets.py" beforeDir="false" afterPath="E:/REPOS/nfb_centerout_w_nores/nfb_fix_nores/pynfb/protocols/widgets.py" afterDir="false" />
+      <change beforePath="E:/REPOS/nfb_centerout_w_nores/nfb_fix_nores/pynfb/results/experiment_02-12_12-04-16/experiment_data.h5" beforeDir="false" />
+      <change beforePath="E:/REPOS/nfb_centerout_w_nores/nfb_fix_nores/pynfb/results/experiment_02-12_12-04-16/settings.xml" beforeDir="false" />
+      <change beforePath="E:/REPOS/nfb_centerout_w_nores/nfb_fix_nores/pynfb/results/experiment_02-12_12-04-16/stream_info.xml" beforeDir="false" />
+      <change beforePath="E:/REPOS/nfb_centerout_w_nores/nfb_fix_nores/pynfb/results/experiment_02-12_12-09-19/experiment_data.h5" beforeDir="false" />
+      <change beforePath="E:/REPOS/nfb_centerout_w_nores/nfb_fix_nores/pynfb/results/experiment_02-12_12-09-19/settings.xml" beforeDir="false" />
+      <change beforePath="E:/REPOS/nfb_centerout_w_nores/nfb_fix_nores/pynfb/results/experiment_02-12_12-09-19/stream_info.xml" beforeDir="false" />
+      <change beforePath="E:/REPOS/nfb_centerout_w_nores/nfb_fix_nores/pynfb/results/experiment_02-12_15-08-10/experiment_data_1.h5" beforeDir="false" />
+      <change beforePath="E:/REPOS/nfb_centerout_w_nores/nfb_fix_nores/pynfb/results/experiment_02-12_15-08-10/settings.xml" beforeDir="false" />
+      <change beforePath="E:/REPOS/nfb_centerout_w_nores/nfb_fix_nores/pynfb/results/experiment_02-12_15-08-10/stream_info.xml" beforeDir="false" />
+      <change beforePath="E:/REPOS/nfb_centerout_w_nores/nfb_fix_nores/pynfb/results/experiment_02-12_15-20-38/experiment_data.h5" beforeDir="false" />
+      <change beforePath="E:/REPOS/nfb_centerout_w_nores/nfb_fix_nores/pynfb/results/experiment_02-12_15-20-38/settings.xml" beforeDir="false" />
+      <change beforePath="E:/REPOS/nfb_centerout_w_nores/nfb_fix_nores/pynfb/results/experiment_02-12_15-20-38/stream_info.xml" beforeDir="false" />
+      <change beforePath="E:/REPOS/nfb_centerout_w_nores/nfb_fix_nores/pynfb/results/experiment_02-12_15-32-17/experiment_data.h5" beforeDir="false" />
+      <change beforePath="E:/REPOS/nfb_centerout_w_nores/nfb_fix_nores/pynfb/results/experiment_02-12_15-32-17/settings.xml" beforeDir="false" />
+      <change beforePath="E:/REPOS/nfb_centerout_w_nores/nfb_fix_nores/pynfb/results/experiment_02-12_15-32-17/stream_info.xml" beforeDir="false" />
+      <change beforePath="E:/REPOS/nfb_centerout_w_nores/nfb_fix_nores/pynfb/results/experiment_02-12_15-32-37/experiment_data.h5" beforeDir="false" />
+      <change beforePath="E:/REPOS/nfb_centerout_w_nores/nfb_fix_nores/pynfb/results/experiment_02-12_15-32-37/settings.xml" beforeDir="false" />
+      <change beforePath="E:/REPOS/nfb_centerout_w_nores/nfb_fix_nores/pynfb/results/experiment_02-12_15-32-37/stream_info.xml" beforeDir="false" />
+      <change beforePath="E:/REPOS/nfb_centerout_w_nores/nfb_fix_nores/pynfb/results/experiment_acc_myo_glove_02-12_15-42-01.rar" beforeDir="false" />
+      <change beforePath="E:/REPOS/nfb_centerout_w_nores/nfb_fix_nores/pynfb/results/experiment_acc_myo_glove_02-12_15-42-01/experiment_data.h5" beforeDir="false" />
+      <change beforePath="E:/REPOS/nfb_centerout_w_nores/nfb_fix_nores/pynfb/results/experiment_acc_myo_glove_02-12_15-42-01/settings.xml" beforeDir="false" />
+      <change beforePath="E:/REPOS/nfb_centerout_w_nores/nfb_fix_nores/pynfb/results/experiment_acc_myo_glove_02-12_15-42-01/stream_info.xml" beforeDir="false" />
+      <change beforePath="E:/REPOS/nfb_centerout_w_nores/nfb_fix_nores/pynfb/run_bci_experiment.py" beforeDir="false" afterPath="E:/REPOS/nfb_centerout_w_nores/nfb_fix_nores/pynfb/run_bci_experiment.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/experiment.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/experiment.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/protocols/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/protocols/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/protocols/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/protocols/widgets.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pynfb/settings_widget/protocols.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/settings_widget/protocols.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/.idea/nfb_centerout.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/.idea/nfb_centerout.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/pynfb/11.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/pynfb/all_events_times.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/pynfb/events_seq.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/pynfb/experiment.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/pynfb/experiment.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/pynfb/io/defaults.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/pynfb/io/defaults.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/pynfb/protocols/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/pynfb/protocols/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/pynfb/protocols/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/pynfb/protocols/widgets.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/pynfb/settings_widget/protocols.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/pynfb/settings_widget/protocols.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/pynfb/trials" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/pynfb/trials_par" beforeDir="false" />
+    </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FUSProjectUsageTrigger">
+    <session id="-1029921838">
+      <usages-collector id="statistics.lifecycle.project">
+        <counts>
+          <entry key="project.open.time.2" value="1" />
+          <entry key="project.opened" value="1" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.extensions.edit">
+        <counts>
+          <entry key="py" value="164" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.types.edit">
+        <counts>
+          <entry key="Python" value="164" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.extensions.open">
+        <counts>
+          <entry key="py" value="18" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.types.open">
+        <counts>
+          <entry key="Python" value="18" />
+        </counts>
+      </usages-collector>
+    </session>
+  </component>
+  <component name="FileEditorManager">
+    <splitter split-orientation="horizontal" split-proportion="0.5">
+      <split-first>
+        <leaf>
+          <file pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/pynfb/protocols/widgets.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="530">
+                  <caret line="247" lean-forward="true" selection-start-line="247" selection-end-line="247" />
+                  <folding>
+                    <element signature="e#0#11#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+        </leaf>
+      </split-first>
+      <split-second>
+        <leaf>
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://E:/REPOS/nfb_centerout_w_nores/nfb_fix_nores/pynfb/protocols/widgets.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="476">
+                  <caret line="28" column="10" selection-start-line="28" selection-start-column="10" selection-end-line="28" selection-end-column="10" />
+                  <folding>
+                    <element signature="e#0#11#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/pynfb/protocols/widgets.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="2678">
+                  <caret line="350" column="14" selection-start-line="350" selection-start-column="8" selection-end-line="350" selection-end-column="14" />
+                  <folding>
+                    <element signature="e#0#11#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+        </leaf>
+      </split-second>
+    </splitter>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>specifi</find>
+      <find>setMaximumWidth</find>
+    </findStrings>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/pynfb/experiment.py" />
+        <option value="$PROJECT_DIR$/pynfb/settings_widget/protocols.py" />
+        <option value="$PROJECT_DIR$/pynfb/protocols/__init__.py" />
+        <option value="$PROJECT_DIR$/pynfb/protocols/widgets.py" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="243" />
+    <option name="y" value="2" />
+    <option name="width" value="1400" />
+    <option name="height" value="1000" />
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectView">
+    <navigator proportions="" version="1">
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="nfb" type="b2602c69:ProjectViewProjectNode" />
+              <item name="nfb_centerout_qt5_mod_nores" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="nfb" type="b2602c69:ProjectViewProjectNode" />
+              <item name="nfb_centerout_qt5_mod_nores" type="462c0819:PsiDirectoryNode" />
+              <item name="pynfb" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="nfb" type="b2602c69:ProjectViewProjectNode" />
+              <item name="nfb_centerout_qt5_mod_nores" type="462c0819:PsiDirectoryNode" />
+              <item name="pynfb" type="462c0819:PsiDirectoryNode" />
+              <item name="protocols" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+      <pane id="Scope" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores" />
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="807bc505-ddff-4a96-ae2d-a8e04810258c" name="Default Changelist" comment="" />
+      <created>1537740383873</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1537740383873</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <editor active="true" />
+    <layout>
+      <window_info id="Favorites" side_tool="true" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.17913593" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info anchor="bottom" id="Version Control" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Python Console" />
+      <window_info anchor="bottom" id="Terminal" />
+      <window_info anchor="bottom" id="Event Log" side_tool="true" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Run" order="2" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+    </layout>
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/pynfb/experiment.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="434">
+          <caret line="434" column="56" selection-start-line="434" selection-start-column="56" selection-end-line="434" selection-end-column="56" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://E:/REPOS/nfb_centerout_w_nores/nfb_fix_nores/pynfb/experiment.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="400">
+          <caret line="462" column="50" selection-start-line="462" selection-start-column="50" selection-end-line="462" selection-end-column="50" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pynfb/settings_widget/protocols.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="629">
+          <caret line="37" column="40" selection-start-line="37" selection-start-column="40" selection-end-line="37" selection-end-column="40" />
+          <folding>
+            <element signature="e#0#42#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://E:/REPOS/nfb_centerout_w_nores/nfb_fix_nores/pynfb/protocols/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="289">
+          <caret line="17" selection-start-line="17" selection-end-line="18" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pynfb/protocols/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="189" column="39" lean-forward="true" selection-start-line="189" selection-start-column="39" selection-end-line="189" selection-end-column="39" />
+          <folding>
+            <element signature="e#0#25#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://E:/REPOS/nfb_centerout_w_nores/nfb_fix_nores/pynfb/protocols/widgets.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="476">
+          <caret line="28" column="10" selection-start-line="28" selection-start-column="10" selection-end-line="28" selection-end-column="10" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/pynfb/protocols/widgets.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2678">
+          <caret line="350" column="14" selection-start-line="350" selection-start-column="8" selection-end-line="350" selection-end-column="14" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pynfb/protocols/widgets.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="530">
+          <caret line="247" lean-forward="true" selection-start-line="247" selection-end-line="247" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>
