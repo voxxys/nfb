@@ -7,6 +7,9 @@ from scipy.misc import imread
 
 from PyQt5.QtGui import QFont
 
+import os
+fin_img_dir_path = os.path.realpath(os.path.dirname(os.path.realpath(__file__)) + '/fin_img')
+
 
 class ProtocolWidget(pg.PlotWidget):
     def __init__(self, **kwargs):
@@ -257,7 +260,7 @@ class FingersProtocolWidgetPainter(Painter):
 
         self.plotItem = widget.plotItem
 
-        self.images = [imread('F:/fingers/' + str(image_num) + '.png') for image_num in np.arange(22)]
+        self.images = [imread(fin_img_dir_path + '/' + str(image_num) + '.png') for image_num in np.arange(22)]
 
         self.img = pg.ImageItem(anchor=(0, 0))
 

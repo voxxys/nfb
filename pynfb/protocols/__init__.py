@@ -271,7 +271,7 @@ class FingersProtocol(Protocol):
         time_rest = 2
         time_prepare = 1
         time_move_signal = 1
-        time_move = 2
+        time_move = 3
         time_stop_signal = 1
 
         fingers_set = np.arange(1, 11)
