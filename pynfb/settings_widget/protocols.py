@@ -3,7 +3,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from pynfb.io.defaults import vectors_defaults as defaults
 
 protocol_default = defaults['vProtocols']['FeedbackProtocol'][0]
-protocols_types = ['Baseline', 'Feedback', 'ThresholdBlink', 'Video', 'Fingers']
+protocols_types = ['Baseline', 'Feedback', 'ThresholdBlink', 'Video', 'Fingers', "CenterOut"]
 
 
 class ProtocolsSettingsWidget(QtWidgets.QWidget):
@@ -252,6 +252,32 @@ class ProtocolDialog(QtWidgets.QDialog):
         self.video_path = FileSelectorLine()
         self.form_layout.addRow('&Video file:', self.video_path)
 
+
+
+        # settings for center-out
+
+        self.ifturn = QtGui.QCheckBox()
+        self.form_layout.addRow('&Rotation task', self.ifturn)
+
+        self.time_to_target = QtGui.QSpinBox()
+        self.time_to_target.setRange(0, 10)
+        self.form_layout.addRow('&C-O: Start to show target [s]:', self.time_to_target)
+
+        self.show_target_len = QtGui.QSpinBox()
+        self.show_target_len.setRange(0, 10)
+        self.form_layout.addRow('&C-O: Show target len [s]:', self.show_target_len)
+
+        self.show_turn_len = QtGui.QSpinBox()
+        self.show_turn_len.setRange(0, 10)
+        self.form_layout.addRow('&C-O (turn): Show turn len [s]:', self.show_turn_len)
+
+        self.time_to_move = QtGui.QSpinBox()
+        self.time_to_move.setRange(0, 10)
+        self.form_layout.addRow('&C-O: Time to move to periphery [s]:', self.time_to_move)
+
+
+
+
         # ok button
         self.save_button = QtWidgets.QPushButton('Save')
         self.save_button.clicked.connect(self.save_and_close)
@@ -360,6 +386,13 @@ class ProtocolDialog(QtWidgets.QDialog):
         current_index = self.m_signal.findText(current_protocol['sMSignal'], QtCore.Qt.MatchFixedString)
         self.m_signal.setCurrentIndex(current_index if current_index > -1 else 0)
         self.m_signal_threshold.setValue(current_protocol['fMSignalThreshold'])
+
+        self.ifturn.setChecked(current_protocol['bIfTurn'])
+        self.time_to_target.setValue(current_protocol['fTimeToTarget'])
+        self.show_target_len.setValue(current_protocol['fShowTargetLen'])
+        self.show_turn_len.setValue(current_protocol['fShowTurnLen'])
+        self.time_to_move.setValue(current_protocol['fTimeToMove'])
+
         pass
 
     def save_and_close(self):
@@ -399,5 +432,12 @@ class ProtocolDialog(QtWidgets.QDialog):
         self.params[current_signal_index]['sVideoPath'] = self.video_path.path.text()
         self.params[current_signal_index]['sMSignal'] = self.m_signal.currentText()
         self.params[current_signal_index]['fMSignalThreshold'] = self.m_signal_threshold.value()
+
+        self.params[current_signal_index]['bIfTurn'] = int(self.ifturn.isChecked())
+        self.params[current_signal_index]['fTimeToTarget'] = self.time_to_target.value()
+        self.params[current_signal_index]['fShowTargetLen'] = self.show_target_len.value()
+        self.params[current_signal_index]['fShowTurnLen'] = self.show_turn_len.value()
+        self.params[current_signal_index]['fTimeToMove'] = self.time_to_move.value()
+
         self.parent().reset_items()
         self.close()

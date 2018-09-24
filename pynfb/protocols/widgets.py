@@ -5,6 +5,8 @@ import pyqtgraph as pg
 
 from scipy.misc import imread
 
+from PyQt5.QtGui import QFont
+
 
 class ProtocolWidget(pg.PlotWidget):
     def __init__(self, **kwargs):
@@ -292,6 +294,378 @@ class FingersProtocolWidgetPainter(Painter):
         self.widget.setMaximumHeight(newy)
         self.widget.setMinimumWidth(newx)
         self.widget.setMinimumHeight(newy)
+
+
+class CenterOutProtocolWidgetPainter(Painter):
+    def __init__(self, if_4_targets, if_vanilla_co):
+        self.if_4_targets = if_4_targets
+        self.if_vanilla_co = if_vanilla_co
+
+        # super(CenterOutProtocolWidgetPainter, self).__init__(show_reward=show_reward)
+
+    def prepare_widget(self, widget):
+
+        self.use_photo_trigger = False
+
+        self.widget = widget
+        self.cursor = pg.QtGui.QCursor
+
+        widget.setMouseEnabled(x=False, y=False)
+
+        # center of the outer circles ring, its radius, outer circle radius, center circle radius, segment radius and segment spacing
+        self.centerX = 0
+        self.centerY = 0
+        self.bigR = 200
+        self.smallR = 25
+        self.centerR = 25
+
+        self.arcOuterR = 45
+        self.arcInnerR = 35
+        self.arcSpacing = 0
+        self.arcArrowWidth = 20
+        self.arcPolyPoints = 30
+
+        self.arcSuppDent = np.pi / 360 * 15
+        self.arcSuppWidth = 2
+
+        # colors of fixation cross, inactive outer, center, active outer and right guessed outer
+        fullblack = pg.mkBrush('#000000')
+        self.darkgray = pg.mkBrush('#333333')
+        self.mediumgray = pg.mkBrush('#505050')
+        self.lightgray = pg.mkBrush('#808080')
+        self.red = pg.mkBrush('#993333')
+        self.green = pg.mkBrush('#339933')
+
+        # =============================================================================
+        #         if(self.if_4_targets):
+        #             rangelist = 2*np.arange(4)
+        #         else:
+        #             rangelist = range(8)
+        # =============================================================================
+
+        rangelist = range(8)
+
+        self.outerCircles = [
+            pg.QtGui.QGraphicsEllipseItem(self.centerX + self.bigR * np.cos(2 * np.pi / 8 * i) - self.smallR,
+                                          self.centerY + self.bigR * np.sin(2 * np.pi / 8 * i) - self.smallR,
+                                          2 * self.smallR, 2 * self.smallR) for i in rangelist]
+        self.cx = [self.centerX + self.bigR * np.cos(2 * np.pi / 8 * i) - self.smallR for i in rangelist]
+        self.cy = [self.centerY + self.bigR * np.sin(2 * np.pi / 8 * i) - self.smallR for i in rangelist]
+
+        ArcSpacing = [{'x': self.arcSpacing * np.cos(2 * np.pi / 8 * i + 2 * np.pi / 16),
+                       'y': self.arcSpacing * np.sin(2 * np.pi / 8 * i + 2 * np.pi / 16)} for i in range(8)]
+        ArcAngle = [np.linspace(2 * np.pi / 8 * i, 2 * np.pi / 8 * (i + 1), self.arcPolyPoints).tolist() for i in
+                    range(8)]
+        ArcPoints = [[pg.QtCore.QPointF(self.arcOuterR * np.cos(outerArc) + ArcSpacing[i]['x'],
+                                        self.arcOuterR * np.sin(outerArc) + ArcSpacing[i]['y']) for outerArc in
+                      ArcAngle[i]] +
+                     [pg.QtCore.QPointF(self.arcInnerR * np.cos(innerArc) + ArcSpacing[i]['x'],
+                                        self.arcInnerR * np.sin(innerArc) + ArcSpacing[i]['y']) for innerArc in
+                      ArcAngle[i][::-1]]
+                     for i in range(8)]
+        ArcPoly = [pg.QtGui.QPolygonF(ArcPoints[i]) for i in range(8)]
+        self.arcSegments = [pg.QtGui.QGraphicsPolygonItem(ArcPoly[i]) for i in range(8)]
+
+        arcCentralR = (self.arcOuterR + self.arcInnerR) / 2
+        SupportArcAngle = [np.linspace(2 * np.pi / 8 * (i) + self.arcSuppDent, 2 * np.pi - self.arcSuppDent,
+                                       self.arcPolyPoints * 8 // (i + 1)).tolist() for i in range(8)] + \
+                          [np.linspace(2 * np.pi / 8 * (i) - self.arcSuppDent, 0 + self.arcSuppDent,
+                                       self.arcPolyPoints * (i + 1)).tolist() for i in range(8)]
+        SupportArcAngle[0] = [0]
+        SupportArcAngle[-8] = [0]
+
+        # for i in SupportArcAngle:
+        #    print('suplen is',len(i))
+
+        SupportArcPoints = [[pg.QtCore.QPointF((arcCentralR - self.arcSuppWidth) * np.cos(outerArc),
+                                               (arcCentralR - self.arcSuppWidth) * np.sin(outerArc)) for outerArc in
+                             SupportArcAngle[i]] +
+                            [pg.QtCore.QPointF((arcCentralR + self.arcSuppWidth) * np.cos(innerArc),
+                                               (arcCentralR + self.arcSuppWidth) * np.sin(innerArc)) for innerArc in
+                             SupportArcAngle[i][::-1]]
+                            for i in range(len(SupportArcAngle))]
+
+        self.supportArcs = [pg.QtGui.QGraphicsPolygonItem(pg.QtGui.QPolygonF(i)) for i in SupportArcPoints]
+
+        deltagrad = 2 * np.pi * self.arcSpacing / ((self.arcOuterR + self.arcInnerR) / 2 + self.arcSpacing) / 8
+
+        ArcCenter = round(len(ArcAngle[0]) / 2)
+        ArcArrowUpPoints = [[pg.QtCore.QPointF(self.arcOuterR * np.cos(outerArc) + +ArcSpacing[i]['x'],
+                                               self.arcOuterR * np.sin(outerArc) + ArcSpacing[i]['y']) for outerArc in
+                             ArcAngle[i][:ArcCenter:1]] + \
+                            [pg.QtCore.QPointF(
+                                ((self.arcOuterR + self.arcInnerR) / 2 + self.arcArrowWidth / 2) * np.cos(
+                                    ArcAngle[i][ArcCenter]) + ArcSpacing[i]['x'],
+                                ((self.arcOuterR + self.arcInnerR) / 2 + self.arcArrowWidth / 2) * np.sin(
+                                    ArcAngle[i][ArcCenter]) + ArcSpacing[i]['y']),
+                             pg.QtCore.QPointF(
+                                 (self.arcOuterR + self.arcInnerR) / 2 * np.cos(ArcAngle[i][-1] + deltagrad) +
+                                 ArcSpacing[i]['x'],
+                                 (self.arcOuterR + self.arcInnerR) / 2 * np.sin(ArcAngle[i][-1] + deltagrad) +
+                                 ArcSpacing[i]['y']),
+                             pg.QtCore.QPointF(
+                                 ((self.arcOuterR + self.arcInnerR) / 2 - self.arcArrowWidth / 2) * np.cos(
+                                     ArcAngle[i][ArcCenter]) + ArcSpacing[i]['x'],
+                                 ((self.arcOuterR + self.arcInnerR) / 2 - self.arcArrowWidth / 2) * np.sin(
+                                     ArcAngle[i][ArcCenter]) + ArcSpacing[i]['y'])] + \
+                            [pg.QtCore.QPointF(self.arcInnerR * np.cos(innerArc) + ArcSpacing[i]['x'],
+                                               self.arcInnerR * np.sin(innerArc) + ArcSpacing[i]['y']) for innerArc in
+                             ArcAngle[i][ArcCenter - 1::-1]] for i in range(8)]
+        ArcArrowUpPoly = [pg.QtGui.QPolygonF(ap) for ap in ArcArrowUpPoints]
+        self.arcUpArrow = [pg.QtGui.QGraphicsPolygonItem(ap) for ap in ArcArrowUpPoly]
+
+        ArcArrowDownPoints = [[pg.QtCore.QPointF(arr.x(), -arr.y()) for arr in ap] for ap in ArcArrowUpPoints]
+        ArcArrowDownPoly = [pg.QtGui.QPolygonF(ap) for ap in ArcArrowDownPoints]
+        self.arcDownArrow = [pg.QtGui.QGraphicsPolygonItem(ap) for ap in ArcArrowDownPoly]
+
+        self.circle = pg.QtGui.QGraphicsEllipseItem(self.centerX - self.centerR, self.centerY - self.centerR,
+                                                    2 * self.centerR, 2 * self.centerR)
+
+        self.fixCrossX = pg.QtGui.QGraphicsRectItem(-10, -2, 20, 4)
+        self.fixCrossY = pg.QtGui.QGraphicsRectItem(-2, -10, 4, 20)
+
+        self.whiterect = pg.QtGui.QGraphicsRectItem(1920 / 2 - 35, 1080 / 2 - 50, 100, 100)
+
+        self.txt = pg.TextItem(anchor=(0.5, 0.5))
+
+        self.circle.setBrush(self.mediumgray)
+        self.circle.setPen(pg.mkPen(None))
+        widget.addItem(self.circle)
+
+        for i in rangelist:
+            self.outerCircles[i].setBrush(self.darkgray)
+            self.outerCircles[i].setPen(pg.mkPen(None))
+            widget.addItem(self.outerCircles[i])
+
+            self.arcSegments[i].setBrush(self.lightgray)
+            self.arcSegments[i].setPen(pg.mkPen(None))
+            widget.addItem(self.arcSegments[i])
+            self.arcSegments[i].hide()
+
+            self.arcUpArrow[i].setBrush(self.lightgray)
+            self.arcUpArrow[i].setPen(pg.mkPen(None))
+            widget.addItem(self.arcUpArrow[i])
+            self.arcUpArrow[i].hide()
+
+            self.arcDownArrow[i].setBrush(self.lightgray)
+            self.arcDownArrow[i].setPen(pg.mkPen(None))
+            widget.addItem(self.arcDownArrow[i])
+            self.arcDownArrow[i].hide()
+
+        for i in self.supportArcs:
+            i.setBrush(self.lightgray)
+            i.setPen(pg.mkPen(None))
+            widget.addItem(i)
+            i.hide()
+
+        self.fixCrossX.setBrush(fullblack)
+        self.fixCrossY.setBrush(fullblack)
+        widget.addItem(self.fixCrossX)
+        widget.addItem(self.fixCrossY)
+
+        widget.addItem(self.txt)
+
+        self.whiterect.setBrush(pg.mkBrush('w'))
+        self.whiterect.setPen(pg.mkPen(None))
+        widget.addItem(self.whiterect)
+        self.whiterect.hide()
+
+        newfont = QFont("Calibri", 16, QFont.Bold)
+        self.txt.setFont(newfont)
+        self.txt.setX(0)
+        self.txt.setY(0)
+        self.txt.setText('    ')
+        widget.addItem(self.txt)
+
+        widget.setBackgroundBrush(pg.mkBrush('#303030'))
+
+        self.prev_par = 0
+        self.prev_state = 0
+
+        if (self.if_4_targets):
+
+            for i in 2 * np.arange(4):
+                self.outerCircles[i].setBrush(self.darkgray)
+                self.outerCircles[i + 1].hide()
+
+        else:
+
+            for i in range(8):
+                self.outerCircles[i].setBrush(self.darkgray)
+
+        self.circle.show()
+
+    def goFullScreen(self):
+        self.widget.parentWidget().parentWidget().showFullScreen()
+
+        newx = 1920
+        newy = 1080
+        self.widget.setYRange(-newy / 2, newy / 2)
+        self.widget.setXRange(-newx / 2, newx / 2)
+        self.widget.setMaximumWidth(newx)
+        self.widget.setMaximumHeight(newy)
+        self.widget.setMinimumWidth(newx)
+        self.widget.setMinimumHeight(newy)
+
+    def getMousePos(self):
+        p = self.cursor.pos();
+        p = self.widget.scene().views()[0].mapFromGlobal(p)
+        self.trueX = (p.x() - 1920 / 2) / 0.917
+        self.trueY = (1080 / 2 - p.y()) / 0.917
+        # self.txt.setText(str(par))
+        # self.txt.setText(str(round(self.trueX))+' '+str(round(self.trueY)))
+
+        return [self.trueX, self.trueY]
+
+    def checkHover(self, x, y):
+        angle = int(round((np.arctan2(y, x)) / (2 * np.pi) * 8)) % 8
+        if np.square(self.cx[angle] + self.smallR - x) + np.square(self.cy[angle] + self.smallR - y) < np.square(
+                self.smallR):
+            sw = 1
+        else:
+            sw = 0
+
+        # self.txt.setText(str(par))
+
+        return angle, sw
+
+    def checkCenterHover(self, x, y):
+
+        if np.square(x) + np.square(y) < np.square(self.centerR):
+            sw = 1
+        else:
+            sw = 0
+
+        # self.txt.setText(str(par))
+
+        return sw
+
+    def showCorrect(self, par, current, switch):
+        if switch == 1:
+            if par == current:
+                self.outerCircles[current].setBrush(self.green)
+            else:
+                self.outerCircles[current].setBrush(self.red)
+        else:
+            if not self.if_vanilla_co:
+                self.outerCircles[current].setBrush(self.darkgray)
+
+    def doStuff(self, state, par):
+
+        if state == 0:
+
+            if (self.prev_state == 1):
+
+                self.circle.show()
+
+            else:
+
+                if (self.if_4_targets):
+
+                    for i in 2 * np.arange(4):
+                        self.outerCircles[i].setBrush(self.darkgray)
+                        self.outerCircles[i + 1].hide()
+
+                else:
+
+                    for i in range(8):
+                        self.outerCircles[i].setBrush(self.darkgray)
+
+                self.circle.show()
+
+        if self.prev_state == 2:
+            if self.prev_par > 0:
+                for i in range(self.prev_par - 1):
+                    self.arcSegments[i].hide()
+                self.arcUpArrow[self.prev_par - 1].hide()
+            elif self.prev_par < 0:
+                for i in range(9 + self.prev_par, 8):
+                    self.arcSegments[i].hide()
+                self.arcDownArrow[abs(self.prev_par + 1)].hide()
+            else:
+                for i in range(7):
+                    self.arcSegments[i].hide()
+                self.arcUpArrow[7].hide()
+            self.whiterect.hide()
+
+            self.supportArcs[self.prev_par].hide()
+
+            self.fixCrossX.show()
+            self.fixCrossY.show()
+
+        elif self.prev_state == 1:
+            if self.if_vanilla_co:
+                if (state == 3):
+                    self.circle.hide()
+            # else:
+            # self.outerCircles[self.prev_par].setBrush(self.darkgray)
+            self.whiterect.hide()
+
+            # self.txt.setText(str(self.prev_par))
+
+        elif state == 1:
+            self.outerCircles[par].setBrush(self.lightgray)
+            if (self.use_photo_trigger):
+                self.whiterect.show()
+            # self.txt.setText(str(par))
+
+        if state == 2:
+            self.fixCrossX.hide()
+            self.fixCrossY.hide()
+            if (par > 0):
+                for i in range(par - 1):
+                    self.arcSegments[i].show()
+                    self.txt.setText(' ' + str(par * 45) + '°')
+                self.arcUpArrow[par - 1].show()
+
+                # self.txt.setText(str(par))
+            elif par < 0:
+                for i in range(9 + par, 8):
+                    self.arcSegments[i].show()
+                    self.txt.setText(str(par * 45) + '°')
+                self.arcDownArrow[abs(par + 1)].show()
+
+                # self.txt.setText(str(par))
+            else:
+                for i in range(7):
+                    self.arcSegments[i].show()
+                    # self.txt.setText(str(par * 45)+'°')
+                    self.txt.setText(' ' + str(360) + '°')
+                self.arcUpArrow[7].show()
+
+                # self.txt.setText(str(par))
+            if (self.use_photo_trigger):
+                self.whiterect.show()
+
+            self.supportArcs[par].show()
+            # self.txt.setText(str(par))
+
+        elif state == 3:
+            self.circle.hide()
+            self.txt.setText('   ')
+            for i in range(8):
+                # if not self.if_vanilla_co:
+                # print('TEST')
+                # self.outerCircles[i].setBrush(self.darkgray)
+
+                self.arcSegments[i].hide()
+                self.arcUpArrow[i].hide()
+                self.arcDownArrow[i].hide()
+
+            self.supportArcs[self.prev_par].hide()
+
+            self.whiterect.hide()
+
+            # self.txt.setText(str(par))
+
+    def redraw_state(self):
+        pass
+
+    def set_message(self, text):
+        # self.text = text
+        # self.text_item.setHtml('<center><font size="7" color="#e5dfc5">{}</font></center>'.format(self.text))
+        pass
+
 
 
 if __name__ == '__main__':

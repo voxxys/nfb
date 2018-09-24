@@ -4,8 +4,8 @@
     <content url="file://$MODULE_DIR$" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="nfb_fix_nores" />
-    <orderEntry type="module" module-name="nfb_centerout" />
+    <orderEntry type="module" module-name="nfb-master" />
+    <orderEntry type="module" module-name="nfb_centerout_qt5_mod_nores (1)" />
   </component>
   <component name="TestRunnerService">
     <option name="projectConfiguration" value="pytest" />

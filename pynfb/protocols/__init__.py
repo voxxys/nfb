@@ -9,7 +9,7 @@ from ..io.hdf5 import load_h5py_protocols_raw
 from ..protocols.user_inputs import SelectSSDFilterWidget
 from ..protocols.widgets import (CircleFeedbackProtocolWidgetPainter, BarFeedbackProtocolWidgetPainter,
                                  BaselineProtocolWidgetPainter, ThresholdBlinkFeedbackProtocolWidgetPainter,
-                                 FingersProtocolWidgetPainter,
+                                 FingersProtocolWidgetPainter, CenterOutProtocolWidgetPainter,
                                  VideoProtocolWidgetPainter)
 from ..signals import CompositeSignal, DerivedSignal, BCISignal
 from ..widgets.helpers import ch_names_to_2d_pos
@@ -19,6 +19,10 @@ import pickle as pkl
 import time
 import random
 
+import os
+co_sound_dir_path = os.path.realpath(os.path.dirname(os.path.realpath(__file__)) + '/co_sound')
+
+from PyQt5.QtMultimedia import QSound
 
 class Protocol:
     def __init__(self, signals, source_signal_id=None, name='', duration=30, update_statistics_in_the_end=False,
@@ -60,6 +64,8 @@ class Protocol:
         self.beep_after = beep_after
         self.as_mock = as_mock
         self.auto_bci_fit = auto_bci_fit
+        self.istrials = 0
+        self.iscenterout = 0
         pass
 
     def update_state(self, samples, reward, chunk_size=1, is_half_time=False):
@@ -277,9 +283,9 @@ class FingersProtocol(Protocol):
 
         for j in np.arange(len(fingers_list_in_order)):
             i = fingers_list_in_order[j]
-            finger_events = np.array([i, i + 10, 0, 21, 0], dtype=np.int);
+            finger_events = np.array([i, i + 10, 0, 21, 0], dtype=np.int)
             finger_event_times = cur_ev_time + np.cumsum(
-                [time_rest, time_prepare, time_move_signal, time_move, time_stop_signal]);
+                [time_rest, time_prepare, time_move_signal, time_move, time_stop_signal])
 
             # time_stop, time_stop+time_rest, time_stop+time_rest+time_prepare, time_stop+time_rest+time_prepare+time_move]);
 
@@ -424,6 +430,251 @@ class FingersProtocol(Protocol):
         event_seq_dir_epoch[::2] = seq
 
         return event_seq_dir_epoch, event_times_dir_epoch
+
+
+class CenterOutProtocol(Protocol):
+    def __init__(self, signals, params, name='CenterOut', update_statistics_in_the_end=True,
+                 **kwargs):
+        kwargs['name'] = name
+        kwargs['update_statistics_in_the_end'] = update_statistics_in_the_end
+        super().__init__(signals, **kwargs)
+
+        self.if_vanilla_co = not bool(params[4])
+
+        self.if_4_targets = not self.if_vanilla_co
+        #self.if_4_targets = False # params[5]
+
+        self.soundpath_correct = co_sound_dir_path + '/correct.wav'
+
+        self.sound_correct = QSound(self.soundpath_correct)
+
+        time_to_target = params[0]
+        show_target_len = params[1]
+        show_turn_len = params[2]
+        time_to_move = params[3]
+
+        print('TTT:')
+        print(self.if_vanilla_co)
+        print(time_to_target)
+        print(show_target_len)
+        print(show_turn_len)
+        print(time_to_move)
+
+        num_trials = 100
+
+        self.widget_painter = CenterOutProtocolWidgetPainter(self.if_4_targets, self.if_vanilla_co)
+        self.is_half_time = False
+        self.beep = SingleBeep()
+
+        self.is_first_update = True
+        self.iscenterout = 1
+
+        self.cur_state = 0
+        self.prev_state = 0
+        self.elapsed = 0
+        self.cur_par = 0
+        self.startHover = -1
+        self.hoverEnough = 0
+        self.hoverCircle = -1
+
+        self.sound_on = False
+        evnts = []
+        tmp = [0, 0, 0]
+
+        self.waitingReturnToCenter = 0
+        self.time_waiting_start = 0
+        self.overtime = 0
+        self.centerHoverMaintained = 0
+
+        # Construct events sequence with corresponding times
+
+        #        (start)
+        #        - 2s -
+        #        center on, outer passive 0 wait
+        #        - 2s -
+        #        center on, outer show (random) 1 showStart
+        #        - 1s -
+        #        center on, outer passive 0 wait
+        #        - 1s -
+        #        center angle (random), outer passive 2 showSpan
+        #        - 2s -
+        #        center dissapear, outer passive 3 getResponse
+        #        - 4s -
+        #        --
+
+        #           timings, types, time to wait on the guessed circle and starting pause (better no less then 4 secs)
+
+        if (self.if_vanilla_co):
+            # timings=[1.5,3,3]
+            timings = [time_to_target, show_target_len, time_to_move]
+            timings_range = [0.5, 1, 0]
+            # timings_range = [0, 0, 0]
+            types = [0, 1, 3]
+        else:
+            timings = [time_to_target, show_target_len, show_turn_len, time_to_move]
+            timings_range = [0.5, 1, 0, 0]
+            # timings=[0.1,0.1,0.1,1,0.1]
+            types = [0, 1, 2, 3]
+        #
+
+        num_events_trial = len(timings)
+
+        self.onCircle = 1
+        start_pause = 5
+
+        for i in range(0, num_events_trial * num_trials, num_events_trial):
+            for j in range(num_events_trial):
+                if i == 0 and j == 0:
+                    tmp[0] = 0
+                    tmp[1] = start_pause
+                    tmp[2] = 0
+                else:
+                    tmp[0] = types[j]
+                    tmp[1] = evnts[i + j - 1][1] + random.uniform(timings[j] - timings_range[j],
+                                                                  timings[j] + timings_range[j])
+                    if types[j] == 1:
+                        if (self.if_4_targets):
+                            options = [0, 2, 4, 6]
+                            tmp[2] = options[random.randint(0, 3)]
+                        else:
+                            tmp[2] = random.randint(0, 7)
+                    elif types[j] == 2:
+                        if (self.if_4_targets):
+                            options = [-6, -4, -2, 0, 2, 4, 6]
+                            tmp[2] = options[random.randint(0, 6)]
+                        else:
+                            tmp[2] = random.randint(-7, 7)
+                    else:
+                        tmp[2] = 0
+                evnts.append([tmp[k] for k in range(len(tmp))])
+
+        evnts.append([0, evnts[i + j - 1][1] + 2, 0])
+        evnts.append([5, evnts[i + j - 1][1] + 2, 0])
+        evnts.append([0, evnts[i + j - 1][1] + 1, 0])
+
+        # print(evnts)
+
+        self.evnts = evnts
+        self.pos_in_events_times = 0
+
+    def update_state(self, samples, reward, chunk_size=1, is_half_time=False, samples_counter=None):
+        # if(samples_counter is not None):
+
+        if (self.is_first_update):
+            self.is_first_update = False
+            self.protocol_start_time = time.time()
+            self.elapsed = 0
+            self.pos_in_events_times = 0
+            self.widget_painter.goFullScreen()
+
+        if (self.waitingReturnToCenter):
+
+            [self.posx, self.posy] = self.widget_painter.getMousePos()
+
+            sw = self.widget_painter.checkCenterHover(self.posx, self.posy)
+
+            if (sw):
+                if (self.centerHoverMaintained):
+                    if (time.time() >= self.startHover + self.onCircle):
+                        self.waitingReturnToCenter = 0
+                        self.overtime = self.overtime + (time.time() - self.time_waiting_start)
+                        self.time_waiting_start = 0
+
+                else:
+                    self.startHover = time.time()
+                    self.centerHoverMaintained = 1
+
+            else:
+                self.centerHoverMaintained = 0
+
+        if (self.waitingReturnToCenter == 0):
+
+            self.elapsed = time.time() - self.overtime - self.protocol_start_time
+
+            self.check_times()
+
+            [self.posx, self.posy] = self.widget_painter.getMousePos()
+
+            if self.cur_state == 3:
+                dat = self.widget_painter.checkHover(self.posx, self.posy)
+                if self.hoverEnough == 1:
+                    if dat[1] == 0 or self.hoverCircle != dat[0]:
+                        self.hoverEnough = -1
+                        self.startHover = -1
+                    else:
+                        # mixer.music.play()
+                        # winsound.Beep(900, 150)
+                        # play(self.sound_correct)
+                        if self.sound_on == False:
+                            # winsound.PlaySound(base64.b64decode(self.sound_correct), winsound.SND_MEMORY)
+                            self.sound_correct.play()
+                            self.sound_on = True
+                            # play(self.sound_correct)
+                        # winsound.PlaySound(self.soundpath_correct, winsound.SND_FILENAME)
+
+                        # self.widget_painter.showCorrect(self.cur_par,self.hoverCircle,1)
+
+                elif self.hoverEnough == 0:
+                    # self.widget_painter.showCorrect(self.cur_par,self.hoverCircle,0)
+                    if dat[1] == 1 and self.hoverCircle == dat[0]:
+                        if self.startHover == -1:
+                            self.startHover = self.elapsed
+                        elif self.elapsed >= self.startHover + self.onCircle:
+                            self.hoverEnough = 1
+                    else:
+                        self.startHover = -1
+                self.hoverCircle = dat[0]
+
+        return None, [self.cur_state, self.cur_par, self.posx, self.posy]
+
+    def check_times(self):
+        if (self.pos_in_events_times < len(self.evnts)):
+            # print(self.elapsed)
+            # print(self.evnts[self.pos_in_events_times][1])
+            if (self.elapsed > self.evnts[self.pos_in_events_times][1]):
+                self.pos_in_events_times = self.pos_in_events_times + 1;
+                if (self.pos_in_events_times < len(self.evnts)):
+                    # self.widget_painter.img.setImage(self.widget_painter.image_0)
+
+                    self.prev_state = self.cur_state  # save previous state before we update it
+                    self.cur_state = self.evnts[self.pos_in_events_times][0]
+                    self.cur_par = self.evnts[self.pos_in_events_times][2]
+
+                    if (self.cur_state == 0) & (self.prev_state == 3):
+                        self.waitingReturnToCenter = 1
+                        self.time_waiting_start = time.time()
+                        self.startHover = -1
+                        self.hoverEnough = 0
+
+                        self.sound_on = False
+
+                    if self.cur_state == 1:
+                        self.startSpan = self.cur_par
+                    elif self.cur_state == 2:
+                        self.plusSpan = self.cur_par
+                    elif self.cur_state == 3:
+                        if (self.if_vanilla_co):
+                            self.cur_par = (8 + self.startSpan) % 8
+                        else:
+                            self.cur_par = (8 + self.plusSpan + self.startSpan) % 8
+                        self.startHover = -1
+                        self.hoverEnough = 0
+                    elif self.cur_state == 5:
+                        print('will try to close protocol')
+                        # self.close_protocol()
+                        self.experiment.next_protocol()
+                        print('tried to close protocol')
+                    self.widget_painter.doStuff(self.cur_state, self.cur_par)
+                    self.widget_painter.prev_par = self.cur_par
+                    self.widget_painter.prev_state = self.cur_state
+                    self.check_times()
+
+    def close_protocol(self, **kwargs):
+        self.is_half_time = False
+        self.beep = SingleBeep()
+        self.widget_painter.set_message('')
+        super(CenterOutProtocol, self).close_protocol(**kwargs)
+        # self.widget_painter.set_message(self.text)
 
 
 def main():

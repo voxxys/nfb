@@ -93,7 +93,12 @@ vectors_defaults = OrderedDict([
             ('fMSignalThreshold', 1),
             ('bMockSource', 0),
             ('bEnableDetectionTask', 0),
-            ('bAutoBCIFit', 0)
+            ('bAutoBCIFit', 0),
+            ('bIfTurn', 1),
+            ('fTimeToTarget', 2),
+            ('fShowTargetLen', 1),
+            ('fShowTurnLen', 1),
+            ('fTimeToMove', 3)
         ])])])),
     ('vPGroups', OrderedDict([
         ('PGroup', [OrderedDict([  # DerivedSignal is list!

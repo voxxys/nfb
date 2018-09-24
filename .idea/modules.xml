@@ -3,8 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/nfb.iml" filepath="$PROJECT_DIR$/.idea/nfb.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/.idea/nfb_centerout.iml" filepath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/.idea/nfb_centerout.iml" />
-      <module fileurl="file://E:/REPOS/nfb_centerout_w_nores/nfb_fix_nores/.idea/nfb_fix_nores.iml" filepath="E:/REPOS/nfb_centerout_w_nores/nfb_fix_nores/.idea/nfb_fix_nores.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../nfb-master (4)/nfb-master/.idea/nfb-master.iml" filepath="$PROJECT_DIR$/../../nfb-master (4)/nfb-master/.idea/nfb-master.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores (1)/.idea/nfb_centerout_qt5_mod_nores (1).iml" filepath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores (1)/.idea/nfb_centerout_qt5_mod_nores (1).iml" />
     </modules>
   </component>
 </project>
