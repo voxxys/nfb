@@ -332,13 +332,14 @@ class CenterOutProtocolWidgetPainter(Painter):
         self.arcSuppWidth = 2
 
         # colors of fixation cross, inactive outer, center, active outer and right guessed outer
+        # # # # # COLORS # # # # #
         fullblack = pg.mkBrush('#000000')
         self.darkgray = pg.mkBrush('#333333')
         self.mediumgray = pg.mkBrush('#505050')
         self.lightgray = pg.mkBrush('#999999')
         self.red = pg.mkBrush('#993333')
         self.green = pg.mkBrush('#339933')
-        self.bgcolor = fullblack
+        self.bgcolor = fullblack # pg.mkBrush('#303030')
 
         # =============================================================================
         #         if(self.if_4_targets):
