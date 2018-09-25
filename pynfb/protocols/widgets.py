@@ -335,9 +335,10 @@ class CenterOutProtocolWidgetPainter(Painter):
         fullblack = pg.mkBrush('#000000')
         self.darkgray = pg.mkBrush('#333333')
         self.mediumgray = pg.mkBrush('#505050')
-        self.lightgray = pg.mkBrush('#808080')
+        self.lightgray = pg.mkBrush('#999999')
         self.red = pg.mkBrush('#993333')
         self.green = pg.mkBrush('#339933')
+        self.bgcolor = fullblack
 
         # =============================================================================
         #         if(self.if_4_targets):
@@ -427,7 +428,6 @@ class CenterOutProtocolWidgetPainter(Painter):
         self.fixCrossX = pg.QtGui.QGraphicsRectItem(-10, -2, 20, 4)
         self.fixCrossY = pg.QtGui.QGraphicsRectItem(-2, -10, 4, 20)
 
-        self.whiterect = pg.QtGui.QGraphicsRectItem(1920 / 2 - 35, 1080 / 2 - 50, 100, 100)
 
         self.txt = pg.TextItem(anchor=(0.5, 0.5))
 
@@ -468,6 +468,7 @@ class CenterOutProtocolWidgetPainter(Painter):
 
         widget.addItem(self.txt)
 
+        self.whiterect = pg.QtGui.QGraphicsRectItem(1920 / 2 - 35, 1080 / 2 - 50, 100, 100)
         self.whiterect.setBrush(pg.mkBrush('w'))
         self.whiterect.setPen(pg.mkPen(None))
         widget.addItem(self.whiterect)
@@ -480,7 +481,7 @@ class CenterOutProtocolWidgetPainter(Painter):
         self.txt.setText('    ')
         widget.addItem(self.txt)
 
-        widget.setBackgroundBrush(pg.mkBrush('#303030'))
+        widget.setBackgroundBrush(self.bgcolor)
 
         self.prev_par = 0
         self.prev_state = 0

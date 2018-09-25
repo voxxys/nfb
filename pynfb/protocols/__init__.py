@@ -268,15 +268,26 @@ class FingersProtocol(Protocol):
         # start after 5 seconds
         cur_ev_time = 3
 
+
+        # # # # # # # # # # # # # # # # # SET-UP # # # # # # # # # # # # # # # # # #
+
         time_rest = 2
         time_prepare = 1
         time_move_signal = 1
         time_move = 3
         time_stop_signal = 1
+        # 2 + 2 + 1 + 3 + 1 = 8 sec - duration of one trial
 
         fingers_set = np.arange(1, 11)
-        # fingers_set = np.arange(1,3)
-        numreps = 10
+        # fingers_set = np.arange(1,5) # left hand only
+        # fingers_set = np.arange(6, 11) # right hand only
+
+        # number of repetitions of each finger
+        numreps = 5
+
+        # EXPERIMENT DURATION WILL BE: numreps * duration of one trial; 400s
+
+        # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
         fingers_list = np.tile(fingers_set, numreps)
         fingers_list_in_order = np.random.permutation(fingers_list)
