@@ -283,7 +283,7 @@ class FingersProtocol(Protocol):
         # fingers_set = np.arange(6, 11) # right hand only
 
         # number of repetitions of each finger
-        numreps = 5
+        numreps = 1
 
         # EXPERIMENT DURATION WILL BE: numreps * duration of one trial; 400s
 
@@ -304,6 +304,12 @@ class FingersProtocol(Protocol):
             all_events_times = np.concatenate((all_events_times, finger_event_times))
 
             cur_ev_time = all_events_times[-1]
+
+        all_events_seq = np.concatenate((all_events_seq, [50])) # 50 = protocol finished
+        all_events_times = np.concatenate((all_events_times, [cur_ev_time + time_rest*2]))
+
+        print(all_events_seq)
+        print(all_events_times)
 
         self.pos_in_events_times = 0
         self.events_seq = all_events_seq
@@ -338,9 +344,14 @@ class FingersProtocol(Protocol):
 
                     self.cur_state = self.events_seq[self.pos_in_events_times]
 
-                    self.widget_painter.change_pic(self.cur_state)
-
-                    self.check_times()
+                    if self.cur_state == 50:
+                        print('will try to close protocol')
+                        # self.close_protocol()
+                        self.experiment.next_protocol()
+                        print('tried to close protocol')
+                    else:
+                        self.widget_painter.change_pic(self.cur_state)
+                        self.check_times()
 
     def close_protocol(self, **kwargs):
         self.is_half_time = False
