@@ -43,9 +43,11 @@ class App(Ui_Form):
             # seq = 16 #sequence_in_data_block
             # num_ch_in_354 = np.arange(6*seq,6*seq+6) # numch in 354 channel data
 
+        self.neuron_idxs = np.hstack((np.arange(16,36),np.arange(39,59)))
         self.ch_idxs = np.hstack((np.arange(96,216),np.arange(234,354)))
 
-        for j in self.ch_idxs: # left and right hand 
+        print(len(self.neuron_idxs))
+        for j in self.neuron_idxs: # left and right hand 
             for coord in ['Xpos','Ypos','Zpos','Xrot','Yrot','Zrot']:
                 chan_names.append(str(j)+'_'+coord)
     
@@ -193,7 +195,7 @@ class App(Ui_Form):
         # np.hstack((np.arange(96,216),np.arange(234,354)))
 
         mysample = [numbers[chidx] for chidx in self.ch_idxs]
-
+        
         #if self.count < 10:
         #    self.buff.append(mysample)
         #    self.count = self.count+1
@@ -202,7 +204,7 @@ class App(Ui_Form):
         #    self.count = 0
         #    self.buff.clear()
 
-        self.outlet.push_sample(mysample, self.counter/60)
+        self.outlet.push_sample(mysample)
         self.counter += 1
         #print(self.outlet.channel_count)
         #time.sleep(0.00833)

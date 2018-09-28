@@ -308,7 +308,7 @@ class CenterOutProtocolWidgetPainter(Painter):
 
     def prepare_widget(self, widget):
 
-        self.use_photo_trigger = False
+        self.use_photo_trigger = True
 
         self.widget = widget
         self.cursor = pg.QtGui.QCursor
