@@ -1,6 +1,7 @@
 from PyQt5 import QtGui, QtCore, QtWidgets
 from pylsl import StreamInlet, resolve_stream, StreamInfo, StreamOutlet, local_clock
 import sys, socket, threading, time
+import time
 import numpy as np
 from collections import deque
 
@@ -24,12 +25,27 @@ class App(Ui_Form):
 
         self.t_1 = time.time()
 
-        self.info = StreamInfo('AxisNeuron', 'BVH', 354, 60, 'float32', 'myuid2424')
+        self.info = StreamInfo('AxisNeuron', 'BVH', 240, 60, 'float32', 'myuid2424')
         self.info.desc().append_child_value("manufacturer", "AxisNeuron")
         channels = self.info.desc().append_child("channels")
         
         chan_names = []
-        for j in np.arange(59):
+
+        #for j in np.arange(59):
+
+        # ONLY STREAM HANDS DATA
+            # right hand = from 16
+            # right fingers = 17-35
+
+            # left hand = from 39
+            # left fingers = 40-58
+
+            # seq = 16 #sequence_in_data_block
+            # num_ch_in_354 = np.arange(6*seq,6*seq+6) # numch in 354 channel data
+
+        self.ch_idxs = np.hstack((np.arange(96,216),np.arange(234,354)))
+
+        for j in self.ch_idxs: # left and right hand 
             for coord in ['Xpos','Ypos','Zpos','Xrot','Yrot','Zrot']:
                 chan_names.append(str(j)+'_'+coord)
     
@@ -39,7 +55,13 @@ class App(Ui_Form):
                 .append_child_value("unit", "angle") \
                 .append_child_value("type", "BVH")
 
+
+        self.chan_names = chan_names
+
         self.outlet = StreamOutlet(self.info)
+        #self.buff = []
+        #self.count = 0
+
 
         self.t = QtCore.QTime()
         self.graph_data_1 = deque(maxlen=1000)
@@ -53,7 +75,9 @@ class App(Ui_Form):
         #self.thread_2.daemon = True
         #self.thread_3 = threading.Thread(target=self.get_lsl, args=())
         #self.thread_3.daemon = True
-        
+
+        self.counter = 0.0
+
         self.connect_ip()
 
     def refresh(self):
@@ -101,66 +125,55 @@ class App(Ui_Form):
         #self.thread_2.start()
         #self.thread_3.start()
         self.t.start()
-		
 
     def get_data(self):
+        res = []
         data_full = True
         while 1:
-            data_in = self.s.recv(self.BUFFER_SIZE)
-            
-            if data_full:
+            data_in = self.s.recv(self.BUFFER_SIZE) #Recieve a string of data from Axis Neuron
+            if data_full: #If the previous string was full
+                if (data_in.decode("utf-8")).find("C") > 0: #If there is a sample beginning
+                    index = (data_in.decode("utf-8")).find("C") #Find index for data beginning
+                    index2 = (data_in.decode("utf-8")).find("|") #Find indef for data ending
+                    if index2 > 0 & index2 > index: #If indexes are correct
+                        res = data_in[index + 7:index2 - 2].decode("utf-8") #Store the data
+                        res = res.split(" ") #Split the string
+                        numbers = [float(i) for i in res] #Create an array with the recieved data
+                        self.send_data(numbers) #send_data pushes the array into lsl
+                    else: #If the recieved string doesn't contain the complete data sample
+                        res = (data_in[index + 7:]).decode("utf-8") #Store the incomplete data
+                        data_full = False #Flag that the data is incomplete
+            else: #If previously didn't recieve a complete data sample
                 if (data_in.decode("utf-8")).find("C") > 0:
-                    index = (data_in.decode("utf-8")).find("C")
+                    index = (data_in.decode("utf-8")).find("C") #Find indexes
                     index2 = (data_in.decode("utf-8")).find("|")
-                    if index2 > 0 & index2 > index:
-                        res = data_in[index + 7:index2 - 2].decode("utf-8")
-                        res = res.split(" ")
-                        numbers = [float(i) for i in res]
-                        self.calc_data(numbers)
-                    else:
-                        res = (data_in[index + 7:]).decode("utf-8")
-                        data_full = False
-            else:
-                if (data_in.decode("utf-8")).find("C") > 0:
-                    index = (data_in.decode("utf-8")).find("C")
-                    index2 = (data_in.decode("utf-8")).find("|")
-                    res1 = data_in[:index - 5].decode("utf-8")
-                    res = res + res1
-                    if res.find("a") > 0:
-                        print("hello")
-                    if res.find("r") > 0:
-                        print("hello")
-                    if res.find("h") > 0:
-                        print("hello")
+                    res1 = data_in[:index - 5].decode("utf-8") #Get the ending for the previous sample
+                    res = res + res1 #Get a complete sample from two parts
                     res = res.split(" ")
-                    numbers = [float(i) for i in res]
-                    self.calc_data(numbers)
-                    if index2 > 0 & index2 > index:
+                    numbers = [float(i) for i in res] #Create an array
+                    self.send_data(numbers) #Send the array through lsl
+                    if index2 > 0 & index2 > index: #If there is a complete sample
                         res = data_in[index + 7:index2 - 2].decode("utf-8")
                         res = res.split(" ")
                         numbers = [float(i) for i in res]
-                        self.calc_data(numbers)
+                        self.send_data(numbers)
                         data_full = True
-                    else:
-                        res = (data_in[(index + 7):]).decode("utf-8")
-                else:
-                    index2 = (data_in.decode("utf-8")).find("|")
-                    if index2 > 0:
+                    else: #If there isn't
+                        res = (data_in[(index + 7):]).decode("utf-8") #Store the beginning of a new sample
+                else: #If there is no sample beginning
+                    index2 = (data_in.decode("utf-8")).find("|") #Find the ending
+                    if index2 > 0: #If it is there
                         res1 = data_in[:index2 - 2].decode("utf-8")
                         res = res + res1
                         res = res.split(" ")
                         numbers = [float(i) for i in res]
-                        self.calc_data(numbers)
+                        self.send_data(numbers)
                         data_full = True
                     else:
                         data_full = True
-                        #res1 = data_in.decode("utf-8")
-                        #res = res + res1
-            #data_old = data_in
 
-    def calc_data(self, numbers):
+    def send_data(self, numbers):
         joint = self.comboBox.currentIndex()
-		#print(numbers[joint*6+3:joint*6+6])
 
         self.graph_data_1.append({'x': self.t.elapsed(), 'y': numbers[joint * 6 + 3]})
         self.graph_data_2.append({'x': self.t.elapsed(), 'y': numbers[joint * 6 + 4]})
@@ -173,12 +186,24 @@ class App(Ui_Form):
 
         #, numbers[joint * 6 + 4], numbers[joint * 6 + 5]
         
-        #print(len(numbers))
-        #mysample = numbers[78:216]
-        mysample = numbers[:]
-        
-        #print(mysample)
-        self.outlet.push_sample(mysample)
+        #mysample = numbers[237:240]
+
+        # STREAM DATA FROM HAND ONLY
+
+        # np.hstack((np.arange(96,216),np.arange(234,354)))
+
+        mysample = [numbers[chidx] for chidx in self.ch_idxs]
+
+        #if self.count < 10:
+        #    self.buff.append(mysample)
+        #    self.count = self.count+1
+        #else:
+        #    self.outlet.push_chunk(self.buff)
+        #    self.count = 0
+        #    self.buff.clear()
+
+        self.outlet.push_sample(mysample, self.counter/60)
+        self.counter += 1
         #print(self.outlet.channel_count)
         #time.sleep(0.00833)
 
@@ -189,8 +214,6 @@ class App(Ui_Form):
             self.t_1 = t_2
             print('Stream alive, last sample (left hand): ')
             print(numbers[234:240])
-
-
 
 
     ''' def show_data(self):
@@ -217,3 +240,11 @@ if __name__ == '__main__':
 
     #dialog.show()
     sys.exit(app.exec_())
+
+'''
+                    if res.find("a") > 0:
+                        print("hello")
+                    if res.find("r") > 0:
+                        print("hello")
+                    if res.find("h") > 0:
+                        print("hello")'''
