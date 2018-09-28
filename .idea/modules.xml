@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://E:/VKI/.idea/VKI.iml" filepath="E:/VKI/.idea/VKI.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/nfb.iml" filepath="$PROJECT_DIR$/.idea/nfb.iml" />
       <module fileurl="file://$PROJECT_DIR$/../../nfb-master (4)/nfb-master/.idea/nfb-master.iml" filepath="$PROJECT_DIR$/../../nfb-master (4)/nfb-master/.idea/nfb-master.iml" />
       <module fileurl="file://$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores (1)/.idea/nfb_centerout_qt5_mod_nores (1).iml" filepath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores (1)/.idea/nfb_centerout_qt5_mod_nores (1).iml" />
