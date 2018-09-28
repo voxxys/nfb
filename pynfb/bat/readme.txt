@@ -13,6 +13,6 @@ Link
 
 LSL stream: EBNeuro_BePLusLTM_192.168.171.81, AxisNeuron
 EBNeuro_BePLusLTM_192.168.171.81 - стрим от усилителя
-Axis Neuron - стрим от костюма
+AxisNeuron - стрим от костюма
 
 
