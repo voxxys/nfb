@@ -17,7 +17,7 @@ vectors_defaults = OrderedDict([
     ('sPrefilterBand', 'None None'),
     ('sExperimentName', 'experiment'),
     ('sInletType', 'lsl'),
-    ('sStreamName', 'NVX136_Data'),
+    ('sStreamName', 'EBNeuro_BePLusLTM_192.168.171.81'),
     ('sEventsStreamName', ''),
     ('sRawDataFilePath', ''),
     ('sFTHostnamePort', 'localhost:1972'),

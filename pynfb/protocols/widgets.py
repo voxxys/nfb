@@ -308,7 +308,7 @@ class CenterOutProtocolWidgetPainter(Painter):
 
     def prepare_widget(self, widget):
 
-        self.use_photo_trigger = False
+        self.use_photo_trigger = True
 
         self.widget = widget
         self.cursor = pg.QtGui.QCursor
@@ -429,7 +429,6 @@ class CenterOutProtocolWidgetPainter(Painter):
         self.fixCrossX = pg.QtGui.QGraphicsRectItem(-10, -2, 20, 4)
         self.fixCrossY = pg.QtGui.QGraphicsRectItem(-2, -10, 4, 20)
 
-        self.whiterect = pg.QtGui.QGraphicsRectItem(1920 / 2 - 35, 1080 / 2 - 50, 100, 100)
 
         self.txt = pg.TextItem(anchor=(0.5, 0.5))
 
@@ -470,6 +469,7 @@ class CenterOutProtocolWidgetPainter(Painter):
 
         widget.addItem(self.txt)
 
+        self.whiterect = pg.QtGui.QGraphicsRectItem(1920 / 2 - 35, 1080 / 2 - 50, 100, 100)
         self.whiterect.setBrush(pg.mkBrush('w'))
         self.whiterect.setPen(pg.mkPen(None))
         widget.addItem(self.whiterect)

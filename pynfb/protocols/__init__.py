@@ -268,15 +268,26 @@ class FingersProtocol(Protocol):
         # start after 5 seconds
         cur_ev_time = 3
 
+
+        # # # # # # # # # # # # # # # # # SET-UP # # # # # # # # # # # # # # # # # #
+
         time_rest = 2
         time_prepare = 1
         time_move_signal = 1
         time_move = 3
         time_stop_signal = 1
+        # 2 + 2 + 1 + 3 + 1 = 8 sec - duration of one trial
 
         fingers_set = np.arange(1, 11)
-        # fingers_set = np.arange(1,3)
+        # fingers_set = np.arange(1,5) # left hand only
+        # fingers_set = np.arange(6, 11) # right hand only
+
+        # number of repetitions of each finger
         numreps = 10
+
+        # EXPERIMENT DURATION WILL BE: numreps * duration of one trial; 400s
+
+        # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
         fingers_list = np.tile(fingers_set, numreps)
         fingers_list_in_order = np.random.permutation(fingers_list)
@@ -293,6 +304,12 @@ class FingersProtocol(Protocol):
             all_events_times = np.concatenate((all_events_times, finger_event_times))
 
             cur_ev_time = all_events_times[-1]
+
+        all_events_seq = np.concatenate((all_events_seq, [50])) # 50 = protocol finished
+        all_events_times = np.concatenate((all_events_times, [cur_ev_time + time_rest*2]))
+
+        print(all_events_seq)
+        print(all_events_times)
 
         self.pos_in_events_times = 0
         self.events_seq = all_events_seq
@@ -327,9 +344,14 @@ class FingersProtocol(Protocol):
 
                     self.cur_state = self.events_seq[self.pos_in_events_times]
 
-                    self.widget_painter.change_pic(self.cur_state)
-
-                    self.check_times()
+                    if self.cur_state == 50:
+                        print('will try to close protocol')
+                        # self.close_protocol()
+                        self.experiment.next_protocol()
+                        print('tried to close protocol')
+                    else:
+                        self.widget_painter.change_pic(self.cur_state)
+                        self.check_times()
 
     def close_protocol(self, **kwargs):
         self.is_half_time = False
