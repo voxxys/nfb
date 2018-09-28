@@ -46,10 +46,8 @@ class SignalViewer(pg.PlotWidget):
         # add vertical running line
         self.vertical_line = pg.InfiniteLine(pos=0, angle=90, pen=pg.mkPen(color='B48375', width=1))
         self.addItem(self.vertical_line)
-        self.redraw_counter = 1
 
     def update(self, chunk):
-
         # estimate current pos
         chunk_len = len(chunk)
         current_pos = (self.previous_pos + chunk_len) % self.n_samples
@@ -66,11 +64,9 @@ class SignalViewer(pg.PlotWidget):
         # pre-process y data and update it
         y_data = self.prepare_y_data(chunk_len)
         before_mask = (self.x_stamps < current_pos)
-        self.redraw_counter +=1
-        if self.redraw_counter%1==0:
-            for i, curve in enumerate(self.curves):
-                y = y_data[:, i] if i < y_data.shape[1] else self.x_mesh * np.nan
-                curve.setData(self.x_mesh, y, connect=np.isfinite(y) | before_mask)
+        for i, curve in enumerate(self.curves):
+            y = y_data[:, i] if i < y_data.shape[1] else self.x_mesh * np.nan
+            curve.setData(self.x_mesh, y, connect=np.isfinite(y) | before_mask)
         self.vertical_line.setValue(current_x)
 
         # update pos
