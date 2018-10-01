@@ -29,6 +29,8 @@ vectors_defaults = OrderedDict([
     ('sReference', ''),
     ('sReferenceSub', ''),
     ('bUseExpyriment', 0),
+    ('bShowPhotoRectangle', 0),
+    ('sVizNotchFilters', '0'),
     ('vSignals', OrderedDict([
         ('DerivedSignal', [OrderedDict([     # DerivedSignal is list!
             ('sSignalName', 'Signal'),

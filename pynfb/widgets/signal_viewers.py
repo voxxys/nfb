@@ -4,13 +4,14 @@ import os
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from scipy import signal, stats
+from pynfb.signal_processing.filters import NotchFilter, IdentityFilter, FilterSequence
 
 paired_colors = ['#dbae57','#57db6c','#dbd657','#57db94','#b9db57','#57dbbb','#91db57','#57d3db','#69db57','#57acdb']
 images_path = os.path.realpath(os.path.dirname(os.path.realpath(__file__)) + '/../static/imag') + '/'
 
 
 class SignalViewer(pg.PlotWidget):
-    def __init__(self, fs, names, seconds_to_plot, overlap, signals_to_plot=None, **kwargs):
+    def __init__(self, fs, names, seconds_to_plot, overlap, signals_to_plot=None, notch_filter=0, **kwargs):
         super(SignalViewer, self).__init__(**kwargs)
         # gui settings
         self.getPlotItem().showGrid(y=True)
@@ -48,12 +49,24 @@ class SignalViewer(pg.PlotWidget):
         self.addItem(self.vertical_line)
         self.redraw_counter = 1
 
+        # notch filter
+        if notch_filter:
+            if isinstance(notch_filter, list):
+                self.notch_filter = FilterSequence([NotchFilter(f0, fs, self.n_signals) for f0 in notch_filter])
+            else:
+                self.notch_filter = NotchFilter(notch_filter, fs, self.n_signals)
+        else:
+            self.notch_filter = IdentityFilter()
+
     def update(self, chunk):
 
         # estimate current pos
         chunk_len = len(chunk)
         current_pos = (self.previous_pos + chunk_len) % self.n_samples
         current_x = self.x_mesh[current_pos]
+
+        # notch filter
+        chunk = self.notch_filter.apply(chunk)
 
         # update buffer
         if self.previous_pos < current_pos:
