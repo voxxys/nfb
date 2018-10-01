@@ -2,11 +2,48 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="807bc505-ddff-4a96-ae2d-a8e04810258c" name="Default Changelist" comment="">
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/nfb.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/nfb.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores (1)/nfb_centerout_qt5_mod_nores/.idea/nfb_centerout.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores (1)/nfb_centerout_qt5_mod_nores/.idea/nfb_centerout.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores (1)/nfb_centerout_qt5_mod_nores/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores (1)/nfb_centerout_qt5_mod_nores/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores (1)/nfb_centerout_qt5_mod_nores/pynfb/11.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores (1)/nfb_centerout_qt5_mod_nores/pynfb/all_events_times.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores (1)/nfb_centerout_qt5_mod_nores/pynfb/events_seq.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores (1)/nfb_centerout_qt5_mod_nores/pynfb/experiment.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores (1)/nfb_centerout_qt5_mod_nores/pynfb/experiment.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores (1)/nfb_centerout_qt5_mod_nores/pynfb/io/defaults.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores (1)/nfb_centerout_qt5_mod_nores/pynfb/io/defaults.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores (1)/nfb_centerout_qt5_mod_nores/pynfb/protocols/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores (1)/nfb_centerout_qt5_mod_nores/pynfb/protocols/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores (1)/nfb_centerout_qt5_mod_nores/pynfb/protocols/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores (1)/nfb_centerout_qt5_mod_nores/pynfb/protocols/widgets.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores (1)/nfb_centerout_qt5_mod_nores/pynfb/settings_widget/protocols.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores (1)/nfb_centerout_qt5_mod_nores/pynfb/settings_widget/protocols.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores (1)/nfb_centerout_qt5_mod_nores/pynfb/trials" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores (1)/nfb_centerout_qt5_mod_nores/pynfb/trials_par" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/.idea/nfb_centerout.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/.idea/nfb_centerout.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/pynfb/11.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/pynfb/all_events_times.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/pynfb/events_seq.pkl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/pynfb/experiment.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/pynfb/experiment.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/pynfb/io/defaults.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/pynfb/io/defaults.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/pynfb/protocols/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/pynfb/protocols/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/pynfb/protocols/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/pynfb/protocols/widgets.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/pynfb/settings_widget/protocols.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/pynfb/settings_widget/protocols.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/pynfb/trials" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../nfb_centerout_qt5_mod_nores/pynfb/trials_par" beforeDir="false" />
+=======
+      <change afterPath="$PROJECT_DIR$/pynfb/widgets/BACKUP_signal_viewers.py" afterDir="false" />
+>>>>>>> 73a0a879023c16fc8690274b73a00c40f81cf65c
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pynfb/backup_fingers_all_events_times.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/backup_fingers_all_events_times.pkl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pynfb/backup_fingers_events_seq.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/backup_fingers_events_seq.pkl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pynfb/protocols/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/protocols/__init__.py" afterDir="false" />
+<<<<<<< HEAD
       <change beforePath="$PROJECT_DIR$/pynfb/protocols/widgets.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/protocols/widgets.py" afterDir="false" />
+=======
+      <change beforePath="$PROJECT_DIR$/pynfb/widgets/signal_viewers.py" beforeDir="false" afterPath="$PROJECT_DIR$/pynfb/widgets/signal_viewers.py" afterDir="false" />
+>>>>>>> 5b0aa412725bdfa607abc8665117285774d30267
+>>>>>>> 73a0a879023c16fc8690274b73a00c40f81cf65c
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -18,10 +55,11 @@
     <session id="-1029921838">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="1" />
+          <entry key="project.closed" value="2" />
+          <entry key="project.open.time.12" value="1" />
           <entry key="project.open.time.2" value="1" />
           <entry key="project.open.time.7" value="1" />
-          <entry key="project.opened" value="2" />
+          <entry key="project.opened" value="3" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
@@ -37,13 +75,13 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="py" value="96" />
+          <entry key="py" value="97" />
           <entry key="xml" value="1" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="Python" value="96" />
+          <entry key="Python" value="97" />
           <entry key="XML" value="1" />
         </counts>
       </usages-collector>
@@ -90,10 +128,21 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
+<<<<<<< HEAD
+        <entry file="file://$PROJECT_DIR$/pynfb/run_design.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="476">
+              <caret line="28" selection-start-line="28" selection-end-line="28" />
+=======
         <entry file="file://$PROJECT_DIR$/utils/pntolsl/mainmod.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="374">
+<<<<<<< HEAD
               <caret line="29" column="56" selection-start-line="29" selection-start-column="56" selection-end-line="29" selection-end-column="56" />
+=======
+              <caret line="28" column="56" selection-start-line="28" selection-start-column="56" selection-end-line="28" selection-end-column="56" />
+>>>>>>> 5b0aa412725bdfa607abc8665117285774d30267
+>>>>>>> 73a0a879023c16fc8690274b73a00c40f81cf65c
               <folding>
                 <element signature="e#0#42#0" expanded="true" />
               </folding>
@@ -101,6 +150,13 @@
           </provider>
         </entry>
       </file>
+<<<<<<< HEAD
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://E:/VKI/processedMembersReviewerTree.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="527">
+              <caret line="37" column="39" lean-forward="true" selection-start-line="37" selection-start-column="39" selection-end-line="37" selection-end-column="39" />
+=======
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pynfb/widgets/signal_viewers.py">
           <provider selected="true" editor-type-id="text-editor">
@@ -113,6 +169,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pynfb/protocols/__init__.py">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
             <state relative-caret-position="1020">
               <caret line="287" column="76" selection-start-line="287" selection-start-column="76" selection-end-line="287" selection-end-column="76" />
             </state>
@@ -124,6 +181,11 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="291">
               <caret line="329" selection-start-line="329" selection-end-line="329" />
+=======
+            <state relative-caret-position="350">
+              <caret line="285" column="20" selection-start-line="285" selection-start-column="20" selection-end-line="285" selection-end-column="20" />
+>>>>>>> 5b0aa412725bdfa607abc8665117285774d30267
+>>>>>>> 73a0a879023c16fc8690274b73a00c40f81cf65c
             </state>
           </provider>
         </entry>
@@ -177,9 +239,19 @@
         <option value="$PROJECT_DIR$/pynfb/run_center_out_rot_10s_gen_test.py" />
         <option value="$PROJECT_DIR$/pynfb/run_exp.py" />
         <option value="$PROJECT_DIR$/pynfb/run_fingers_30s_gen_test.py" />
+<<<<<<< HEAD
         <option value="$PROJECT_DIR$/pynfb/widgets/signal_viewers.py" />
         <option value="$PROJECT_DIR$/pynfb/protocols/__init__.py" />
         <option value="$PROJECT_DIR$/pynfb/protocols/widgets.py" />
+=======
+        <option value="$PROJECT_DIR$/pynfb/protocols/widgets.py" />
+<<<<<<< HEAD
+        <option value="E:/VKI/processedMembersReviewerTree.py" />
+=======
+        <option value="$PROJECT_DIR$/pynfb/widgets/signal_viewers.py" />
+        <option value="$PROJECT_DIR$/pynfb/protocols/__init__.py" />
+>>>>>>> 5b0aa412725bdfa607abc8665117285774d30267
+>>>>>>> 73a0a879023c16fc8690274b73a00c40f81cf65c
       </list>
     </option>
   </component>
@@ -201,12 +273,7 @@
           <expand>
             <path>
               <item name="nfb" type="b2602c69:ProjectViewProjectNode" />
-              <item name="nfb" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="nfb" type="b2602c69:ProjectViewProjectNode" />
-              <item name="nfb" type="462c0819:PsiDirectoryNode" />
-              <item name="pynfb" type="462c0819:PsiDirectoryNode" />
+              <item name="VKI" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="nfb" type="b2602c69:ProjectViewProjectNode" />
@@ -221,12 +288,16 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
+<<<<<<< HEAD
+    <property name="last_opened_file_path" value="E:/VKI" />
+=======
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\nfb\pynfb\widgets" />
     </key>
+>>>>>>> 5b0aa412725bdfa607abc8665117285774d30267
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -254,7 +325,11 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
+<<<<<<< HEAD
     <frame x="250" y="288" width="1022" height="726" extended-state="0" />
+=======
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+>>>>>>> 73a0a879023c16fc8690274b73a00c40f81cf65c
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.22764228" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -397,6 +472,16 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="170">
           <caret line="10" column="25" lean-forward="true" selection-start-line="10" selection-start-column="25" selection-end-line="10" selection-end-column="25" />
+<<<<<<< HEAD
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pynfb/protocols/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="476">
+          <caret line="82" column="74" lean-forward="true" selection-start-line="82" selection-start-column="74" selection-end-line="82" selection-end-column="74" />
+=======
+>>>>>>> 5b0aa412725bdfa607abc8665117285774d30267
         </state>
       </provider>
     </entry>
@@ -408,6 +493,10 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/pynfb/run_design.py">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
+        <state relative-caret-position="476">
+          <caret line="28" selection-start-line="28" selection-end-line="28" />
+=======
         <state relative-caret-position="510">
           <caret line="30" column="38" lean-forward="true" selection-start-line="30" selection-start-column="38" selection-end-line="30" selection-end-column="38" />
         </state>
@@ -429,13 +518,24 @@
     <entry file="file://$PROJECT_DIR$/utils/pntolsl/mainmod.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="374">
+<<<<<<< HEAD
           <caret line="29" column="56" selection-start-line="29" selection-start-column="56" selection-end-line="29" selection-end-column="56" />
+=======
+          <caret line="28" column="56" selection-start-line="28" selection-start-column="56" selection-end-line="28" selection-end-column="56" />
+>>>>>>> 5b0aa412725bdfa607abc8665117285774d30267
+>>>>>>> 73a0a879023c16fc8690274b73a00c40f81cf65c
           <folding>
             <element signature="e#0#42#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+<<<<<<< HEAD
+    <entry file="file://E:/VKI/processedMembersReviewerTree.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="527">
+          <caret line="37" column="39" lean-forward="true" selection-start-line="37" selection-start-column="39" selection-end-line="37" selection-end-column="39" />
+=======
     <entry file="file://$PROJECT_DIR$/pynfb/widgets/signal_viewers.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1173">
@@ -445,6 +545,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/pynfb/protocols/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
         <state relative-caret-position="1020">
           <caret line="287" column="76" selection-start-line="287" selection-start-column="76" selection-end-line="287" selection-end-column="76" />
         </state>
@@ -454,6 +555,11 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="291">
           <caret line="329" selection-start-line="329" selection-end-line="329" />
+=======
+        <state relative-caret-position="350">
+          <caret line="285" column="20" selection-start-line="285" selection-start-column="20" selection-end-line="285" selection-end-column="20" />
+>>>>>>> 5b0aa412725bdfa607abc8665117285774d30267
+>>>>>>> 73a0a879023c16fc8690274b73a00c40f81cf65c
         </state>
       </provider>
     </entry>

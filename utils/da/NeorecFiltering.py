@@ -9,7 +9,7 @@ import numpy as np
 
 
 b0=b1=b2=a1=a2=0
-cutoff=0
+cutoff=50/512
 x0=x1=x2=y1=y2=0
 numch = 64
 
