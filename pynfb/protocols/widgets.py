@@ -318,9 +318,9 @@ class CenterOutProtocolWidgetPainter(Painter):
         # center of the outer circles ring, its radius, outer circle radius, center circle radius, segment radius and segment spacing
         self.centerX = 0
         self.centerY = 0
-        self.bigR = 200
-        self.smallR = 25
-        self.centerR = 25
+        self.bigR = 150
+        self.smallR = 22
+        self.centerR = 22
 
         self.arcOuterR = 45
         self.arcInnerR = 35

@@ -283,7 +283,7 @@ class FingersProtocol(Protocol):
         # fingers_set = np.arange(6, 11) # right hand only
 
         # number of repetitions of each finger
-        numreps = 10
+        numreps = 5
 
         # EXPERIMENT DURATION WILL BE: numreps * duration of one trial; 400s
 
