@@ -482,7 +482,7 @@ class CenterOutProtocol(Protocol):
         print(show_turn_len)
         print(time_to_move)
 
-        num_trials = 100
+        num_trials = 80
 
         self.widget_painter = CenterOutProtocolWidgetPainter(self.if_4_targets, self.if_vanilla_co)
         self.is_half_time = False
@@ -544,6 +544,37 @@ class CenterOutProtocol(Protocol):
         self.onCircle = 1
         start_pause = 5
 
+        if (self.if_vanilla_co):
+            options = np.arange(8)
+        else:
+            options = [0, 2, 4, 6]
+
+        num_types = len(options)
+        num_each_type = num_trials // num_types
+        assert (num_each_type * num_types == num_trials)
+
+        types_order = np.zeros(num_trials)
+        k = 0
+        for i in options:
+            types_order[num_each_type * k:num_each_type * (k + 1)] = np.ones(num_each_type) * i
+            k = k + 1
+
+        types_order = np.random.permutation(types_order)
+
+        options_turn = [-4, -2, 0, 2, 4]
+        num_types_turn = len(options_turn)
+        num_each_type_turn = num_trials // num_types_turn
+        assert (num_each_type_turn * num_types_turn == num_trials)
+
+        types_order_turn = np.zeros(num_trials)
+        k = 0
+        for i in options_turn:
+            types_order_turn[num_each_type_turn * k:num_each_type_turn * (k + 1)] = np.ones(num_each_type_turn) * i
+            k = k + 1
+
+        types_order_turn = np.random.permutation(types_order_turn)
+
+        tr_num = 0
         for i in range(0, num_events_trial * num_trials, num_events_trial):
             for j in range(num_events_trial):
                 if i == 0 and j == 0:
@@ -556,19 +587,26 @@ class CenterOutProtocol(Protocol):
                                                                   timings[j] + timings_range[j])
                     if types[j] == 1:
                         if (self.if_4_targets):
-                            options = [0, 2, 4, 6]
-                            tmp[2] = options[random.randint(0, 3)]
+                            # options = [0,2,4,6]
+                            # mp[2] = options[random.randint(0,3)]
+                            tmp[2] = int(types_order[tr_num])
                         else:
-                            tmp[2] = random.randint(0, 7)
+                            # tmp[2]=random.randint(0,7)
+                            tmp[2] = int(types_order[tr_num])
                     elif types[j] == 2:
                         if (self.if_4_targets):
-                            options = [-6, -4, -2, 0, 2, 4, 6]
-                            tmp[2] = options[random.randint(0, 6)]
+                            # options = [-6,-4,-2,0,2,4,6]
+                            # options = [-4, -2, 0, 2, 4]
+
+                            # tmp[2]=options[random.randint(0,4)]
+                            tmp[2] = int(types_order_turn[tr_num])
                         else:
                             tmp[2] = random.randint(-7, 7)
+                            # -360 -270 -180 -90 0 90 180 270 360
                     else:
                         tmp[2] = 0
                 evnts.append([tmp[k] for k in range(len(tmp))])
+            tr_num = tr_num + 1
 
         evnts.append([0, evnts[i + j - 1][1] + 2, 0])
         evnts.append([5, evnts[i + j - 1][1] + 2, 0])
