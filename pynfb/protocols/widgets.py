@@ -469,7 +469,7 @@ class CenterOutProtocolWidgetPainter(Painter):
 
         widget.addItem(self.txt)
 
-        self.whiterect = pg.QtGui.QGraphicsRectItem(1920 / 2 - 35, 1080 / 2 - 50, 100, 100)
+        self.whiterect = pg.QtGui.QGraphicsRectItem(1920 / 2 - 35-50, 1080 / 2 - 50-50, 200, 200)
         self.whiterect.setBrush(pg.mkBrush('w'))
         self.whiterect.setPen(pg.mkPen(None))
         widget.addItem(self.whiterect)
