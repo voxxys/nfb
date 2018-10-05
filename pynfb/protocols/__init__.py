@@ -467,8 +467,12 @@ class CenterOutProtocol(Protocol):
         #self.if_4_targets = False # params[5]
 
         self.soundpath_correct = co_sound_dir_path + '/correct.wav'
-
         self.sound_correct = QSound(self.soundpath_correct)
+
+        self.soundpath_end = co_sound_dir_path + '/end.ogx'
+        self.sound_end = QSound(self.soundpath_end)
+
+        self.sound_end_on == False
 
         time_to_target = params[0]
         show_target_len = params[1]
@@ -482,7 +486,7 @@ class CenterOutProtocol(Protocol):
         print(show_turn_len)
         print(time_to_move)
 
-        num_trials = 80
+        num_trials = 40
 
         self.widget_painter = CenterOutProtocolWidgetPainter(self.if_4_targets, self.if_vanilla_co)
         self.is_half_time = False
@@ -600,6 +604,7 @@ class CenterOutProtocol(Protocol):
 
                             # tmp[2]=options[random.randint(0,4)]
                             tmp[2] = int(types_order_turn[tr_num])
+
                         else:
                             tmp[2] = random.randint(-7, 7)
                             # -360 -270 -180 -90 0 90 180 270 360
@@ -732,6 +737,12 @@ class CenterOutProtocol(Protocol):
     def close_protocol(self, **kwargs):
         self.is_half_time = False
         self.beep = SingleBeep()
+
+        if self.sound_end_on == False:
+            # winsound.PlaySound(base64.b64decode(self.sound_correct), winsound.SND_MEMORY)
+            self.sound_end.play()
+            self.sound_end_on = True
+
         self.widget_painter.set_message('')
         super(CenterOutProtocol, self).close_protocol(**kwargs)
         # self.widget_painter.set_message(self.text)
