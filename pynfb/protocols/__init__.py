@@ -283,7 +283,7 @@ class FingersProtocol(Protocol):
         # fingers_set = np.arange(6, 11) # right hand only
 
         # number of repetitions of each finger
-        numreps = 10
+        numreps = 5
 
         # EXPERIMENT DURATION WILL BE: numreps * duration of one trial; 400s
 
@@ -482,7 +482,7 @@ class CenterOutProtocol(Protocol):
         print(show_turn_len)
         print(time_to_move)
 
-        num_trials = 100
+        num_trials = 40
 
         self.widget_painter = CenterOutProtocolWidgetPainter(self.if_4_targets, self.if_vanilla_co)
         self.is_half_time = False
@@ -562,8 +562,8 @@ class CenterOutProtocol(Protocol):
                             tmp[2] = random.randint(0, 7)
                     elif types[j] == 2:
                         if (self.if_4_targets):
-                            options = [-6, -4, -2, 0, 2, 4, 6]
-                            tmp[2] = options[random.randint(0, 6)]
+                            options = [-4, -2, 0, 2, 4]
+                            tmp[2] = options[random.randint(0, 4)]
                         else:
                             tmp[2] = random.randint(-7, 7)
                     else:

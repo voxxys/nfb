@@ -318,9 +318,9 @@ class CenterOutProtocolWidgetPainter(Painter):
         # center of the outer circles ring, its radius, outer circle radius, center circle radius, segment radius and segment spacing
         self.centerX = 0
         self.centerY = 0
-        self.bigR = 200
-        self.smallR = 25
-        self.centerR = 25
+        self.bigR = 150
+        self.smallR = 22
+        self.centerR = 22
 
         self.arcOuterR = 45
         self.arcInnerR = 35
@@ -469,7 +469,7 @@ class CenterOutProtocolWidgetPainter(Painter):
 
         widget.addItem(self.txt)
 
-        self.whiterect = pg.QtGui.QGraphicsRectItem(1920 / 2 - 35, 1080 / 2 - 50, 100, 100)
+        self.whiterect = pg.QtGui.QGraphicsRectItem(1920 / 2 - 35-50, 1080 / 2 - 50-50, 200, 200)
         self.whiterect.setBrush(pg.mkBrush('w'))
         self.whiterect.setPen(pg.mkPen(None))
         widget.addItem(self.whiterect)

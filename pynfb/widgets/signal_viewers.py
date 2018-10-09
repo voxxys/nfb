@@ -4,13 +4,14 @@ import os
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from scipy import signal, stats
+from pynfb.signal_processing.filters import NotchFilter, IdentityFilter, FilterSequence
 
 paired_colors = ['#dbae57','#57db6c','#dbd657','#57db94','#b9db57','#57dbbb','#91db57','#57d3db','#69db57','#57acdb']
 images_path = os.path.realpath(os.path.dirname(os.path.realpath(__file__)) + '/../static/imag') + '/'
 
 
 class SignalViewer(pg.PlotWidget):
-    def __init__(self, fs, names, seconds_to_plot, overlap, signals_to_plot=None, **kwargs):
+    def __init__(self, fs, names, seconds_to_plot, overlap, signals_to_plot=None, notch_filter=False, **kwargs):
         super(SignalViewer, self).__init__(**kwargs)
         # gui settings
         self.getPlotItem().showGrid(y=True)
@@ -48,12 +49,24 @@ class SignalViewer(pg.PlotWidget):
         self.addItem(self.vertical_line)
         self.redraw_counter = 1
 
+        # notch filter
+        if notch_filter:
+            self.notch_filter_check_box = NotchButton(self)
+            self.notch_filter_check_box.setGeometry(18*2, 0, 100, 100)
+            self.notch_filter = NotchFilter(50, fs, self.n_signals)
+        else:
+            self.notch_filter = None
+
     def update(self, chunk):
 
         # estimate current pos
         chunk_len = len(chunk)
         current_pos = (self.previous_pos + chunk_len) % self.n_samples
         current_x = self.x_mesh[current_pos]
+
+        # notch filter
+        if self.notch_filter is not None and self.notch_filter_check_box.isChecked():
+            chunk = self.notch_filter.apply(chunk)
 
         # update buffer
         if self.previous_pos < current_pos:
@@ -95,6 +108,14 @@ class CuteButton(QtWidgets.QPushButton):
                            "QPushButton:pressed { background-color: #252120 }")
         print(images_path + icon_name)
         self.setIcon(QtGui.QIcon(images_path + icon_name))
+
+
+class NotchButton(QtWidgets.QRadioButton):
+    def __init__(self, parent):
+        super(NotchButton, self).__init__('Notch', parent)
+        self.setMaximumHeight(18)
+        self.setStyleSheet("QRadioButton { background-color: #393231; color: #E5DfC5 }"
+                           "QRadioButtonn:checked { background-color: #252120 }")
 
 
 class RawSignalViewer(SignalViewer):
