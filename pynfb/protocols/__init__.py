@@ -260,6 +260,11 @@ class FingersProtocol(Protocol):
         self.cur_state = 100
         self.istrials = 1
 
+        self.soundpath_end = co_sound_dir_path + '/end.wav'
+        self.sound_end = QSound(self.soundpath_end)
+
+        self.sound_end_on = False
+
         # Construct events sequence with corresponding times
 
         all_events_seq = np.array([0], dtype=np.int)
@@ -357,6 +362,12 @@ class FingersProtocol(Protocol):
         self.is_half_time = False
         self.beep = SingleBeep()
         self.widget_painter.set_message('')
+
+        if self.sound_end_on == False:
+            # winsound.PlaySound(base64.b64decode(self.sound_correct), winsound.SND_MEMORY)
+            self.sound_end.play()
+            self.sound_end_on = True
+
         super(FingersProtocol, self).close_protocol(**kwargs)
         # self.widget_painter.set_message(self.text)
 
@@ -467,20 +478,24 @@ class CenterOutProtocol(Protocol):
         #self.if_4_targets = False # params[5]
 
         self.soundpath_correct = co_sound_dir_path + '/correct.wav'
-
         self.sound_correct = QSound(self.soundpath_correct)
+
+        self.soundpath_end = co_sound_dir_path + '/end.wav'
+        self.sound_end = QSound(self.soundpath_end)
+
+        self.sound_end_on = False
 
         time_to_target = params[0]
         show_target_len = params[1]
         show_turn_len = params[2]
         time_to_move = params[3]
 
-        print('TTT:')
-        print(self.if_vanilla_co)
-        print(time_to_target)
-        print(show_target_len)
-        print(show_turn_len)
-        print(time_to_move)
+        #print('TTT:')
+        #print(self.if_vanilla_co)
+        #print(time_to_target)
+        #print(show_target_len)
+        #print(show_turn_len)
+        #print(time_to_move)
 
         num_trials = 40
 
@@ -499,6 +514,7 @@ class CenterOutProtocol(Protocol):
         self.hoverEnough = 0
         self.hoverCircle = -1
 
+        self.if_last_correct = False
         self.sound_on = False
         evnts = []
         tmp = [0, 0, 0]
@@ -544,6 +560,37 @@ class CenterOutProtocol(Protocol):
         self.onCircle = 1
         start_pause = 5
 
+        if (self.if_vanilla_co):
+            options = np.arange(8)
+        else:
+            options = [0, 2, 4, 6]
+
+        num_types = len(options)
+        num_each_type = num_trials // num_types
+        assert (num_each_type * num_types == num_trials)
+
+        types_order = np.zeros(num_trials)
+        k = 0
+        for i in options:
+            types_order[num_each_type * k:num_each_type * (k + 1)] = np.ones(num_each_type) * i
+            k = k + 1
+
+        types_order = np.random.permutation(types_order)
+
+        options_turn = [-4, -2, 0, 2, 4]
+        num_types_turn = len(options_turn)
+        num_each_type_turn = num_trials // num_types_turn
+        assert (num_each_type_turn * num_types_turn == num_trials)
+
+        types_order_turn = np.zeros(num_trials)
+        k = 0
+        for i in options_turn:
+            types_order_turn[num_each_type_turn * k:num_each_type_turn * (k + 1)] = np.ones(num_each_type_turn) * i
+            k = k + 1
+
+        types_order_turn = np.random.permutation(types_order_turn)
+
+        tr_num = 0
         for i in range(0, num_events_trial * num_trials, num_events_trial):
             for j in range(num_events_trial):
                 if i == 0 and j == 0:
@@ -556,19 +603,27 @@ class CenterOutProtocol(Protocol):
                                                                   timings[j] + timings_range[j])
                     if types[j] == 1:
                         if (self.if_4_targets):
-                            options = [0, 2, 4, 6]
-                            tmp[2] = options[random.randint(0, 3)]
+                            # options = [0,2,4,6]
+                            # mp[2] = options[random.randint(0,3)]
+                            tmp[2] = int(types_order[tr_num])
                         else:
-                            tmp[2] = random.randint(0, 7)
+                            # tmp[2]=random.randint(0,7)
+                            tmp[2] = int(types_order[tr_num])
                     elif types[j] == 2:
                         if (self.if_4_targets):
-                            options = [-4, -2, 0, 2, 4]
-                            tmp[2] = options[random.randint(0, 4)]
+                            # options = [-6,-4,-2,0,2,4,6]
+                            # options = [-4, -2, 0, 2, 4]
+
+                            # tmp[2]=options[random.randint(0,4)]
+                            tmp[2] = int(types_order_turn[tr_num])
+
                         else:
                             tmp[2] = random.randint(-7, 7)
+                            # -360 -270 -180 -90 0 90 180 270 360
                     else:
                         tmp[2] = 0
                 evnts.append([tmp[k] for k in range(len(tmp))])
+            tr_num = tr_num + 1
 
         evnts.append([0, evnts[i + j - 1][1] + 2, 0])
         evnts.append([5, evnts[i + j - 1][1] + 2, 0])
@@ -627,10 +682,13 @@ class CenterOutProtocol(Protocol):
                         # mixer.music.play()
                         # winsound.Beep(900, 150)
                         # play(self.sound_correct)
+                        #self.if_last_correct = True
                         if self.sound_on == False:
                             # winsound.PlaySound(base64.b64decode(self.sound_correct), winsound.SND_MEMORY)
-                            self.sound_correct.play()
-                            self.sound_on = True
+                            if self.cur_par == self.hoverCircle:
+                                self.sound_correct.play()
+                                self.sound_on = True
+
                             # play(self.sound_correct)
                         # winsound.PlaySound(self.soundpath_correct, winsound.SND_FILENAME)
 
@@ -646,6 +704,14 @@ class CenterOutProtocol(Protocol):
                     else:
                         self.startHover = -1
                 self.hoverCircle = dat[0]
+
+            # if self.cur_state == 0:
+            #     if self.if_last_correct:
+            #         self.sound_correct.play()
+            #         self.if_last_correct = False
+
+                # if self.sound_on == False:
+                    #     self.sound_on = True
 
         return None, [self.cur_state, self.cur_par, self.posx, self.posy]
 
@@ -668,10 +734,9 @@ class CenterOutProtocol(Protocol):
                         self.startHover = -1
                         self.hoverEnough = 0
 
-                        self.sound_on = False
-
                     if self.cur_state == 1:
                         self.startSpan = self.cur_par
+                        self.sound_on = False
                     elif self.cur_state == 2:
                         self.plusSpan = self.cur_par
                     elif self.cur_state == 3:
@@ -681,6 +746,7 @@ class CenterOutProtocol(Protocol):
                             self.cur_par = (8 + self.plusSpan + self.startSpan) % 8
                         self.startHover = -1
                         self.hoverEnough = 0
+
                     elif self.cur_state == 5:
                         print('will try to close protocol')
                         # self.close_protocol()
@@ -694,6 +760,12 @@ class CenterOutProtocol(Protocol):
     def close_protocol(self, **kwargs):
         self.is_half_time = False
         self.beep = SingleBeep()
+
+        if self.sound_end_on == False:
+            # winsound.PlaySound(base64.b64decode(self.sound_correct), winsound.SND_MEMORY)
+            self.sound_end.play()
+            self.sound_end_on = True
+
         self.widget_painter.set_message('')
         super(CenterOutProtocol, self).close_protocol(**kwargs)
         # self.widget_painter.set_message(self.text)
