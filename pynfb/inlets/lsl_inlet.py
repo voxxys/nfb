@@ -8,7 +8,7 @@ import socket
 fmt2string = ['undefined', 'float32', 'float64', 'str', 'int32', 'int16',
               'int8', 'int64']
 LSL_STREAM_NAMES = ['AudioCaptureWin', 'NVX136_Data', 'example']
-LSL_RESOLVE_TIMEOUT = 10
+LSL_RESOLVE_TIMEOUT = 20
 
 
 class FixedStreamInfo(StreamInfo):

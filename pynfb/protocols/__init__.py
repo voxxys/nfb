@@ -490,12 +490,12 @@ class CenterOutProtocol(Protocol):
         show_turn_len = params[2]
         time_to_move = params[3]
 
-        print('TTT:')
-        print(self.if_vanilla_co)
-        print(time_to_target)
-        print(show_target_len)
-        print(show_turn_len)
-        print(time_to_move)
+        #print('TTT:')
+        #print(self.if_vanilla_co)
+        #print(time_to_target)
+        #print(show_target_len)
+        #print(show_turn_len)
+        #print(time_to_move)
 
         num_trials = 40
 
@@ -514,6 +514,7 @@ class CenterOutProtocol(Protocol):
         self.hoverEnough = 0
         self.hoverCircle = -1
 
+        self.if_last_correct = False
         self.sound_on = False
         evnts = []
         tmp = [0, 0, 0]
@@ -681,11 +682,13 @@ class CenterOutProtocol(Protocol):
                         # mixer.music.play()
                         # winsound.Beep(900, 150)
                         # play(self.sound_correct)
+                        #self.if_last_correct = True
                         if self.sound_on == False:
                             # winsound.PlaySound(base64.b64decode(self.sound_correct), winsound.SND_MEMORY)
                             if self.cur_par == self.hoverCircle:
                                 self.sound_correct.play()
-                            self.sound_on = True
+                                self.sound_on = True
+
                             # play(self.sound_correct)
                         # winsound.PlaySound(self.soundpath_correct, winsound.SND_FILENAME)
 
@@ -701,6 +704,14 @@ class CenterOutProtocol(Protocol):
                     else:
                         self.startHover = -1
                 self.hoverCircle = dat[0]
+
+            # if self.cur_state == 0:
+            #     if self.if_last_correct:
+            #         self.sound_correct.play()
+            #         self.if_last_correct = False
+
+                # if self.sound_on == False:
+                    #     self.sound_on = True
 
         return None, [self.cur_state, self.cur_par, self.posx, self.posy]
 
