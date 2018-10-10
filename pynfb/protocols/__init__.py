@@ -260,6 +260,11 @@ class FingersProtocol(Protocol):
         self.cur_state = 100
         self.istrials = 1
 
+        self.soundpath_end = co_sound_dir_path + '/end.wav'
+        self.sound_end = QSound(self.soundpath_end)
+
+        self.sound_end_on = False
+
         # Construct events sequence with corresponding times
 
         all_events_seq = np.array([0], dtype=np.int)
@@ -357,6 +362,12 @@ class FingersProtocol(Protocol):
         self.is_half_time = False
         self.beep = SingleBeep()
         self.widget_painter.set_message('')
+
+        if self.sound_end_on == False:
+            # winsound.PlaySound(base64.b64decode(self.sound_correct), winsound.SND_MEMORY)
+            self.sound_end.play()
+            self.sound_end_on = True
+
         super(FingersProtocol, self).close_protocol(**kwargs)
         # self.widget_painter.set_message(self.text)
 
@@ -469,10 +480,10 @@ class CenterOutProtocol(Protocol):
         self.soundpath_correct = co_sound_dir_path + '/correct.wav'
         self.sound_correct = QSound(self.soundpath_correct)
 
-        self.soundpath_end = co_sound_dir_path + '/end.ogx'
+        self.soundpath_end = co_sound_dir_path + '/end.wav'
         self.sound_end = QSound(self.soundpath_end)
 
-        self.sound_end_on == False
+        self.sound_end_on = False
 
         time_to_target = params[0]
         show_target_len = params[1]
@@ -672,7 +683,8 @@ class CenterOutProtocol(Protocol):
                         # play(self.sound_correct)
                         if self.sound_on == False:
                             # winsound.PlaySound(base64.b64decode(self.sound_correct), winsound.SND_MEMORY)
-                            self.sound_correct.play()
+                            if self.cur_par == self.hoverCircle:
+                                self.sound_correct.play()
                             self.sound_on = True
                             # play(self.sound_correct)
                         # winsound.PlaySound(self.soundpath_correct, winsound.SND_FILENAME)
@@ -711,10 +723,9 @@ class CenterOutProtocol(Protocol):
                         self.startHover = -1
                         self.hoverEnough = 0
 
-                        self.sound_on = False
-
                     if self.cur_state == 1:
                         self.startSpan = self.cur_par
+                        self.sound_on = False
                     elif self.cur_state == 2:
                         self.plusSpan = self.cur_par
                     elif self.cur_state == 3:
@@ -724,6 +735,7 @@ class CenterOutProtocol(Protocol):
                             self.cur_par = (8 + self.plusSpan + self.startSpan) % 8
                         self.startHover = -1
                         self.hoverEnough = 0
+
                     elif self.cur_state == 5:
                         print('will try to close protocol')
                         # self.close_protocol()
