@@ -475,12 +475,12 @@ class CenterOutProtocol(Protocol):
         show_turn_len = params[2]
         time_to_move = params[3]
 
-        print('TTT:')
-        print(self.if_vanilla_co)
-        print(time_to_target)
-        print(show_target_len)
-        print(show_turn_len)
-        print(time_to_move)
+        #print('TTT:')
+        #print(self.if_vanilla_co)
+        #print(time_to_target)
+        #print(show_target_len)
+        #print(show_turn_len)
+        #print(time_to_move)
 
         num_trials = 40
 

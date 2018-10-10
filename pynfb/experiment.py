@@ -25,6 +25,7 @@ from .windows import MainWindow
 from ._titles import WAIT_BAR_MESSAGES
 import mne
 
+import logging
 
 # helpers
 def int_or_none(string):
@@ -316,6 +317,10 @@ class Experiment():
         self.dir_name = 'results/{}_{}/'.format(self.params['sExperimentName'], timestamp_str)
         os.makedirs(self.dir_name)
 
+        # configure logger to save logs to the same folder as experiment results
+        log_path = self.dir_name + 'experiment_log.log'
+        logging.basicConfig(filename=log_path, level=logging.DEBUG)
+
         wait_bar = WaitMessage(WAIT_BAR_MESSAGES['EXPERIMENT_START']).show_and_return()
 
         self.test_mode = False
@@ -379,7 +384,11 @@ class Experiment():
         self.n_channels_other = self.stream.get_n_channels_other()
         channels_labels = self.stream.get_channels_labels()
         montage = Montage(channels_labels)
+
+        logging.info('Montage:')
+        logging.info('\n' + repr(montage))
         print(montage)
+
         self.seconds = 2 * self.freq
         self.raw_std = None
 
@@ -498,7 +507,11 @@ class Experiment():
         # protocols sequence
         names = [protocol.name for protocol in self.protocols]
         group_names = [p['sName'] for p in self.params['vPGroups']['PGroup']]
+
+        logging.info('Protocol group names:')
+        logging.info('\n' + repr(group_names))
         print(group_names)
+
         self.protocols_sequence = []
         for name in self.params['vPSequence']:
             if name in names:
@@ -513,6 +526,8 @@ class Experiment():
                     subgroup = list(subgroup[np.random.permutation(len(subgroup))])
                 else:
                     subgroup = [k for k in chain(*zip_longest(*subgroup)) if k is not None]
+                logging.info('Subgroup:')
+                logging.info('\n' + repr(subgroup))
                 print(subgroup)
                 for subname in subgroup:
                     self.protocols_sequence.append(self.protocols[names.index(subname)])
@@ -560,6 +575,8 @@ class Experiment():
         # save init signals
         save_signals(self.dir_name + 'experiment_data.h5', self.signals,
                      group_name='protocol0')
+
+
 
         # save settings
         params_to_xml_file(self.params, self.dir_name + 'settings.xml')

@@ -2,6 +2,8 @@ import numpy as np
 import h5py
 from ..signals import DerivedSignal, CompositeSignal, BCISignal
 
+import logging
+
 
 def save_h5py(file_path, data, dataset_name='dataset'):
     with h5py.File(file_path, 'a') as f:
@@ -52,6 +54,15 @@ def save_channels_and_fs(file_path, channels, fs):
 def save_signals(file_path, signals, group_name='protocol0', raw_data=None, timestamp_data=None, signals_data=None,
                  raw_other_data=None, reward_data=None, protocol_name='unknown', mock_previous=0, mark_data=None, state_data=None, par_data=None, posx_data=None, posy_data=None):
     print('Signals stats saving', group_name)
+
+    print(file_path)
+
+    log_path = '/'.join(file_path.split('/')[:-1]) + '/' + 'experiment_log.log'
+
+    logging.basicConfig(filename=log_path, level=logging.DEBUG)
+
+    logging.info('Saving signals for ' + group_name)
+
     with h5py.File(file_path, 'a') as f:
         main_group = f.create_group(group_name)
         main_group.attrs['name'] = protocol_name
@@ -98,6 +109,9 @@ def save_signals(file_path, signals, group_name='protocol0', raw_data=None, time
             main_group.create_dataset('posx_data', data=posx_data, compression="gzip")
         if posy_data is not None:
             main_group.create_dataset('posy_data', data=posy_data, compression="gzip")
+
+    logging.info('Signals saved')
+
     pass
 
 
