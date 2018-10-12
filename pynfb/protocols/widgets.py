@@ -320,10 +320,10 @@ class CenterOutProtocolWidgetPainter(Painter):
         self.centerY = 0
         self.bigR = 150
         self.smallR = 22
-        self.centerR = 22
+        self.centerR = 40
 
-        self.arcOuterR = 45
-        self.arcInnerR = 35
+        self.arcOuterR = 60
+        self.arcInnerR = 50
         self.arcSpacing = 0
         self.arcArrowWidth = 20
         self.arcPolyPoints = 30
@@ -475,7 +475,7 @@ class CenterOutProtocolWidgetPainter(Painter):
         widget.addItem(self.whiterect)
         self.whiterect.hide()
 
-        newfont = QFont("Calibri", 16, QFont.Bold)
+        newfont = QFont("Calibri", 20, QFont.Bold)
         self.txt.setFont(newfont)
         self.txt.setX(0)
         self.txt.setY(0)
@@ -633,10 +633,10 @@ class CenterOutProtocolWidgetPainter(Painter):
                 # self.txt.setText(str(par))
             else:
                 for i in range(7):
-                    self.arcSegments[i].show()
+                    # self.arcSegments[i].show()
                     # self.txt.setText(str(par * 45)+'°')
-                    self.txt.setText(' ' + str(360) + '°')
-                self.arcUpArrow[7].show()
+                    self.txt.setText(' ' + str(0) + '°')
+                #self.arcUpArrow[7].show()
 
                 # self.txt.setText(str(par))
             if (self.use_photo_trigger):
